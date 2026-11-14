@@ -1,9 +1,16 @@
-# ElyBeauty — Master Project Architecture Document (PAD) v2.44
+# ElyBeauty — Master Project Architecture Document (PAD) v2.45
 
 **Classification:** Internal Engineering Reference
 **Status:** DEFINITIVE, PRODUCTION-LOCKED BLUEPRINT
 **Companion Document:** `README.md` (quick start), `AGENTS.md` (agent traps), `CLAUDE.md` (conventions)
-**Last Updated:** 2026-11-13
+**Last Updated:** 2026-11-15
+
+#### Revision Block — v2.45 (Run 118 — the zero-defect verification & console-error-count pin cycle)
+
+- `[SR]` **The audit-118-a envelope — a zero-defect cycle, one INFO remediated as a pin, plus four recorded no-action**: 12/12 standing anchors PASS · 0 CRITICAL/HIGH/MEDIUM/LOW · 5 INFO. The operator's post-gate `session_92.md` paste (the run-117 final recap) is the FIRST clean paste since the run-109 re-leak streak began — no credential shape landed in the tracked corpus, `docs/start_server_log.txt` still holds the run-117 placeholder, and the 861/861 baseline ran ZERO RED. The INFOs: (1) the console.error prose-count drift — the frozen run-117 narratives say "13 deliberate console.error boundary sites" while the measured reality (already true on run-117's own green tree) is **14 call sites across 6 files** (webhook×8, payment-intent×2, checkout×1, `(storefront)/error.tsx`×1, `actions/admin.ts`×1, `actions/reviews.ts`×1) — the run-114 copied-count lesson repeating; (2) the bare username fragment in frozen plan history (the documented exemption); (3) the git author-metadata identifier now 143 rows (operator-side); (4) the frozen Session-50 numeric-collision pointer (`session_92.md` cited by a HomeNest-era narrative — frozen history); (5) the positive clean-paste confirmation.
+- `[FIX]` **The console-error-count pin (TDD-first, audit 118-a INFO-1 — the cycle's only test-suite change)**: `tests/unit/console-error-count.test.ts` (the S114-2 `api-seam-counts` filesystem-derivation convention — reading `src/` directly) pins S118-2a exactly 14 `console.error(` call sites across exactly the 6 enumerated files (with the per-file breakdown asserted) and S118-2b the boundary-logger discipline — zero `console.log|debug|info|warn|trace|dir|table` CALLS in src/ (paren-aware matching keeps prose "the console" comments legal). The unit count moves **861 → 863** (+2 pins, 73 files); the count-lockstep fired RED BY NAME on exactly the live-tense 861 sites (README ×4 · CLAUDE ×1 · PAD §1.2/§8.1/§12 · SKILL project_state) after the `UNIT_TESTS` constant bump → GREEN in one sweep. The frozen run-117 "13" narratives stay frozen (append-only); every live-tense surface now carries 14 — and the pin makes the number mechanically checked forever. No `src/` changes this cycle.
+- `[VERIFY]` **Parity zero-delta on every pinned surface for the EIGHTH consecutive cycle, the S110-4 state machine and the F-2 header-icon path both re-measured live on BOTH sites** (mobile 390×844, the reference logged in, matched methodology): the panel rows reference 89/125/161/197/233 vs clone 88/124/160/196/232 (−1px uniform, hrefs/labels/tags byte-identical — Search a BUTTON, the four links As) · the S110-4 SEARCH-row state machine matching both sides (header 278/277 → 64 at overlay-open, panel unmounts, stays closed after exit, hamburger re-opens the full 5-row panel) · the F-2 header-icon path: the reference KEEPS the panel mounted (header stays 278, panel still visible after overlay exit) and the clone matches at 277 · the "e" typeahead byte-identical in names AND prices through row 8 ($370/$288/$340/$470/$470/$540/$665/$340; geometry 174/258/342/426/510/594/678/762 BUTTONs vs clone −1px uniform As) · the no-results copy byte-identical · the About h1 both · /shop 19 unique cards bonnet-first. **The mobile nav is functional on both sites — no TailwindCSS v4 bug.** One environment misconfiguration was caught at baseline WITHOUT code impact (a first `.env` carrying `NEXT_PUBLIC_DEMO_MODE="true"` failing the S13-1/S92-2e production-posture pins exactly as designed — the documented fresh-`.env` contract rebuilt and re-ran 93/93).
+- `[CHORE]` **The lockstep + housekeeping**: the plan-range lockstep 2..117 → 2..118 (RED by name on exactly AGENTS.md → GREEN); 25/25 screenshots (all valid PNGs — the traffic-owned families 03/12/14/19 at 3–14% real fresh-DB pixel drift, the admin-table/chart rasters, PLUS a persistent ±1-LSB text anti-aliasing raster class across the static shots at 0.01–0.06%: this sandbox generation's Chromium rasterizer, the run-50 environmental-raster-noise class, content verified byte-identical by the live parity battery); the count lockstep 861 → 863 (the `UNIT_TESTS` constant + every live-tense site swept BY NAME); SKILL v2.44.0 (the run-118 project_state with the corrected 14-count, run-117 compressed to PREVIOUS, the Appendix B signpost to runs 89–118 / v2.17–v2.45); worklog Task 112; the polished `session_93.md` + the raw narrative `session_94.md` (the next free pair — the operator's `session_92.md` paste occupies 92).
 
 #### Revision Block — v2.44 (Run 117 — the server-log secret re-leak & header-icon parity-measurement cycle)
 
@@ -717,7 +724,7 @@ The starting point of this remediation was a client-only Vite SPA that kept the 
 | UI primitives | Radix UI (dialog, label, select, slot, toast) + CVA + lucide-react | latest | Accessible primitives; the shadcn pattern without the CLI |
 | Charts | Recharts | ^3 | Admin revenue + analytics surfaces |
 | Validation | Zod | ^4.6.7 | Single validation boundary (ADR-005) — v4 since run 86 (S86-1) |
-| Unit tests | Vitest | ^4.1.12 | Node-env suite (861 tests; grew with every remediation session — the session-61 Stripe retrofit, the session-73/74 parity pins, the S88 toolchain pins, the run-94 replay/rotation pins, the run-95 content-resync + docs-counts pins, the run-96 SEO-fallback + accent pins, the run-97 secret-floor + whitespace/lockstep pins — see §8.1; vitest 4.1.12 retired the tinypool/@vitest/mocker advisories) |
+| Unit tests | Vitest | ^4.1.12 | Node-env suite (863 tests; grew with every remediation session — the session-61 Stripe retrofit, the session-73/74 parity pins, the S88 toolchain pins, the run-94 replay/rotation pins, the run-95 content-resync + docs-counts pins, the run-96 SEO-fallback + accent pins, the run-97 secret-floor + whitespace/lockstep pins — see §8.1; vitest 4.1.12 retired the tinypool/@vitest/mocker advisories) |
 | E2E tests | Playwright | ^1.64 | 93 tests incl. the Tailwind v4 mobile-nav regression guard + the 404 CSP-hydration pin (S69-2) + the S75 measured-frame geometry pins + the S92-2f password-change round-trip |
 | Fonts | next/font (Cormorant Garamond + Inter) | — | Self-hosted at build, no runtime font requests |
 
@@ -967,7 +974,7 @@ None. There are no queues, cron jobs, or background workers. Long-running concer
 
 **Two suites, one gate:** `npm run lint && npm run typecheck && npm run typecheck:tests && npm run test && npm run build && npm run test:e2e` — all must be green; there is no hosted CI, so this local gate is the only gate.
 
-### 8.1 Unit (Vitest, node env — 861 tests, `tests/unit/`)
+### 8.1 Unit (Vitest, node env — 863 tests, `tests/unit/`)
 
 | File | Pins |
 |---|---|
@@ -1242,7 +1249,7 @@ See the table in `AGENTS.md` (authoritative). Clean-check order: `lint → typec
 | `src/components/store/store-chrome.tsx` | Sticky header + mobile panel + cart drawer |
 | `src/app/(storefront)/admin/coupons/` | The S19-5 coupon-management surface (page + dialog island) |
 | `prisma/schema.prisma` / `seed.ts` | 20 models / idempotent seed |
-| `tests/unit/*` · `tests/e2e/*` | 861 unit · 93 e2e (incl. the v4 guard + tracking access contract + the session-11 through session-27 hardening/wiring pins + the session-61 Stripe seam/engine pins + the session-69 404 CSP-hydration pin + the session-73 server-derived-shipping/variant-composition pins + the session-75 measured-frame pins + the run-76 scan-guard/card-anatomy/gallery pins + the run-94 replay/rotation pins + the run-95 content-resync/docs-counts pins + the run-96 SEO-fallback/accent pins + the run-97 secret-floor/whitespace/lockstep pins) |
+| `tests/unit/*` · `tests/e2e/*` | 863 unit · 93 e2e (incl. the v4 guard + tracking access contract + the session-11 through session-27 hardening/wiring pins + the session-61 Stripe seam/engine pins + the session-69 404 CSP-hydration pin + the session-73 server-derived-shipping/variant-composition pins + the session-75 measured-frame pins + the run-76 scan-guard/card-anatomy/gallery pins + the run-94 replay/rotation pins + the run-95 content-resync/docs-counts pins + the run-96 SEO-fallback/accent pins + the run-97 secret-floor/whitespace/lockstep pins) |
 | `playwright.config.ts` / `vitest.config.ts` | Suite wiring (standalone webServer; iPhone-13-on-Chromium project) |
 
 ---
