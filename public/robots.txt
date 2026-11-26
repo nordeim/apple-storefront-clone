@@ -1,0 +1,9 @@
+# Educational clone of the Apple Singapore storefront (unaffiliated demo).
+# Crawlers: the app routes by hash fragment, so every route collapses onto
+# the entry URL for indexing; the sitemap still enumerates the full route
+# set for tooling. See README.md "SEO" and the PAD's routing ADR.
+
+User-agent: *
+Allow: /
+
+Sitemap: http://localhost:5173/sitemap.xml
