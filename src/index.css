@@ -1,8 +1,18 @@
 @import "tailwindcss";
 
-/* Tailwind v4 scans every non-ignored text file; keep prose out of the class-candidate graph. */
+/* Tailwind v4 auto-detection scans every non-ignored text file under the repo
+   root. The vendored skills/ library and the long engineering docs at the root
+   are prose, not class sources — without these exclusions their class-shaped
+   tokens (bg-red-*, container, w-96, …) leak into the shipped CSS. */
+@source not "../skills";
 @source not "../docs";
 @source not "../README.md";
+@source not "../AGENTS.md";
+@source not "../CLAUDE.md";
+@source not "../Project_Architecture_Document.md";
+@source not "../apple-storefront-clone_SKILL.md";
+@source not "../ely-beauty_SKILL.md";
+@source not "../worklog.md";
 
 @theme {
   --font-display: "SF Pro Display", "SF Pro Icons", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;

@@ -16,4 +16,15 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  // The vendored skills/ folder is documentation, not source. Without this,
+  // Vite's dependency scanner crawls every HTML file under skills/ and dies on
+  // imports that exist only there (e.g. `three` in a reference template).
+  optimizeDeps: {
+    entries: ["index.html"],
+  },
+  server: {
+    watch: {
+      ignored: ["**/skills/**", "**/docs/**"],
+    },
+  },
 });
