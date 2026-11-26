@@ -1,0 +1,42 @@
+# NORDHEM (ikeasg-furnishing-store) — local PostgreSQL via Docker.
+#
+# Usage:
+#   Start:   docker compose up -d
+#   Stop:    docker compose down
+#   Reset:   docker compose down -v  (WARNING: deletes all data)
+#   Logs:    docker compose logs -f postgres
+#
+# The credentials/port match drizzle.config.json exactly
+# (postgresql://postgres:postgres@127.0.0.1:5432/app_db; the port is bound to
+# loopback only — postgres:postgres must never be network-reachable). After the
+# first `docker compose up -d`, run `npm run db:setup` from the repo root
+# (drizzle-kit push creates the 7 tables, then the seed runs) — or push and let
+# the app's first catalog read seed it (ensureCatalog in src/db/seed.ts).
+
+services:
+
+  # ─── PostgreSQL 17 ───────────────────────────────────────────────
+  postgres:
+    image: postgres:17-alpine
+    container_name: ikeasg_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+# ─── Named Volumes ─────────────────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
