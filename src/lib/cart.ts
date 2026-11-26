@@ -1,251 +1,93 @@
-/**
- * Server-side cart — DB-backed with a guest token cookie.
- *
- * The cart is the same Cart row whether the visitor is a guest (token cookie)
- * or signed in (userId claim). On login the guest cart is claimed by userId;
- * if the user already had a cart, the guest items are merged into it.
- */
-import { randomBytes } from "node:crypto";
-import { cookies } from "next/headers";
-import { Prisma } from "@prisma/client";
-import { db } from "./db";
-import { splitBulkKey } from "./cart-bulk";
-import { computeMergedQuantities, stockMapForCompositeKeys } from "./cart-merge";
+import { getProduct, type Product } from "./catalog";
 
-export const CART_COOKIE = "homenest_cart";
-const CART_TTL_S = 60 * 60 * 24 * 60; // 60 days
+export const MAX_LINE_QUANTITY = 10;
 
-export type CartLine = {
-  id: string;
+export interface CartLine {
   productId: string;
-  name: string;
-  slug: string;
-  image: string;
-  unitPrice: number; // cents
+  /** option id -> choice id */
+  selections: Record<string, string>;
   quantity: number;
-  stock: number;
-  lineTotal: number; // cents
-  /** ElyBeauty variant ("Pink", "0.5mm", …); "" = no variant (run-72). */
-  variant: string;
-};
-
-export type CartSummary = {
-  lines: CartLine[];
-  itemCount: number;
-  subtotal: number; // cents
-};
-
-/**
- * The delete filter checkout uses to clear the cart (session-12 S12-1): ONLY
- * the lines that were snapshotted into the order — never the whole cart. A
- * line added by a concurrent tab between the pre-tx summary read and the
- * in-tx delete survives checkout instead of silently vanishing (unordered,
- * unrestocked, invisible to the receipt). The cartId stays in the compound
- * filter so a stray id can never touch another cart's rows.
- */
-export function cartClearFilter(cartId: string, lines: readonly CartLine[]): { cartId: string; id: { in: string[] } } {
-  return { cartId, id: { in: lines.map((line) => line.id) } };
 }
 
-function parseImages(json: string): string[] {
-  try {
-    const parsed: unknown = JSON.parse(json);
-    return Array.isArray(parsed) ? parsed.filter((v): v is string => typeof v === "string") : [];
-  } catch {
-    return [];
+export type CartAction =
+  | { type: "add"; line: CartLine }
+  | { type: "setQuantity"; key: string; quantity: number }
+  | { type: "remove"; key: string }
+  | { type: "clear" };
+
+export function lineKey(productId: string, selections: Record<string, string>): string {
+  const parts = Object.entries(selections)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, v]) => `${k}=${v}`);
+  return `${productId}|${parts.join(",")}`;
+}
+
+export function defaultSelections(product: Product): Record<string, string> {
+  const selections: Record<string, string> = {};
+  for (const option of product.options) {
+    const first = option.choices[0];
+    if (first) selections[option.id] = first.id;
   }
+  return selections;
 }
 
-/** Read the cart token cookie, or null. */
-export async function readCartToken(): Promise<string | null> {
-  const store = await cookies();
-  return store.get(CART_COOKIE)?.value ?? null;
+export function unitPrice(product: Product, selections: Record<string, string>): number {
+  let total = product.basePrice;
+  for (const option of product.options) {
+    const choice = option.choices.find((c) => c.id === selections[option.id]);
+    if (choice) total += choice.deltaSgd;
+  }
+  return total;
 }
 
-/** Get (or lazily create) the caller's cart id, setting the cookie for guests. */
-export async function getOrCreateCart(userId: string | null): Promise<string> {
-  const store = await cookies();
-  const token = store.get(CART_COOKIE)?.value;
+export function describeSelections(product: Product, selections: Record<string, string>): string[] {
+  const labels: string[] = [];
+  for (const option of product.options) {
+    const choice = option.choices.find((c) => c.id === selections[option.id]);
+    if (choice) labels.push(choice.label);
+  }
+  return labels;
+}
 
-  if (userId) {
-    // Signed in: the user's own cart wins.
-    const own = await db.cart.findUnique({ where: { userId } });
-    if (own) {
-      // Merge a guest cart into the user cart if one rides along. The whole
-      // merge (read → planned upserts → guest-cart delete → token rotation)
-      // runs inside ONE transaction — a mid-loop failure must never leave a
-      // half-merged guest cart behind (session-5 S5-7). Quantities come from
-      // the pure planner (tests/unit/cart-merge.test.ts): per-product sums,
-      // 99 ceiling, zero-sum lines dropped — and the writes are idempotent
-      // final quantities (`update: { quantity }`, not `increment`), so a
-      // retried merge can never double-count.
-      if (token && token !== own.token) {
-        const guest = await db.cart.findUnique({
-          where: { token },
-          include: { items: true },
-        });
-        if (guest) {
-          const ownItems = await db.cartItem.findMany({
-            where: { cartId: own.id },
-            select: { productId: true, quantity: true, variant: true },
-          });
-          // Current stock pins the plan's third clamp dimension (session-6
-          // S6-6): a merged line can never exceed what checkout would accept.
-          // Run-72: the merge plan keys on (productId, variant) — the same
-          // product in two colors merges per variant, and each variant line
-          // clamps to the product's stock independently. S73-2: the stock map
-          // is keyed by the SAME composite keys (the plain-keyed map made the
-          // clamp dead code — the planner's get() never hit).
-          const planIds = [...new Set([...ownItems, ...guest.items].map((i) => i.productId))];
-          const stockRows = await db.product.findMany({
-            where: { id: { in: planIds } },
-            select: { id: true, stock: true },
-          });
-          const stockById = stockMapForCompositeKeys(
-            [...ownItems, ...guest.items].map((i) => ({ productId: i.productId, variant: i.variant ?? "" })),
-            stockRows,
-          );
-          const plan = computeMergedQuantities(
-            ownItems.map((i) => ({ productId: `${i.productId}|${i.variant ?? ""}`, quantity: i.quantity })),
-            guest.items.map((i) => ({ productId: `${i.productId}|${i.variant ?? ""}`, quantity: i.quantity })),
-            stockById,
-          );
+const clampQuantity = (quantity: number) => Math.min(MAX_LINE_QUANTITY, Math.max(0, quantity));
 
-          const newToken = randomBytes(24).toString("base64url");
-          const mergedId = await db.$transaction(async (tx) => {
-            for (const [planKey, quantity] of plan) {
-              // S74-12 (F-6): single-source the composite-key split through
-              // splitBulkKey (first-pipe semantics + the no-pipe guard).
-              const { productId, variant } = splitBulkKey(planKey);
-              if (!productId) continue;
-              await tx.cartItem.upsert({
-                where: { cartId_productId_variant: { cartId: own.id, productId, variant } },
-                create: { cartId: own.id, productId, variant, quantity },
-                update: { quantity },
-              });
-            }
-            await tx.cart.delete({ where: { id: guest.id } }).catch(() => undefined);
-            const merged = await tx.cart.update({ where: { id: own.id }, data: { token: newToken } });
-            return merged.id;
-          });
-
-          // Cookie write happens after the tx commits (cookies() is request-
-          // scoped, not transactional) — a retry re-derives the same plan.
-          store.set(CART_COOKIE, newToken, { ...cookieOptions(), maxAge: CART_TTL_S });
-          return mergedId;
-        }
+export function cartReducer(lines: readonly CartLine[], action: CartAction): CartLine[] {
+  switch (action.type) {
+    case "add": {
+      const { line } = action;
+      if (!getProduct(line.productId) || !Number.isInteger(line.quantity) || line.quantity < 1) {
+        return [...lines];
       }
-      return own.id;
+      const key = lineKey(line.productId, line.selections);
+      const existing = lines.find((l) => lineKey(l.productId, l.selections) === key);
+      if (!existing) return [...lines, { ...line, quantity: clampQuantity(line.quantity) }];
+      return lines.map((l) =>
+        l === existing ? { ...l, quantity: clampQuantity(l.quantity + line.quantity) } : l,
+      );
     }
-    const created = await safeCreateCart(userId, token, store);
-    store.set(CART_COOKIE, created.token, { ...cookieOptions(), maxAge: CART_TTL_S });
-    return created.id;
-  }
-
-  // Guest: token cookie identifies the cart.
-  if (token) {
-    const existing = await db.cart.findUnique({ where: { token } });
-    if (existing) return existing.id;
-  }
-  const newToken = randomBytes(24).toString("base64url");
-  const created = await db.cart.create({ data: { token: newToken } });
-  store.set(CART_COOKIE, newToken, { ...cookieOptions(), maxAge: CART_TTL_S });
-  return created.id;
-}
-
-/**
- * Create the user's cart, surviving the token @unique race (session-6 S6-2):
- * two concurrent first requests can both observe "no cart" and both create —
- * the loser hits P2002 and re-reads the winner instead of 500ing.
- *
- * Session-7 S7-1: the P2002 winner is frequently the GUEST cart that holds
- * the cookie token (the common first-login path — user has no own cart yet).
- * The row is claimed here with a GUARDED update (`userId: null` in the where —
- * it can never steal a row another user already owns); a claim that loses a
- * concurrent-create race self-heals on the next request, when getOrCreateCart
- * finds the own cart and the cookie token still triggers the merge branch.
- */
-async function safeCreateCart(
-  userId: string,
-  token: string | undefined,
-  store: Awaited<ReturnType<typeof cookies>>,
-): Promise<{ id: string; token: string }> {
-  try {
-    return await db.cart.create({
-      data: { userId, token: token ?? randomBytes(24).toString("base64url") },
-    });
-  } catch (error) {
-    if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== "P2002") {
-      throw error;
+    case "setQuantity": {
+      if (!Number.isInteger(action.quantity)) return [...lines];
+      if (action.quantity <= 0) return lines.filter((l) => lineKey(l.productId, l.selections) !== action.key);
+      return lines.map((l) =>
+        lineKey(l.productId, l.selections) === action.key
+          ? { ...l, quantity: clampQuantity(action.quantity) }
+          : l,
+      );
     }
-    const winner = await db.cart.findFirst({
-      where: token ? { token } : { userId },
-      orderBy: { id: "asc" },
-    });
-    if (winner) {
-      // Claim an unclaimed (guest) winner. Guarded on userId: null so a
-      // colliding row owned by someone else is never touched. A P2002 here
-      // means a concurrent request created the user's own cart mid-claim —
-      // best-effort: the regular merge path reconciles on the next call.
-      await db.cart
-        .updateMany({ where: { id: winner.id, userId: null }, data: { userId } })
-        .catch(() => undefined);
-      return winner;
-    }
-    throw error;
+    case "remove":
+      return lines.filter((l) => lineKey(l.productId, l.selections) !== action.key);
+    case "clear":
+      return [];
   }
 }
 
-/** Best-effort read of the current cart's id (never creates). */
-export async function findCartId(userId: string | null): Promise<string | null> {
-  if (userId) {
-    const own = await db.cart.findUnique({ where: { userId } });
-    if (own) return own.id;
-  }
-  const token = await readCartToken();
-  if (!token) return null;
-  const guest = await db.cart.findUnique({ where: { token } });
-  return guest?.id ?? null;
+export function cartCount(lines: readonly CartLine[]): number {
+  return lines.reduce((sum, l) => sum + l.quantity, 0);
 }
 
-/** Shared cookie attributes for all durable token cookies (cart, wishlist). */
-export function cookieOptions() {
-  return {
-    httpOnly: true,
-    sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-  };
-}
-
-/** Full cart lines joined against products, with derived totals. */
-export async function getCartSummary(cartId: string | null): Promise<CartSummary> {
-  if (!cartId) return { lines: [], itemCount: 0, subtotal: 0 };
-  const cart = await db.cart.findUnique({
-    where: { id: cartId },
-    include: {
-      items: {
-        include: { product: true },
-        orderBy: { createdAt: "asc" },
-      },
-    },
-  });
-  if (!cart) return { lines: [], itemCount: 0, subtotal: 0 };
-  const lines: CartLine[] = cart.items.map((item) => ({
-    id: item.id,
-    productId: item.productId,
-    name: item.product.name,
-    slug: item.product.slug,
-    image: parseImages(item.product.images)[0] ?? "/images/placeholder.svg",
-    unitPrice: item.product.price,
-    quantity: item.quantity,
-    stock: item.product.stock,
-    lineTotal: item.product.price * item.quantity,
-    variant: item.variant ?? "",
-  }));
-  return {
-    lines,
-    itemCount: lines.reduce((sum, l) => sum + l.quantity, 0),
-    subtotal: lines.reduce((sum, l) => sum + l.lineTotal, 0),
-  };
+export function cartSubtotal(lines: readonly CartLine[]): number {
+  return lines.reduce((sum, l) => {
+    const product = getProduct(l.productId);
+    return product ? sum + unitPrice(product, l.selections) * l.quantity : sum;
+  }, 0);
 }
