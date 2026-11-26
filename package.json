@@ -1,12 +1,21 @@
 {
-  "name": "react-vite-tailwind",
+  "name": "apple-storefront-clone",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "typecheck:tests": "tsc --noEmit -p tsconfig.tests.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:smoke": "node tests/e2e/smoke.mjs",
+    "sitemap": "node scripts/build-sitemap.mjs",
+    "gate": "npm run lint && npm run typecheck && npm run typecheck:tests && npm run test && npm run build && npm run test:e2e && npm run test:smoke"
   },
   "dependencies": {
     "clsx": "2.1.1",
@@ -15,6 +24,7 @@
     "tailwind-merge": "3.4.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/vite": "4.1.17",
     "@testing-library/dom": "10.4.2",
     "@testing-library/react": "16.3.3",
@@ -22,9 +32,14 @@
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.1",
+    "eslint": "^10.15.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.8",
+    "globals": "^17.14.0",
     "jsdom": "29.1.1",
     "tailwindcss": "4.1.17",
     "typescript": "5.9.3",
+    "typescript-eslint": "^8.74.0",
     "vite": "7.3.7",
     "vite-plugin-singlefile": "2.3.0",
     "vitest": "4.1.12"
