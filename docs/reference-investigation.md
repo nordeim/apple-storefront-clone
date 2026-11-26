@@ -48,11 +48,24 @@ Verified for Chromium at 1440×900 and 390×844 by `tests/e2e/smoke.mjs` ("token
 
 ## Verification ledger (this build)
 
+> Refreshed 2026-11-27 by the remediation cycle (`docs/REMEDIATION_PLAN.md`).
+> The as-committed `sonnet 5.5 v1` tree could NOT satisfy these rows — the
+> stale `postcss.config.mjs` broke both the build and the dev server until it
+> was removed (see the deviations note below).
+
 | Check | Result |
 |---|---|
 | `npx tsc --noEmit` | clean (Verified) |
-| `npx vitest run` | 5 files, 44 tests pass (Verified) |
-| `npm run build` | succeeds, `dist/index.html` single file (Verified) |
-| `tests/e2e/smoke.mjs` (headless Chromium) | 45/45 PASS, 0 console errors/warnings (Verified) |
+| `npx tsc --noEmit -p tsconfig.tests.json` | clean (Verified) |
+| `npx vitest run` | 6 files, 50 tests pass (Verified) |
+| `npm run lint` | 0 errors (Verified) |
+| `npm run build` | succeeds, `dist/index.html` single file, 301.5 kB / 91.4 kB gzip, CSS 31.6 kB / 476 rules (Verified) |
+| `npm run test:e2e` (Playwright over `vite preview`) | 21/21 PASS (Verified) |
+| `tests/e2e/smoke.mjs` (headless Chromium, `file://`) | 45/45 PASS, 0 console errors/warnings (Verified) |
+| Mobile navigation re-measured on the dev server (agent-browser, 390×844) | menu opens/navigates/closes; geometry + typography correct; no Tailwind v4 display-toggling defect (Verified) |
 | Visual review of screenshots (desktop home, mobile, product) | done by eye; no pixel diff (Verified for what was viewed) |
 | Safari / Firefox / real devices / screen readers | not run (Unknown: not available in this sandbox) |
+
+Deviation D8's side-gutter behavior and all other rows above remain as
+originally measured; the remediation did not change any visual token (the
+e2e token assertions are byte-identical to the original smoke assertions).
