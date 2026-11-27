@@ -3,7 +3,7 @@ import { EntertainmentGallery } from "@/components/EntertainmentGallery";
 import { PageShell, PageTitle } from "@/components/PageShell";
 import { useBag } from "@/context/BagContext";
 import { routeHref } from "@/lib/router";
-import { INFO_TITLES, SUPPORT_PHONE_DISPLAY, SUPPORT_PHONE_TEL } from "@/lib/site-content";
+import { INFO_TITLES, slugify, SUPPORT_PHONE_DISPLAY, SUPPORT_PHONE_TEL } from "@/lib/site-content";
 
 const SERVICES = [
   { title: "Apple TV+", copy: "Award-winning originals, films and live sports." },
@@ -63,7 +63,7 @@ export function SupportPage() {
         {SUPPORT_TOPICS.map((t) => (
           <li key={t}>
             <a
-              href={routeHref.info(t.toLowerCase().replace(/[^a-z0-9]+/g, "-"))}
+              href={routeHref.info(slugify(t))}
               className="block rounded-[20px] bg-[#f5f5f7] p-6 font-display text-xl font-semibold text-inherit no-underline hover:bg-[#ececf0]"
             >
               {t}

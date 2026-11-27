@@ -20,7 +20,8 @@ describe("siteRoutes", () => {
   it("is unique and sorted deterministically", () => {
     const paths = siteRoutes().map((r) => r.path);
     expect(new Set(paths).size).toBe(paths.length);
-    const sorted = [...paths].sort();
+    // same comparator as the seam's sort — locale-safe, not code-unit order
+    const sorted = [...paths].sort((a, b) => a.localeCompare(b));
     expect(paths).toEqual(sorted);
   });
 

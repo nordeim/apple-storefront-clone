@@ -51,12 +51,13 @@ export function describeSelections(product: Product, selections: Record<string, 
 
 const clampQuantity = (quantity: number) => Math.min(MAX_LINE_QUANTITY, Math.max(0, quantity));
 
-export function cartReducer(lines: readonly CartLine[], action: CartAction): CartLine[] {
+export function cartReducer(lines: readonly CartLine[], action: CartAction): readonly CartLine[] {
   switch (action.type) {
     case "add": {
       const { line } = action;
       if (!getProduct(line.productId) || !Number.isInteger(line.quantity) || line.quantity < 1) {
-        return [...lines];
+        // Same reference on a rejected action — useReducer bails out instead of re-rendering consumers.
+        return lines;
       }
       const key = lineKey(line.productId, line.selections);
       const existing = lines.find((l) => lineKey(l.productId, l.selections) === key);
@@ -66,7 +67,7 @@ export function cartReducer(lines: readonly CartLine[], action: CartAction): Car
       );
     }
     case "setQuantity": {
-      if (!Number.isInteger(action.quantity)) return [...lines];
+      if (!Number.isInteger(action.quantity)) return lines;
       if (action.quantity <= 0) return lines.filter((l) => lineKey(l.productId, l.selections) !== action.key);
       return lines.map((l) =>
         lineKey(l.productId, l.selections) === action.key
