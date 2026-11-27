@@ -38,6 +38,21 @@ export function MenuIcon({ open, ...props }: IconProps & { open: boolean }) {
   );
 }
 
+export function ChevronIcon({ open, ...props }: IconProps & { open: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 18 18"
+      width={14}
+      height={14}
+      {...base}
+      {...props}
+      className={open ? "rotate-180 transition-transform duration-200" : "transition-transform duration-200"}
+    >
+      <path d="M4.5 7.5L9 12l4.5-4.5" />
+    </svg>
+  );
+}
+
 export function PlayIcon(props: IconProps) {
   return (
     <svg viewBox="0 0 16 16" width={14} height={14} aria-hidden focusable="false" fill="currentColor" {...props}>

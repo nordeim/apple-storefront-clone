@@ -5,6 +5,14 @@ const url = `file://${process.cwd()}/dist/index.html`;
 const b = await chromium.launch();
 const results = []; const errors = [];
 const ok = (name, cond, extra='') => { results.push(`${cond ? 'PASS' : 'FAIL'} ${name} ${extra}`); };
+const waitForState = async (p, fn, timeout = 12000) => {
+  const start = Date.now();
+  while (Date.now() - start < timeout) {
+    if (await fn()) return true;
+    await p.waitForTimeout(400);
+  }
+  return false;
+};
 async function page(vp, opts={}) {
   const ctx = await b.newContext({ viewport: vp, ...opts });
   const p = await ctx.newPage();
@@ -22,7 +30,7 @@ ok('3 hero + 6 promo tiles', (await p.locator('.section-hero .tile').count())===
 await p.locator('a.globalnav-link', {hasText:'iPhone'}).hover();
 ok('flyout opens on hover', await p.locator('#flyout-iphone').isVisible());
 ok('flyout lists iPhone 18 Pro', await p.locator('#flyout-iphone a', {hasText:'iPhone 18 Pro'}).isVisible());
-await p.mouse.move(700,500); await p.waitForTimeout(100);
+await p.mouse.move(700,850); await p.waitForTimeout(100);
 ok('flyout closes on leave', (await p.locator('#flyout-iphone').count())===0);
 // search
 await p.getByRole('button',{name:'Search apple.com'}).click();
@@ -72,9 +80,9 @@ await p.goto(url+'#/info/privacy'); await p.reload();
 ok('info page title', (await p.title()).startsWith('Privacy'));
 // gallery
 await p.goto(url+'#/'); await p.reload();
-await p.locator('.gallery').scrollIntoViewIfNeeded(); await p.waitForTimeout(5200);
-const sel = await p.locator('.dotnav-dot[aria-selected=true]').getAttribute('id');
-ok('gallery autoplays', sel !== 'tv-gallery-item-1-trigger', sel);
+await p.locator('.gallery').scrollIntoViewIfNeeded();
+const firstDot = await p.locator('.dotnav-dot[aria-selected=true]').getAttribute('id');
+ok('gallery autoplays', await waitForState(p, async () => (await p.locator('.dotnav-dot[aria-selected=true]').getAttribute('id')) !== firstDot));
 await p.getByRole('button',{name:'Pause Apple TV+ gallery'}).click();
 const s1 = await p.locator('.dotnav-dot[aria-selected=true]').getAttribute('id'); await p.waitForTimeout(4600);
 ok('gallery pause holds', s1 === await p.locator('.dotnav-dot[aria-selected=true]').getAttribute('id'));
@@ -84,9 +92,9 @@ ok('gallery arrow key', (await p.locator('.dotnav-dot[aria-selected=true]').getA
 await p.evaluate(()=>window.scrollTo(0,0));
 await p.getByRole('button',{name:'Pause Holiday 2026 animation'}).click();
 ok('holiday paused', (await p.locator('[data-tile-id=holiday-2026]').getAttribute('data-playing'))==='false');
-// duo reveal
-await p.locator('[data-tile-id=iphone-duo]').scrollIntoViewIfNeeded(); await p.waitForTimeout(2200);
-ok('duo subhead revealed', (await p.locator('.duo-subhead.is-revealed').count())===1);
+// duo reveal (state-based polling — the reveal is class-driven)
+await p.locator('[data-tile-id=iphone-duo]').scrollIntoViewIfNeeded();
+ok('duo subhead revealed', await waitForState(p, async () => (await p.locator('.duo-subhead.is-revealed').count()) === 1));
 // computed styles vs reference tokens
 const css = await p.evaluate(()=>{ const g=(s,pr)=>getComputedStyle(document.querySelector(s))[pr];
   return { h:g('.section-hero h2','fontSize'), hw:g('.section-hero h2','fontWeight'), sub:g('.section-hero .tile-subhead','fontSize'), btnR:g('.tile .button','borderTopLeftRadius'), btnBg:g('.tile .button','backgroundColor'), tileH:g('.section-hero .tile','minHeight'), promoH:g('.section-promo .tile','minHeight'), navH:g('.globalnav','height'), promoH3:g('.section-promo h3','fontSize'), ribbon:g('.ribbon','fontSize'), footerBg:g('.footer','backgroundColor')}; });

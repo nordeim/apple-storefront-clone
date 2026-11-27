@@ -14,12 +14,18 @@ test.describe("home (desktop)", () => {
     await expect(page.locator("nav.globalnav-bar li")).toHaveCount(11);
   });
 
-  test("flyout opens on hover and closes on leave", async ({ page }) => {
+  test("flyout opens on hover with the reference's three-section structure", async ({ page }) => {
     await page.goto("/");
     await page.locator("a.globalnav-link", { hasText: "iPhone" }).hover();
-    await expect(page.locator("#flyout-iphone")).toBeVisible();
-    await expect(page.locator("#flyout-iphone a", { hasText: "iPhone 18 Pro" })).toBeVisible();
-    await page.mouse.move(700, 500);
+    const flyout = page.locator("#flyout-iphone");
+    await expect(flyout).toBeVisible();
+    for (const heading of ["Explore iPhone", "Shop iPhone", "More from iPhone"]) {
+      await expect(flyout.locator("p", { hasText: heading })).toBeVisible();
+    }
+    await expect(flyout.locator("a", { hasText: "iPhone 18 Pro" })).toBeVisible();
+    await expect(flyout.locator("a", { hasText: "Explore All iPhone" })).toBeVisible();
+    await expect(flyout.locator("a", { hasText: "Personal Setup" })).toBeVisible();
+    await page.mouse.move(700, 850); // beyond the reference-height flyout panel
     await expect(page.locator("#flyout-iphone")).toHaveCount(0);
   });
 
@@ -52,9 +58,11 @@ test.describe("home (desktop)", () => {
   test("TV+ gallery autoplays, pauses and takes arrow keys", async ({ page }) => {
     await page.goto("/");
     await page.locator(".gallery").scrollIntoViewIfNeeded();
-    await page.waitForTimeout(5200);
-    const sel = await page.locator(".dotnav-dot[aria-selected=true]").getAttribute("id");
-    expect(sel).not.toBe("tv-gallery-item-1-trigger");
+    const first = await page.locator(".dotnav-dot[aria-selected=true]").getAttribute("id");
+    // state-based polling instead of a fixed sleep: the dwell is 4.16 s
+    await expect(async () => {
+      expect(await page.locator(".dotnav-dot[aria-selected=true]").getAttribute("id")).not.toBe(first);
+    }).toPass({ timeout: 12_000 });
     await page.getByRole("button", { name: "Pause Apple TV+ gallery" }).click();
     const s1 = await page.locator(".dotnav-dot[aria-selected=true]").getAttribute("id");
     await page.waitForTimeout(4600);
@@ -74,8 +82,10 @@ test.describe("home (desktop)", () => {
   test("duo subhead reveals in view", async ({ page }) => {
     await page.goto("/");
     await page.locator("[data-tile-id=iphone-duo]").scrollIntoViewIfNeeded();
-    await page.waitForTimeout(2200);
-    await expect(page.locator(".duo-subhead.is-revealed")).toHaveCount(1);
+    // state-based polling instead of a fixed sleep: the reveal is class-driven
+    await expect(async () => {
+      expect(await page.locator(".duo-subhead.is-revealed").count()).toBe(1);
+    }).toPass({ timeout: 8_000 });
   });
 
   test("zero console errors or warnings on load", async ({ page }) => {

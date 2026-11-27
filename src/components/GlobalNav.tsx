@@ -1,39 +1,90 @@
 import { useEffect, useRef, useState } from "react";
 import { useBag } from "@/context/BagContext";
-import { CATEGORIES, getProduct } from "@/lib/catalog";
+import { getProduct } from "@/lib/catalog";
 import { describeSelections, lineKey, unitPrice } from "@/lib/cart";
 import { formatSgd } from "@/lib/money";
 import { routeHref } from "@/lib/router";
-import { NAV_LINKS, flyoutLinks, type NavLinkSpec } from "@/lib/site-content";
-import { AppleLogoIcon, BagIcon, MenuIcon, SearchIcon } from "./Icons";
+import { NAV_LINKS, flyoutSections, type FlyoutSection, type NavLinkSpec } from "@/lib/site-content";
+import { AppleLogoIcon, BagIcon, ChevronIcon, MenuIcon, SearchIcon } from "./Icons";
 import { SearchPanel } from "./SearchPanel";
 
 type Panel = "menu" | "search" | "bag" | null;
 
 function Flyout({ link }: { link: NavLinkSpec }) {
-  const isStore = link.id === "store";
-  const heading = isStore ? "Shop" : `Explore ${link.label}`;
-  const items = isStore
-    ? [{ label: "Shop All", href: routeHref.store() }, ...CATEGORIES.map((c) => ({ label: c.label, href: routeHref.store(c.id) }))]
-    : link.category
-      ? [...flyoutLinks(link.category), { label: `Shop ${link.label}`, href: link.href }]
-      : [];
-  if (items.length === 0) return null;
+  const sections = flyoutSections(link);
+  if (sections.length === 0) return null;
   return (
     <div className="flyout" id={`flyout-${link.id}`}>
-      <div className="mx-auto max-w-[980px] px-[22px] pt-10 pb-12">
-        <p className="mb-4 text-xs text-[#86868b]">{heading}</p>
-        <ul className="m-0 grid list-none gap-3 p-0">
-          {items.map((item) => (
-            <li key={item.href}>
-              <a href={item.href} className="font-display text-2xl font-semibold leading-tight tracking-[0.009em]">
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+      <div className="mx-auto flex max-w-[980px] flex-wrap gap-x-[26px] gap-y-8 px-[22px] pt-10 pb-12">
+        {sections.map((s) => (
+          <div key={s.heading} className="w-[192px] shrink-0">
+            <p className="m-0 mb-4 text-xs text-[#86868b]">{s.heading}</p>
+            <ul className="m-0 grid list-none gap-3 p-0">
+              {s.links.map((item) => (
+                <li key={item.href}>
+                  <a href={item.href} className="font-display text-2xl font-semibold leading-tight tracking-[0.009em]">
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
     </div>
+  );
+}
+
+/**
+ * One mobile-menu row: the top link navigates (reference behavior), and rows
+ * with flyout content carry a separate expand button that reveals the same
+ * three-section content the desktop flyout shows. Independent toggles — the
+ * same convention as the footer accordion.
+ */
+function MobileMenuRow({ link, sections }: { link: NavLinkSpec; sections: FlyoutSection[] }) {
+  const [open, setOpen] = useState(false);
+  const sectionId = `${link.id}-menu-section`;
+  return (
+    <li className="border-b border-[#424245]">
+      <div className="flex items-center">
+        <a
+          href={link.href}
+          className="flex-1 cursor-pointer py-3 font-display text-[28px] font-semibold leading-tight text-inherit no-underline"
+        >
+          {link.label}
+        </a>
+        {sections.length > 0 ? (
+          <button
+            type="button"
+            className="flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent text-inherit"
+            aria-label={`${link.label} menu`}
+            aria-expanded={open}
+            aria-controls={sectionId}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <ChevronIcon open={open} />
+          </button>
+        ) : null}
+      </div>
+      {open ? (
+        <div id={sectionId} className="pb-4">
+          {sections.map((s) => (
+            <div key={s.heading} className="mb-4">
+              <p className="m-0 mb-2 text-xs text-[#86868b]">{s.heading}</p>
+              <ul className="m-0 grid list-none gap-2 p-0">
+                {s.links.map((item) => (
+                  <li key={item.href}>
+                    <a href={item.href} className="text-[17px] leading-snug text-[rgba(245,245,247,0.88)] no-underline">
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </li>
   );
 }
 
@@ -122,25 +173,20 @@ export function GlobalNav() {
         }
       }}
     >
-      <nav className="globalnav-bar" aria-label="Global">
-        <button
-          type="button"
-          className="globalnav-icon-button nav:hidden"
-          aria-label={panel === "menu" ? "Close menu" : "Menu"}
-          aria-expanded={panel === "menu"}
-          aria-controls="mobile-menu"
-          onClick={() => toggle("menu")}
+      {/* Bar layout measured off the live reference: logo flush left, the icon
+          cluster (Search, Bag, then the hamburger) flush right on mobile. */}
+      <nav className="globalnav-bar px-0 nav:px-[22px]" aria-label="Global">
+        <a
+          href={routeHref.home}
+          className="globalnav-link w-12 nav:w-9 nav:justify-center"
+          aria-label="Apple Singapore home"
         >
-          <MenuIcon open={panel === "menu"} />
-        </button>
-
-        <a href={routeHref.home} className="globalnav-link justify-center nav:w-9" aria-label="Apple Singapore home">
           <AppleLogoIcon />
         </a>
 
         <ul className="m-0 hidden flex-1 list-none items-center justify-between p-0 pl-2 nav:flex">
           {NAV_LINKS.map((link) => {
-            const hasFlyout = link.id === "store" || link.category !== undefined;
+            const hasFlyout = flyoutSections(link).length > 0;
             const open = hasFlyout && flyoutId === link.id && panel === null;
             return (
               <li
@@ -168,7 +214,7 @@ export function GlobalNav() {
         <div className="relative flex items-center">
           <button
             type="button"
-            className="globalnav-icon-button hidden nav:inline-flex"
+            className="globalnav-icon-button w-12 nav:w-9"
             aria-label="Search apple.com"
             aria-expanded={panel === "search"}
             aria-controls="search-panel"
@@ -178,7 +224,7 @@ export function GlobalNav() {
           </button>
           <button
             type="button"
-            className="globalnav-icon-button"
+            className="globalnav-icon-button w-12 nav:w-9"
             aria-label={count > 0 ? `Shopping Bag, ${count} ${count === 1 ? "item" : "items"}` : "Shopping Bag"}
             aria-expanded={panel === "bag"}
             aria-controls="bag-popover"
@@ -192,6 +238,16 @@ export function GlobalNav() {
             ) : null}
           </button>
           {panel === "bag" ? <BagPopover onClose={() => setPanel(null)} /> : null}
+          <button
+            type="button"
+            className="globalnav-icon-button w-12 nav:w-9 nav:hidden"
+            aria-label={panel === "menu" ? "Close menu" : "Menu"}
+            aria-expanded={panel === "menu"}
+            aria-controls="mobile-menu"
+            onClick={() => toggle("menu")}
+          >
+            <MenuIcon open={panel === "menu"} />
+          </button>
         </div>
       </nav>
 
@@ -203,24 +259,8 @@ export function GlobalNav() {
           className="absolute top-[var(--nav-h)] right-0 left-0 h-[calc(100dvh-var(--nav-h))] overflow-auto bg-[rgba(22,22,23,0.98)] px-[22px] pt-4 pb-10 text-[#f5f5f7] nav:hidden"
         >
           <ul className="m-0 grid list-none gap-1 p-0">
-            <li>
-              <button
-                type="button"
-                className="flex w-full cursor-pointer items-center gap-3 border-0 border-b border-[#424245] bg-transparent py-3 text-left font-display text-[28px] font-semibold text-inherit"
-                onClick={() => setPanel("search")}
-              >
-                <SearchIcon width={18} height={18} /> Search
-              </button>
-            </li>
             {NAV_LINKS.map((link) => (
-              <li key={link.id}>
-                <a
-                  href={link.href}
-                  className="block border-b border-[#424245] py-3 font-display text-[28px] font-semibold leading-tight text-inherit no-underline"
-                >
-                  {link.label}
-                </a>
-              </li>
+              <MobileMenuRow key={link.id} link={link} sections={flyoutSections(link)} />
             ))}
           </ul>
         </div>
