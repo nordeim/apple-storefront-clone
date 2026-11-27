@@ -40,12 +40,11 @@ test.describe("mobile navigation (390×844, touch)", () => {
     for (const label of LINKS) {
       await expect(menu.locator("a", { hasText: label })).toBeVisible();
     }
-    // the two-level structure: every flyout-bearing row carries an expand button
-    for (const label of ["Store", "Mac", "iPhone", "Support"]) {
+    // the two-level structure: every one of the reference's 11 rows carries an
+    // expand button (session-3 live capture — Entertainment included)
+    for (const label of ["Store", "Mac", "iPad", "iPhone", "Watch", "Vision", "AirPods", "Home", "Entertainment", "Accessories", "Support"]) {
       await expect(menu.getByRole("button", { name: `${label} menu` })).toBeVisible();
     }
-    // Entertainment has no flyout on the reference — no expand button for it
-    await expect(menu.getByRole("button", { name: "Entertainment menu" })).toHaveCount(0);
   });
 
   test("menu link navigates and closes the menu", async ({ page }) => {
@@ -77,6 +76,10 @@ test.describe("mobile navigation (390×844, touch)", () => {
     await expect(page.locator("#mac-menu-section p", { hasText: "More from Mac" })).toBeVisible();
     await expect(page.locator("#mac-menu-section a", { hasText: "Explore All Mac" })).toBeVisible();
     await expect(page.locator("#mac-menu-section a", { hasText: "MacBook Pro" }).first()).toBeVisible();
+    // sub-links keep a touch-sized hit area (session-3 audit LOW-3 fix)
+    const subLink = page.locator("#mac-menu-section a", { hasText: "Mac Support" });
+    await expect(subLink).toBeVisible();
+    expect((await subLink.boundingBox())?.height).toBeGreaterThanOrEqual(32);
     await mac.click();
     await expect(mac).toHaveAttribute("aria-expanded", "false");
     await expect(page.locator("#mac-menu-section")).toHaveCount(0);

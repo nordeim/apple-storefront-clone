@@ -25,8 +25,35 @@ test.describe("home (desktop)", () => {
     await expect(flyout.locator("a", { hasText: "iPhone 18 Pro" })).toBeVisible();
     await expect(flyout.locator("a", { hasText: "Explore All iPhone" })).toBeVisible();
     await expect(flyout.locator("a", { hasText: "Personal Setup" })).toBeVisible();
+    // session-3 live capture: Wallet, Pay joined iPhone's More-from section
+    await expect(flyout.locator("a", { hasText: "Wallet, Pay" })).toBeVisible();
     await page.mouse.move(700, 850); // beyond the reference-height flyout panel
     await expect(page.locator("#flyout-iphone")).toHaveCount(0);
+  });
+
+  test("Entertainment and Home flyouts match the reference's measured structures", async ({ page }) => {
+    await page.goto("/");
+    // Entertainment: Explore Entertainment + Support (session-3 — the reference
+    // grew this flyout after the session-2 capture)
+    await page.locator("a.globalnav-link", { hasText: "Entertainment" }).hover();
+    const ent = page.locator("#flyout-entertainment");
+    await expect(ent).toBeVisible();
+    for (const heading of ["Explore Entertainment", "Support"]) {
+      await expect(ent.locator("p", { hasText: heading })).toBeVisible();
+    }
+    await expect(ent.locator("a", { hasText: "Apple Music" }).first()).toBeVisible();
+    await expect(ent.locator("a", { hasText: "Apple TV Support" })).toBeVisible();
+    await page.mouse.move(700, 850);
+    await expect(page.locator("#flyout-entertainment")).toHaveCount(0);
+    // Home: the reference's single Quick Links section
+    await page.locator("a.globalnav-link", { hasText: "Home" }).hover();
+    const home = page.locator("#flyout-home");
+    await expect(home).toBeVisible();
+    await expect(home.locator("p", { hasText: "Quick Links" })).toBeVisible();
+    await expect(home.locator("a", { hasText: "Shop Gifts" })).toBeVisible();
+    await expect(home.locator("a", { hasText: "Apple Intelligence" })).toBeVisible();
+    await page.mouse.move(700, 850);
+    await expect(page.locator("#flyout-home")).toHaveCount(0);
   });
 
   test("computed tokens match the reference measurements", async ({ page }) => {
