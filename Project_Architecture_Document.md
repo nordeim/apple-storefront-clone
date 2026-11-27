@@ -1,12 +1,40 @@
-# apple-storefront-clone — Master Project Architecture Document (PAD) v1.3
+# apple-storefront-clone — Master Project Architecture Document (PAD) v1.4
 
 **Classification:** Internal Engineering Reference
 **Status:** DEFINITIVE, PRODUCTION-LOCKED BLUEPRINT
 **Companion Document:** `README.md` (quick start), `AGENTS.md` (agent traps), `CLAUDE.md` (conventions), `docs/reference-investigation.md` (parity dossier)
-**Last Updated:** 2026-11-27
+**Last Updated:** 2026-11-28
 **Audience:** Senior Engineers, Tech Leads, DevOps, and Onboarding Engineers
 **Rule:** Every architectural decision in this document traces to a specific rationale.
 Nothing is here "because it's popular."
+
+#### Revision Block — v1.4 (the session-5 verification + hygiene cycle)
+
+- `[SR]` The session-5 cycle (2026-11-28, `docs/REMEDIATION_PLAN.md` session-5 section)
+  re-verified the pulled tree (4390746) — baseline gates exactly as documented — plus a
+  read-only audit (0 CRITICAL/HIGH/MEDIUM; 2 LOW + 4 INFO, 13/14 anchors PASS) and a fresh
+  agent-browser parity sweep: the clone's mobile navigation re-measured working at 390×844 and
+  **all eleven reference flyout models re-extracted from the live DOM and programmatically
+  diffed against `flyoutSections()` — all match** (NBSP-normalized); nav order, hero/promo
+  sequences and the TV+ gallery titles also match. No reference drift found this cycle.
+- `[FIX]` Audit fixes: `routeTitle()` extracted from `App.tsx` into the tested
+  `src/lib/route-title.ts` seam and now uses `STORE_CATEGORY_LABELS` (the tab title and the
+  store h1 agree — "Shop Apple Watch"); `hasBuyParam()` in `router.ts` owns the `?buy`
+  grammar exactly (URLSearchParams, not substring — `?buyfoo`/`?q=buy` are not the deep
+  link); the dead `.button-neutral`/`.section-ribbon-host` CSS rules deleted; `aria-controls`
+  on the nav icon buttons, desktop nav links and mobile accordion rows now exist only while
+  the referenced panel is mounted; the duplicated bag-line `<li>` extracted into
+  `components/BagLineRow.tsx` (BagLineRow + BagLineList) consumed by the bag popover and the
+  checkout aside. The PAD §7.1 stale table (7/62, desktop 7) corrected to the live counts.
+- `[VERIFY]` Full gate green after the change: lint 0 errors · typecheck clean ×2 · unit 9
+  files / 99 tests · build 309.2 kB / 93.2 kB gzip (CSS 33.2 kB / 501 rules) · e2e 26/26 ·
+  smoke 45/45, zero console errors. Live on the dev server: the watch store tab title reads
+  "Shop Apple Watch - Apple (Singapore)" matching its h1; the `?buy` deep link scrolls to and
+  focuses the configurator heading; aria-controls is absent while panels are closed and
+  present while open.
+- `[CHORE]` README/AGENTS/CLAUDE/PAD/SKILL swept in lockstep (counts 8/86 → 9/99 unit,
+  25 → 26 e2e, 309.6 → 309.2 kB, CSS 33,322/503 → 33,214/501); the 17 screenshots
+  re-captured; worklog Task 117.
 
 #### Revision Block — v1.3 (the session-4 store-surface parity cycle)
 
@@ -230,7 +258,7 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 - **Decision:** All logic in `src/lib/*` (catalog, cart reducer, router, money, checkout
   validation, content, sitemap); the single shared store is
   `src/context/BagContext.tsx` (React context + reducer, in-memory only).
-- **Rationale:** The seam is unit-testable without rendering (86 tests); "no backend,
+- **Rationale:** The seam is unit-testable without rendering (99 tests); "no backend,
   nothing transmitted" is an explicit documented deviation, not an accident.
 - **Consequences:** Bag/order state resets on reload (documented limitation).
 - **Alternatives rejected:** localStorage persistence (silently changes the privacy
@@ -247,8 +275,8 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 
 **ADR-006: Three-tier test suite against the production artifact.**
 - **Context:** The dev server is not the build; parity claims must be executable.
-- **Decision:** Vitest for the seam (86 tests); Playwright against
-  `npm run build && vite preview --host 127.0.0.1` (25 tests: tokens,
+- **Decision:** Vitest for the seam (99 tests); Playwright against
+  `npm run build && vite preview --host 127.0.0.1` (26 tests: tokens,
   mobile-navigation state machine, store flow incl. hostile routes); the exhaustive
   45-assertion `file://` smoke battery as the parity net.
 - **Rationale:** The token assertions ARE the parity evidence; the mobile spec pins
@@ -355,9 +383,8 @@ apple-storefront-clone/
 │   ├── hooks/                  ← useRoute (useSyncExternalStore over hashchange), browser.ts
 │   │                             (useMediaQuery, usePrefersReducedMotion, useInView)
 │   ├── lib/                    ← THE SEAM: catalog, cart, router, money, checkout,
-│   │                             home-content, site-content (+flyoutSections), sitemap
-│   │                             (each with *.test.ts)
-│   └── utils/cn.ts             ← clsx + tailwind-merge
+│   │                             home-content, site-content (+flyoutSections), sitemap,
+│   │                             route-title (each with *.test.ts)
 ├── tests/
 │   └── e2e/                    ← home.spec.ts, mobile-navigation.spec.ts, store-flow.spec.ts,
 │                                 smoke.mjs (the 45-assertion file:// battery)
@@ -531,10 +558,10 @@ credentials.
 
 | Category | Files | Tests | Location | Framework |
 |---|---|---|---|---|
-| Unit (seam) | 7 | 62 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
-| E2E — desktop | 1 | 7 | `tests/e2e/home.spec.ts` | Playwright (1440×900) |
+| Unit (seam) | 9 | 99 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
+| E2E — desktop | 1 | 8 | `tests/e2e/home.spec.ts` | Playwright (1440×900) |
 | E2E — mobile nav | 1 | 11 | `tests/e2e/mobile-navigation.spec.ts` | Playwright (iPhone 13 viewport, touch) |
-| E2E — store flow | 1 | 6 | `tests/e2e/store-flow.spec.ts` | Playwright (1440×900) |
+| E2E — store flow | 1 | 7 | `tests/e2e/store-flow.spec.ts` | Playwright (1440×900) |
 | File:// smoke battery | 1 | 45 assertions | `tests/e2e/smoke.mjs` | Playwright library |
 
 ### 7.2 Test Patterns
@@ -552,9 +579,9 @@ credentials.
 
 - [ ] `npm run lint` exit 0
 - [ ] `npm run typecheck` && `npm run typecheck:tests` clean
-- [ ] `npm run test` — 8 files / 86 tests
+- [ ] `npm run test` — 9 files / 99 tests
 - [ ] `npm run build` — single-file `dist/index.html`
-- [ ] `npm run test:e2e` — 25 passed
+- [ ] `npm run test:e2e` — 26 passed
 - [ ] `npm run test:smoke` — 45 assertions, zero console errors
 - [ ] Docs touched in the same commit; counts in lockstep
 
@@ -565,8 +592,8 @@ credentials.
 ### 8.1 Production Build
 
 `npm run build` → `vite build` with `react()`, `@tailwindcss/vite`, and
-`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 309.6 kB /
-93.2 kB gzip this cycle; CSS 33.3 kB / 503 rules). No server bundle, no image
+`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 309.2 kB /
+93.2 kB gzip this cycle; CSS 33.2 kB / 501 rules). No server bundle, no image
 pipeline, no external requests.
 
 ### 8.2 Environment Variables
@@ -640,19 +667,21 @@ The full remediation history of this cycle: `docs/REMEDIATION_PLAN.md`.
 
 | File | Lines | Purpose |
 |---|---|---|
-| `src/lib/router.ts` | 86 | The hash-route grammar; every href factory |
+| `src/lib/router.ts` | 94 | The hash-route grammar; every href factory + `hasBuyParam` |
+| `src/lib/route-title.ts` | 39 | The tab-title seam (full-form store labels, matching the h1) |
 | `src/lib/catalog.ts` | 356 | The typed catalog: 8 categories, 12 products, option matrices, search |
-| `src/lib/cart.ts` | 93 | The bag reducer + price/line-key seam |
-| `src/lib/checkout.ts` | 43 | Singapore checkout validation + order numbers |
-| `src/lib/sitemap.ts` | 75 | Route-set enumeration + sitemap.xml/robots.txt rendering (123 URLs) |
-| `src/lib/site-content.ts` | 378 | Nav links, the per-category flyout content model, footer directory, info-page map |
-| `src/index.css` | 390 | Tailwind v4 tokens + all component CSS + source scoping |
-| `src/components/GlobalNav.tsx` | 270 | Desktop flyouts, mobile accordion menu, bag popover, search trigger |
+| `src/lib/cart.ts` | 94 | The bag reducer + price/line-key seam |
+| `src/lib/checkout.ts` | 49 | Singapore checkout validation + order numbers |
+| `src/lib/sitemap.ts` | 75 | Route-set enumeration + sitemap.xml/robots.txt rendering (156 URLs) |
+| `src/lib/site-content.ts` | 441 | Nav links, the per-category flyout content model, footer directory, info-page map |
+| `src/index.css` | 387 | Tailwind v4 tokens + all component CSS + source scoping |
+| `src/components/GlobalNav.tsx` | 253 | Desktop flyouts, mobile accordion menu, bag popover, search trigger |
 | `src/components/ProductArt.tsx` | 449 | The original SVG art library |
 | `src/components/EntertainmentGallery.tsx` | 153 | The TV+ gallery state machine (dwell, pause, keys) |
-| `src/App.tsx` | 120 | Route switch, titles, navigation side-effects |
-| `tests/e2e/mobile-navigation.spec.ts` | 146 | The mobile-menu contract (bar layout, accordion, the v4 display trap) |
-| `tests/e2e/smoke.mjs` | 125 | The exhaustive file:// parity battery (45 assertions) |
+| `src/components/BagLineRow.tsx` | 33 | The shared bag-line summary row (popover + checkout aside) |
+| `src/App.tsx` | 91 | Route switch, navigation side-effects (title via the route-title seam) |
+| `tests/e2e/mobile-navigation.spec.ts` | 148 | The mobile-menu contract (bar layout, accordion, the v4 display trap) |
+| `tests/e2e/smoke.mjs` | 131 | The exhaustive file:// parity battery (45 assertions) |
 | `vite.config.ts` | 30 | Build pipeline + dep-scan scoping (ADR-003) |
 | `playwright.config.ts` | 47 | The two-project e2e harness over `vite preview` |
 

@@ -13,9 +13,9 @@ in-memory bag, Singapore checkout). The evidence dossier (measured tokens, devia
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest/jsdom — **8 files / 86 tests**; update this count in README + PAD when it changes) |
+| Unit tests | `npm run test` (Vitest/jsdom — **9 files / 99 tests**; update this count in README + PAD when it changes) |
 | Production build | `npm run build` (single file → `dist/index.html`, ~310 kB) |
-| E2E | `npm run test:e2e` (Playwright — **25 tests**; builds and serves `dist/` itself) |
+| E2E | `npm run test:e2e` (Playwright — **26 tests**; builds and serves `dist/` itself) |
 | File:// smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
 | Regenerate sitemap | `npm run sitemap` (writes `public/sitemap.xml` + `public/robots.txt` from the tested `src/lib/sitemap.ts` seam — **156 routes**) |
 | Clean gate order | lint → typecheck → typecheck:tests → test → build → test:e2e → test:smoke |

@@ -482,3 +482,56 @@ page chip row and the category-page h1.
   re-capturable next cycle. The clone's catalog is untouched — the superset
   (12 products, configurator, bag, checkout) is fully preserved; only the
   flyout's label surface moves to the reference's model.
+
+---
+
+# Session 5 (2026-11-28 — the verification + hygiene cycle)
+
+Inputs: the operator's standing review prompt on a fresh clone (HEAD `4390746` = run-116's docs commit + the session_4.md log paste). Baseline re-observed exactly as documented (lint 0 errors · 2× typecheck clean · 8 files/86 unit · build 309.56 kB / 93.18 kB gzip · e2e 25/25 · smoke 45/45, zero console errors · sitemap 156 routes · PG 17 rootless accepting connections). A read-only subagent audit (web-application methodology, `skills/` excluded) ran over the whole tree with the session-4 diffs (`7b8a3ec..4390746`) first; the live-parity pass re-measured the clone's mobile navigation and re-extracted **all eleven reference flyout models + the home tile/gallery surfaces** from the live DOM.
+
+## Session-5 findings (counts by severity)
+
+| Severity | Count | Key items |
+|---|---|---|
+| CRITICAL | 0 | — |
+| HIGH | 0 | — |
+| MEDIUM | 0 | — |
+| LOW | 2 | PAD §7.1 table still carries pre-session-4 counts (7 files/62 tests, e2e-desktop 7); `routeTitle` uses the short category label while the store h1 uses the full form ("Shop Watch" tab vs "Shop Apple Watch" h1) |
+| INFO | 4 | `?buy` deep link matched by substring (`hash.includes("?buy")`) in App/ProductPage; dead CSS (`.button-neutral` + `.section-ribbon-host`, zero references); dangling `aria-controls` while panels are unmounted; bag-line `<li>` block duplicated (BagPopover + CheckoutPage) |
+
+### Verified evidence (this cycle)
+
+- **Baseline:** every documented gate re-run and green (counts above) — the docs' claims hold at HEAD.
+- **Live parity (agent-browser, both sites):** clone mobile navigation fully working at 390×844 (bar geometry byte-equal to the pins: logo x=0 w=48, Search x=246, Bag x=294, Menu x=342, all 48px; menu opens at top=48/h=796, rgba(22,22,23,.98), 11 rows; Mac expansion renders the 3-section content; sub-links 39px; "Compare Mac" → `#/info/compare-mac` + menu closes + h1 correct) — **no Tailwind v4 display-toggling defect** (conditional mounting holds; e2e pins it). The live reference's DOM was extracted fresh and diffed programmatically against `flyoutSections()`: **all eleven flyout content models match exactly** (headings + link lists; NBSP-normalized). Nav order, hero sequence ("Gifts they'll love." / iPhone Duo / iPhone 18 Pro), promo sequence (Apple HomeView / iPad / Apple Watch Series 12 / MacBook Pro ×2 / AirPods Pro 3) and the TV+ gallery titles (9/9) all match. **No reference drift found this cycle** — the session-4 parity state holds. (The reference's own menu dialog and chip-row page measurements remain flaky in this environment — hidden-flyout DOM contaminates page-level probes — so the session-4 captures stand as the evidence base.)
+- **Audit:** session-4 diffs verified correct (phone normalization edge cases, `routeHref.productBuy` grammar, cart bail-out, chip/h1 modeling all confirmed); 13/14 doc anchors PASS (the miss = LOW DOC-1, PAD §7.1).
+- **Test suites:** `vitest.config.ts` + `playwright.config.ts` present and passing (8 files/86 unit; 25 e2e over the production build; 45-assertion file:// smoke battery) — the standing instruction "add vitest and playwright suites via config files" is satisfied by the existing configs; this cycle extends the suites with regression tests for the fixes below.
+- **SEO:** `public/sitemap.xml` (156 `<url>` routes) + `public/robots.txt` (stamped, honest hash-route caveat) + OG/Twitter/JSON-LD in `index.html` verified; `.env.example` matches the codebase exactly (zero app-env reads; `VITE_SITE_URL` generator-only, shell > `.env` precedence verified by the audit).
+
+## Remediation ToDo list (session 5 — S5-*)
+
+### Phase 1 — TDD seam fixes
+
+- **S5-1 (LOW UI-1).** Extract `routeTitle()` from `App.tsx` into a pure seam `src/lib/route-title.ts` that uses `STORE_CATEGORY_LABELS` (full-form, matching the store h1) — tests RED first in `src/lib/route-title.test.ts` (per-route title grammar incl. `#/store/watch` → "Shop Apple Watch - Apple (Singapore)"); `App.tsx` imports it from the seam.
+- **S5-2 (INFO ROUTE-1).** Own the `?buy` grammar exactly: new `hasBuyParam(hash)` in `src/lib/router.ts` (URLSearchParams-based, not substring) — `router.test.ts` RED first (`"?buy"` true; `"?buyfoo"`/`"?q=buy"`/`"#/store?buyfoo"` false); `App.tsx` + `ProductPage.tsx` consume it.
+- **S5-3 (INFO CSS-1).** Delete the dead `.button-neutral` (+ `:hover`) and `.section-ribbon-host` rules from `src/index.css` (zero references verified); the built CSS shrinks accordingly.
+- **S5-4 (INFO A11Y-1).** Gate `aria-controls` on the nav icon buttons, the desktop nav links and the mobile accordion rows to the mounted state (attribute present only while the panel/flyout/section exists); the two spec locators + one smoke locator that address the hamburger via `aria-controls` move to `aria-label`/role (pin strength preserved — the hamburger itself is still asserted hidden on desktop).
+- **S5-5 (INFO MAINT-1).** Extract the shared bag-line `<li>` block into `src/components/BagLineRow.tsx`; `BagPopover` and `CheckoutPage` consume it (BagPage keeps its rich layout — it shares only the seam calls).
+
+### Phase 2 — e2e + verification
+
+- **S5-6.** e2e: pin the store tab title's full form inside an existing store-flow assertion (no count change); the mobile-navigation/home/smoke locator updates above keep the hamburger contract.
+- **S5-7.** Full gate; live dev-server re-verification of the touched surfaces (store tab title, `?buy` deep-link scroll, bag popover rendering, aria attributes).
+
+### Phase 3 — evidence, docs, delivery
+
+- **S5-8.** Re-capture the 17-shot screenshot family via `scripts/capture-screenshots.sh` on the remediated dev server.
+- **S5-9.** Docs lockstep sweep: PAD §7.1 + revision block v1.4; SKILL → v1.4.0 (project_state, counts, §20 seam list); README/AGENTS/CLAUDE counts; `docs/reference-investigation.md` ledger note (session-5 flyout re-verification); worklog Task 117; `.env.example` re-verified unchanged.
+- **S5-10.** Atomic Conventional Commits on `main` → SSH-wrapper push (`docs/ssh_git_wrapper_v3.py --remote git@github.com:nordeim/apple-storefront-clone.git`).
+
+## Plan validation notes (session 5, against the codebase)
+
+- `route-title.ts` imports `{getProduct}` (catalog) + `{INFO_TITLES, STORE_CATEGORY_LABELS}` (site-content) + `Route` (router) — no import cycle (site-content already imports router); the layer rule holds (logic that needs a test lives in Layer 4).
+- `hasBuyParam` lives in `router.ts` next to `parseSearchQuery` (same query-parsing family); `URLSearchParams` handles the `"?buy"` bare-key form; both consumers currently substring-match (`App.tsx:89`, `ProductPage.tsx:20` — read in full).
+- The aria-controls gating touches exactly three pinned locators: `mobile-navigation.spec.ts:34` (→ role locator), `home.spec.ts:11` (→ `aria-label='Menu'`), `smoke.mjs:33` (→ same) — each keeps asserting the same behavior through a stable attribute; the accordion/nav-link aria-controls have no spec consumers (verified by grep).
+- `BagLineRow` is purely presentational over the existing seam (`describeSelections`/`unitPrice`/`lineKey`); both consumer blocks were read in full and are byte-identical apart from surrounding layout.
+- Counts will move (unit files 8 → 9, tests 86 → ~100; CSS bytes/rules drop; build size ~unchanged) — the lockstep sweep (S5-9) covers README/AGENTS/CLAUDE/PAD/SKILL in the same commit.

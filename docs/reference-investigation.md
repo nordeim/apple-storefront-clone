@@ -58,15 +58,16 @@ Verified for Chromium at 1440×900 and 390×844 by `tests/e2e/smoke.mjs` ("token
 |---|---|
 | `npx tsc --noEmit` | clean (Verified) |
 | `npx tsc --noEmit -p tsconfig.tests.json` (incl. scripts checkJs) | clean (Verified) |
-| `npx vitest run` | 8 files, 86 tests pass (Verified, session-4) |
+| `npx vitest run` | 9 files, 99 tests pass (Verified, session-5) |
 | `npm run lint` | 0 errors (Verified) |
-| `npm run build` | succeeds, `dist/index.html` single file, 309.6 kB / 93.2 kB gzip, CSS 33.3 kB / 503 rules (Verified, session-4 re-measure) |
-| `npm run test:e2e` (Playwright over `vite preview`) | 25/25 PASS (Verified, session-4) |
+| `npm run build` | succeeds, `dist/index.html` single file, 309.2 kB / 93.2 kB gzip, CSS 33.2 kB / 501 rules (Verified, session-5 re-measure) |
+| `npm run test:e2e` (Playwright over `vite preview`) | 26/26 PASS (Verified, session-5) |
 | `tests/e2e/smoke.mjs` (headless Chromium, `file://`) | 45/45 PASS, 0 console errors/warnings (Verified) |
 | Mobile navigation re-measured on the dev server (agent-browser, 390×844) | bar geometry byte-equal to the live reference (logo x=0 w=48, Search x=246, Bag x=294, Menu x=342); accordion opens/expands/navigates/closes; no Tailwind v4 display-toggling defect (Verified) |
 | Live parity pass against apple.com/sg (session 2) | gallery autoplay (dwell ≈4.16 s) and holiday animation confirmed matching; flyout three-section structure and mobile accordion modeled on live captures (Verified) |
 | Live parity full-sweep against apple.com/sg (session 3) | all eleven flyouts re-captured; Entertainment/Home/Accessories structures and per-category label drift closed to the seam; every mobile row carries an expand button; sub-links 39px vs reference 33px; search typeahead and /store h1 parity confirmed; zero console errors (Verified) |
 | Sitemap regeneration (session 4) | 156 routes / 131 info pages; `.env`-file VITE_SITE_URL verified by a custom-origin run stamped into both sitemap.xml and robots.txt (Verified) |
+| Live parity re-verification (session 5) | all eleven reference flyout models re-extracted from the live DOM and programmatically diffed against `flyoutSections()` — all match (NBSP-normalized); nav order, hero/promo sequences and TV+ gallery titles match; clone mobile navigation re-measured working; zero reference drift (Verified) |
 | Visual review of screenshots (desktop home, mobile, product) | done by eye; no pixel diff (Verified for what was viewed) |
 | Safari / Firefox / real devices / screen readers | not run (Unknown: not available in this sandbox) |
 
