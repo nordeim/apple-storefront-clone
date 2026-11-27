@@ -19,9 +19,9 @@ Apple's proprietary assets were deliberately not copied or hot-linked.
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest, jsdom — 7 files / 62 tests) |
+| Unit tests | `npm run test` (Vitest, jsdom — 7 files / 71 tests) |
 | Production build (single file → `dist/index.html`) | `npm run build` |
-| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 24 tests) |
+| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 25 tests) |
 | File-protocol smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
 | Regenerate `public/sitemap.xml` | `npm run sitemap` |
 | Clean gate order | `npm run lint && npm run typecheck && npm run typecheck:tests && npm run test && npm run build && npm run test:e2e && npm run test:smoke` |
@@ -43,9 +43,9 @@ npm run dev          # → http://localhost:5173
 
 ```bash
 npm run typecheck    # clean, no output
-npm run test         # 7 files / 62 tests passed
-npm run build        # dist/index.html (~306 kB single file)
-npm run test:e2e     # 24 passed
+npm run test         # 7 files / 71 tests passed
+npm run build        # dist/index.html (~307 kB single file)
+npm run test:e2e     # 25 passed
 ```
 
 Node.js ≥ 20 (verified on Node 24); npm is the package manager and `package-lock.json` is the lockfile.
@@ -53,14 +53,17 @@ Node.js ≥ 20 (verified on Node 24); npm is the package manager and `package-lo
 ## What is in it
 
 **Parity with the reference home page:** blue→charcoal ribbon, translucent global nav with hover flyouts (the
-reference's three-section Explore/Shop/More-from content model), 3 hero tiles + 6 promo tiles (2-column grid
-≥735px), the "Hello, hello." subhead reveal, the PROLED subhead light sweep, the colour-cycling holiday tile
-with play/pause, the 9-title Apple TV+ gallery (auto-advance 4.16 s, dot navigation, pause, swipe, arrow
-keys), the legal footnotes and the full footer directory (accordion on ≤734px). Type scale, button geometry
-(980px pill), tile heights and breakpoints (734 / 1068) are taken from the reference's CSS —
-`docs/reference-investigation.md` holds the measured token table and the deviations ledger. The mobile
-navigation matches the reference's measured bar layout (logo flush left; Search, Bag and the hamburger
-flush right) and its two-level accordion menu (top rows navigate; expand buttons reveal the flyout content).
+reference's measured per-category content model — device categories carry the three-section
+Explore/Shop/More-from structure; Home is a single Quick-Links row; Entertainment and Accessories
+carry two-section flyouts; Store and Support carry their captured three-section models), 3 hero tiles +
+6 promo tiles (2-column grid ≥735px), the "Hello, hello." subhead reveal, the PROLED subhead light sweep,
+the colour-cycling holiday tile with play/pause, the 9-title Apple TV+ gallery (auto-advance 4.16 s,
+dot navigation, pause, swipe, arrow keys), the legal footnotes and the full footer directory (accordion
+on ≤734px). Type scale, button geometry (980px pill), tile heights and breakpoints (734 / 1068) are taken
+from the reference's CSS — `docs/reference-investigation.md` holds the measured token table and the
+deviations ledger. The mobile navigation matches the reference's measured bar layout (logo flush left;
+Search, Bag and the hamburger flush right) and its two-level accordion menu (every one of the 11 rows
+carries an expand button; expansions reveal the same flyout content the desktop shows).
 
 **Superset:** store with category filters and sorting, product pages with a configurator (options change
 price), an in-memory bag with a nav popover, GST-inclusive totals (9%), validated Singapore checkout
@@ -72,8 +75,9 @@ navigation, `prefers-reduced-motion` support.
 
 ```
 src/lib/        pure, tested logic: catalog, cart reducer, router (hash), money, checkout validation,
-                content + the flyout content model (feeds nav flyouts, the mobile accordion menu
-                and the sitemap route enumeration), sitemap route enumeration (feeds public/sitemap.xml)
+                content + the flyout content model (per-category structures measured off the live
+                reference; feeds nav flyouts, the mobile accordion menu and the sitemap route
+                enumeration), sitemap route enumeration (feeds public/sitemap.xml)
 src/hooks/      useRoute (hashchange), media-query / in-view hooks
 src/context/    BagContext (in-memory only)
 src/components/ GlobalNav (desktop flyouts + mobile accordion menu), SearchPanel, Tile, EntertainmentGallery,
@@ -105,7 +109,7 @@ The app reads **no** environment variables. One optional variable drives the sit
 
 ## SEO
 
-`public/sitemap.xml` (123 routes) is generated from the tested `src/lib/sitemap.ts` seam — never a
+`public/sitemap.xml` (128 routes) is generated from the tested `src/lib/sitemap.ts` seam — never a
 hand-maintained list. `public/robots.txt` and `index.html` (OG/Twitter meta, JSON-LD WebSite+Organization)
 are part of the same deliverable — one `VITE_SITE_URL` value stamps both the sitemap's base and the
 robots.txt `Sitemap:` directive. Honest limitation: hash routing means search engines collapse every

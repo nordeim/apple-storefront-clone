@@ -195,3 +195,131 @@ Execution order = the table order; TDD wherever a behavior is assertable
   exclusive toggles) could not be conclusively measured on the live site in this
   environment — the clone follows its own footer-accordion convention (Reasoned, not
   Verified).
+
+---
+
+# Session 3 (2026-11-27, evening — the full-sweep parity cycle)
+
+Inputs: the operator's `docs/session_2.md` paste (the completed session-2 log) +
+the standing review prompt, on the pulled tree (9841cb1 = 0bd9d7d + the paste).
+Baseline re-observed exactly as documented (lint 0 errors · 2× typecheck clean ·
+7 files/62 unit · build 305.52 kB · e2e 24/24 · smoke 45, zero console errors ·
+sitemap 123 routes · robots stamped). A read-only subagent audit (web-application
+methodology, `skills/` excluded) ran on the session-2 commits; the live-parity
+pass this cycle swept **all eleven nav flyouts** on the live reference (the
+session-2 capture covered Store/Mac/iPhone/Support only) plus the mobile bar,
+accordion, search and store routes.
+
+## Session-3 findings (counts by severity)
+
+| Severity | Count | Key items |
+|---|---|---|
+| CRITICAL | 0 | — |
+| HIGH | 0 | — |
+| MEDIUM | 1 | `.env.example` documents a `.env` copy path that never reaches the generator (`build-sitemap.mjs` reads `process.env.VITE_SITE_URL` before Vite exists — a silent localhost-stamped production deploy) |
+| LOW | 3 | dead `src/utils/cn.ts` + unused runtime deps `clsx`/`tailwind-merge`; 9 orphan info routes (INFO_TITLES over-derivation); mobile accordion sub-links ≈19px hit area (reference: 33px) |
+| INFO | 6 | axe-core absent / focus-trap / Escape-focus-return; duplicated slug logic in StaticPages; locale-sensitive sort assertion; `home-content.ts` hand-built href; `smoke.mjs` outside both typecheck gates; no React error boundary |
+
+### Verified live-parity evidence (agent-browser, reference logged-out)
+
+**Confirmed green (no code change):** mobile bar geometry byte-equal on both sites
+(logo x=0 [ref w=49 / clone w=48], Search x=246, Bag x=294, menu x=342 — all 48px);
+mobile menu open/expand/navigate/close functional with zero console errors; search
+typeahead matches; `/store` h1 parity; baseline gates exactly as documented.
+
+**Content-model deltas (the reference's flyout content has evolved past the
+session-2 capture):**
+
+1. **Entertainment has a flyout on the live reference** (measured, 490px panel):
+   `Explore Entertainment` (Explore Entertainment, Apple TV, Apple Music, Apple
+   Arcade, Apple Fitness+, Apple Podcasts, Apple Books, App Store) + `Support`
+   (Apple TV Support, Apple Music Support). The clone renders no Entertainment
+   flyout at all (the seam returns `[]`).
+2. **Home flyout is a single `Quick Links` section** (measured, 44px single-row
+   panel): Shop Gifts, Find a Store, AirPods, Apple Intelligence, Apple Trade In.
+   The clone renders the generic three-section category model.
+3. **Accessories flyout is two sections**: `Shop Accessories` (Shop All
+   Accessories, Mac, iPad, iPhone, Apple Watch, Apple Vision Pro, AirPods, Home)
+   + `Explore Accessories` (Made by Apple, Beats, AirTag). The clone renders the
+   generic three-section model.
+4. **Store flyout's first Shop label is `Shop Gifts`** (the reference's seasonal
+   swap; the clone ships `Shop All`).
+5. **Support `Explore Support` carries 9 rows on the reference** (iPhone, Mac,
+   iPad, Watch, Apple Vision Pro, AirPods, Music, TV, Explore Support) — the clone
+   adds a 10th (`Home`) the reference does not render.
+6. **Per-category label drift** (live capture vs the seam's current model):
+   Mac More-from +`Education`; iPhone More-from +`Wallet, Pay`; iPad More-from
+   +`iPadOS 27`, `Apple Creator Studio`, `Education`, `Apple at Work`; Watch —
+   reference order is Apple Watch Support, AppleCare, `watchOS 27`, `Apple Watch
+   For Your Kids`, Apps by Apple, `Apple Fitness+`, `Education` (no AI-and-Siri /
+   iCloud+ rows), +`Apple Watch Straps` in Shop; Vision — reference order is
+   Apple Vision Pro Support, AppleCare, `visionOS 27`, `Apple Vision Pro for
+   Enterprise`, Shop swaps Trade In for `Book a Demo`, Explore is
+   `Explore Apple Vision Pro` + `Tech Specs`; AirPods — More-from is AirPods
+   Support, AppleCare, `Hearing Health`, `Apple Music`, `Apple Fitness+`, Shop is
+   the three model shops + Accessories.
+7. **Mobile accordion rows**: every one of the reference's 11 rows carries an
+   expand button (measured on the reference's dialog); the clone's Entertainment
+   row lacks one (follows from delta 1).
+
+## Remediation ToDo list (session 3 — S3-*)
+
+### Phase 1 — content seam (TDD-first)
+
+- **S3-1.** Rewrite `flyoutSections()` in `src/lib/site-content.ts` to the
+  live-measured per-category structures: explicit section models for `store`
+  (Shop Gifts swap), `support` (drop `Home`), `home` (single Quick Links),
+  `entertainment` (Explore Entertainment + Support), `accessories` (Shop
+  Accessories + Explore Accessories); per-category label lists for
+  mac/ipad/iphone/watch/vision/airpods per the capture above. Catalog products
+  stay in the Explore rows (the documented D6 deviation). Tests RED first
+  (`site-content.test.ts` rewritten to pin the captured model: structures,
+  labels, the routeHref-factory grammar, the no-dead-slugs invariant).
+- **S3-2.** Fix the `INFO_TITLES` over-derivation (audit LOW-2) in the same seam
+  change: derive titles only from links that actually route to `#/info/`
+  (footer + legal + the flyout model's own info links) — the 9 store-routed
+  footer labels stop seeding orphan `/info/*` routes.
+
+### Phase 2 — env contract + hygiene
+
+- **S3-3.** `scripts/build-sitemap.mjs`: resolve `VITE_SITE_URL` via Vite's
+  `loadEnv` so the `.env.example` documented `cp .env.example .env` path actually
+  stamps the base (shell env still wins). Verified by a custom-base `.env` run.
+- **S3-4.** Delete dead `src/utils/cn.ts`; `npm rm clsx tailwind-merge`
+  (audit LOW-1 — zero importers verified).
+- **S3-5.** Mobile accordion sub-links: `py-2` touch padding (≈35px hit area,
+  reference measures 33px) — audit LOW-3.
+
+### Phase 3 — e2e + regeneration
+
+- **S3-6.** Update `tests/e2e/mobile-navigation.spec.ts` (all 11 rows carry
+  expand buttons; sub-link height ≥ 32px) and `tests/e2e/home.spec.ts` (flyout
+  content assertions to the new model).
+- **S3-7.** Regenerate `public/sitemap.xml` + `public/robots.txt`; measure the
+  new route count; count-lockstep sweep across the doc set.
+
+### Phase 4 — evidence & delivery
+
+- **S3-8.** Screenshots (the 10-shot family, re-captured on the remediated dev
+  server), docs sweep (README/AGENTS/CLAUDE/PAD/SKILL/reference-investigation/
+  DEPLOYMENT + worklog Task 115), atomic commits, SSH-wrapper push to `main`.
+
+## Plan validation notes (session 3, against the codebase)
+
+- `flyoutSections()` is the single seam feeding the desktop flyouts, the mobile
+  accordion bodies and (via `INFO_TITLES`) the sitemap's info routes — one change
+  propagates everywhere by design; `NAV_LINKS` and the `MobileMenuRow`
+  expand-button logic (`sections.length > 0`) pick the Entertainment/Home/
+  Accessories flyouts up with no component change.
+- Blast radius on tests: `site-content.test.ts` (9 tests, rewritten), 
+  `sitemap.test.ts` (route-count derivations hold — they iterate `INFO_TITLES`),
+  `mobile-navigation.spec.ts` (2 assertions flip), `home.spec.ts` (flyout labels),
+  `smoke.mjs` (label-dependent assertions checked before run). Count lockstep:
+  unit count may move; sitemap route count moves; both swept in the same commit.
+- `scripts/build-sitemap.mjs` already imports from `vite` (`ssrLoadModule`);
+  `loadEnv` is an additive import from the same package — no new dependency.
+- Risk control: the reference's seasonal `Shop Gifts` label is the live state at
+  capture time and will rotate again; it is modeled as content, not hardcoded
+  structure, and can be re-captured next cycle. The accordion-expansion semantics
+  (independent toggles) keep the clone's footer convention (unchanged from
+  session 2's Reasoned disposition).

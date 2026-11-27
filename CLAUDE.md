@@ -109,10 +109,10 @@ connect to it): `bash docs/setup_pg_z.sh` — see `docs/DEPLOYMENT.md` §4.
 | `npm run preview` | Serve `dist/` (bind `--host 127.0.0.1`) |
 | `npm run lint` | ESLint 10 flat config — must exit 0 |
 | `npm run typecheck` / `npm run typecheck:tests` | `tsc --noEmit` (app / tests+configs) |
-| `npm run test` | Vitest run (7 files / 62 tests) |
-| `npm run test:e2e` | Playwright (24 tests; builds + serves the artifact) |
+| `npm run test` | Vitest run (7 files / 71 tests) |
+| `npm run test:e2e` | Playwright (25 tests; builds + serves the artifact) |
 | `npm run test:smoke` | 45-assertion file:// battery over `dist/` |
-| `npm run sitemap` | Regenerate `public/sitemap.xml` |
+| `npm run sitemap` | Regenerate `public/sitemap.xml` + `public/robots.txt` (128 routes) |
 
 ## Testing Strategy
 
@@ -120,7 +120,7 @@ connect to it): `bash docs/setup_pg_z.sh` — see `docs/DEPLOYMENT.md` §4.
   reducer, router parsing (incl. malformed inputs), money/GST, checkout
   validation, flyout content model, sitemap route enumeration.
 - **E2E (Playwright, production build)** — `home.spec.ts` (tokens, the
-  three-section flyouts, gallery state machine, zero console errors),
+  per-category flyout content model, gallery state machine, zero console errors),
   `mobile-navigation.spec.ts` (390×844 touch: the reference's bar layout,
   accordion menu open/expand/sub-link navigation/close, geometry, no
   horizontal overflow), `store-flow.spec.ts` (search → configurator → bag →

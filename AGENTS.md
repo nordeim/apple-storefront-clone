@@ -13,11 +13,11 @@ in-memory bag, Singapore checkout). The evidence dossier (measured tokens, devia
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest/jsdom — **7 files / 62 tests**; update this count in README + PAD when it changes) |
-| Production build | `npm run build` (single file → `dist/index.html`, ~306 kB) |
-| E2E | `npm run test:e2e` (Playwright — **24 tests**; builds and serves `dist/` itself) |
+| Unit tests | `npm run test` (Vitest/jsdom — **7 files / 71 tests**; update this count in README + PAD when it changes) |
+| Production build | `npm run build` (single file → `dist/index.html`, ~307 kB) |
+| E2E | `npm run test:e2e` (Playwright — **25 tests**; builds and serves `dist/` itself) |
 | File:// smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
-| Regenerate sitemap | `npm run sitemap` (writes `public/sitemap.xml` + `public/robots.txt` from the tested `src/lib/sitemap.ts` seam — **123 routes**) |
+| Regenerate sitemap | `npm run sitemap` (writes `public/sitemap.xml` + `public/robots.txt` from the tested `src/lib/sitemap.ts` seam — **128 routes**) |
 | Clean gate order | lint → typecheck → typecheck:tests → test → build → test:e2e → test:smoke |
 
 Use `npm`; the lockfile is `package-lock.json`. Commit to `main` only (no feature branches);
@@ -60,7 +60,8 @@ remediation.
 
 The app reads **no** environment variables (verified: zero `import.meta.env`/`process.env` in `src/`).
 `VITE_SITE_URL` exists for `scripts/build-sitemap.mjs` only — one value stamps the sitemap base AND
-the robots.txt `Sitemap:` directive. See `.env.example`.
+the robots.txt `Sitemap:` directive; it resolves from the shell **or** a `.env` file (Vite `loadEnv`,
+shell wins — the `.env.example` `cp` flow works as documented). See `.env.example`.
 
 ## Testing posture
 

@@ -15,7 +15,7 @@ optional local PostgreSQL 17 is installed rootless by `docs/setup_pg_z.sh`
 
 - One React 19 single-page application: hash routing over 123 enumerated routes
   (home, store + 8 categories, 12 products, bag, checkout, confirmation, search,
-  entertainment, support, 98 info pages, 404), TypeScript strict, Tailwind CSS
+  entertainment, support, 103 info pages, 404), TypeScript strict, Tailwind CSS
   v4 CSS-first, built by Vite 7 into **one self-contained HTML file**.
 - No backend, no API, no database connection, no auth, no payment provider:
   the bag and last order live in memory; checkout takes no payment and sends

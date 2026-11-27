@@ -8,6 +8,38 @@
 **Rule:** Every architectural decision in this document traces to a specific rationale.
 Nothing is here "because it's popular."
 
+#### Revision Block — v1.2 (the session-3 full-sweep content-model cycle)
+
+- `[SR]` The session-3 cycle (2026-11-27 late, `docs/REMEDIATION_PLAN.md` session-3 section) ran
+  the standing verification on the pulled tree (9841cb1) — baseline gates exactly as documented —
+  plus a read-only audit (0 CRITICAL/HIGH; 1 MEDIUM, 3 LOW, 6 INFO) and an agent-browser
+  full-sweep of **all eleven** reference flyouts (session 2 captured Store/Mac/iPhone/Support
+  only). Measured deltas: the live reference had grown an Entertainment flyout (Explore
+  Entertainment + Support), a single-Quick-Links Home flyout, a two-section Accessories flyout,
+  a seasonal `Shop Gifts` store label, a 9-row (no Home) Explore Support, and per-category
+  More-from label drift (Wallet, Pay; watchOS 27; visionOS 27; iPadOS 27; Apple Creator Studio;
+  Education; Hearing Health; Apple Watch Straps; Book a Demo; Apple Vision Pro for Enterprise…).
+- `[FIX]` `flyoutSections()` rewritten to the live-measured per-category structures (tests RED
+  first — `site-content.test.ts` 9 → 18 tests pinning structures, label lists, the routeHref
+  grammar and the no-dead-slugs invariant); `INFO_TITLES` now derives only from links that route
+  to `#/info/` — the nine store-routed footer labels stop seeding orphan routes (audit LOW-2);
+  `scripts/build-sitemap.mjs` resolves `VITE_SITE_URL` via Vite `loadEnv` so the documented
+  `cp .env.example .env` flow stamps the base (audit MEDIUM-1 — the shell env still wins);
+  dead `src/utils/cn.ts` deleted with the unused `clsx`/`tailwind-merge` deps (LOW-1); mobile
+  accordion sub-links carry `py-2` touch padding (≈39px hit area, reference 33px — LOW-3).
+- `[VERIFY]` Full gate green after the change: lint 0 errors · typecheck clean ×2 · unit 7 files /
+  71 tests · build 307.1 kB / 92.3 kB gzip (CSS 32.1 kB / 489 rules) · e2e 25/25 · smoke 45/45,
+  zero console errors. Live on the dev server: the Entertainment flyout renders the reference's
+  two-section content (10 links), the Home flyout its 5-link Quick Links, all 11 mobile rows
+  carry expand buttons, and the sub-links measure 39px. Sitemap regenerated: 128 routes
+  (103 info pages). `.env`-file base verified by a custom-origin run
+  (`https://envfile-test.example.org` stamped into both files).
+- `[CHORE]` README/AGENTS/CLAUDE/PAD/SKILL/reference-investigation/DEPLOYMENT swept in lockstep
+  (counts 7/62 → 7/71 unit, 24 → 25 e2e, 123 → 128 routes); 13 screenshots under
+  `docs/screenshots/` (the standing 10 + the Entertainment flyout, the iPhone flyout and the
+  mobile Entertainment expansion); `scripts/capture-screenshots.sh` added (reproducible captures);
+  worklog Task 115.
+
 #### Revision Block — v1.1 (the session-2 live-parity pass)
 
 - `[SR]` The session-2 cycle (2026-11-27 evening, `docs/REMEDIATION_PLAN.md` session-2 section)
@@ -130,7 +162,7 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
   storefront clone does not need a server); plain static HTML (no componentization).
 
 **ADR-002: Hash-based routing.**
-- **Context:** A single-file artifact with no server rewrites must handle ~123 routes.
+- **Context:** A single-file artifact with no server rewrites must handle ~128 routes.
 - **Decision:** `src/lib/router.ts` parses `location.hash` (`#/store/mac`,
   `#/product/iphone-18-pro`, `#/search?q=…`); `routeHref.*` factories build every href.
 - **Rationale:** Works from `file://` and any static host; no 404-handling server
@@ -190,7 +222,7 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 
 **ADR-007: SEO posture — generated sitemap, honest hash-route caveat.**
 - **Context:** Hash routes collapse to one URL for crawlers (ADR-002 consequence).
-- **Decision:** `src/lib/sitemap.ts` enumerates the real route set (123 URLs) from the
+- **Decision:** `src/lib/sitemap.ts` enumerates the real route set (128 URLs) from the
   live catalog and footer map (tested, never hand-maintained);
   `scripts/build-sitemap.mjs` regenerates `public/sitemap.xml` against
   `VITE_SITE_URL`; `robots.txt`, OG/Twitter meta and JSON-LD ship in the entry HTML.
@@ -495,8 +527,8 @@ credentials.
 ### 8.1 Production Build
 
 `npm run build` → `vite build` with `react()`, `@tailwindcss/vite`, and
-`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 305.5 kB /
-92.4 kB gzip this cycle; CSS 32.1 kB / 489 rules). No server bundle, no image
+`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 307.1 kB /
+92.3 kB gzip this cycle; CSS 32.1 kB / 489 rules). No server bundle, no image
 pipeline, no external requests.
 
 ### 8.2 Environment Variables
@@ -571,18 +603,18 @@ The full remediation history of this cycle: `docs/REMEDIATION_PLAN.md`.
 | File | Lines | Purpose |
 |---|---|---|
 | `src/lib/router.ts` | 86 | The hash-route grammar; every href factory |
-| `src/lib/catalog.ts` | 357 | The typed catalog: 8 categories, 12 products, option matrices, search |
+| `src/lib/catalog.ts` | 356 | The typed catalog: 8 categories, 12 products, option matrices, search |
 | `src/lib/cart.ts` | 93 | The bag reducer + price/line-key seam |
 | `src/lib/checkout.ts` | 43 | Singapore checkout validation + order numbers |
 | `src/lib/sitemap.ts` | 75 | Route-set enumeration + sitemap.xml/robots.txt rendering (123 URLs) |
-| `src/lib/site-content.ts` | 282 | Nav links, the flyout content model (three sections per entry), footer directory, info-page map |
+| `src/lib/site-content.ts` | 378 | Nav links, the per-category flyout content model, footer directory, info-page map |
 | `src/index.css` | 390 | Tailwind v4 tokens + all component CSS + source scoping |
 | `src/components/GlobalNav.tsx` | 270 | Desktop flyouts, mobile accordion menu, bag popover, search trigger |
 | `src/components/ProductArt.tsx` | 449 | The original SVG art library |
 | `src/components/EntertainmentGallery.tsx` | 153 | The TV+ gallery state machine (dwell, pause, keys) |
 | `src/App.tsx` | 120 | Route switch, titles, navigation side-effects |
-| `tests/e2e/mobile-navigation.spec.ts` | 143 | The mobile-menu contract (bar layout, accordion, the v4 display trap) |
-| `tests/e2e/smoke.mjs` | 120 | The exhaustive file:// parity battery (45 assertions) |
+| `tests/e2e/mobile-navigation.spec.ts` | 146 | The mobile-menu contract (bar layout, accordion, the v4 display trap) |
+| `tests/e2e/smoke.mjs` | 125 | The exhaustive file:// parity battery (45 assertions) |
 | `vite.config.ts` | 30 | Build pipeline + dep-scan scoping (ADR-003) |
 | `playwright.config.ts` | 47 | The two-project e2e harness over `vite preview` |
 
