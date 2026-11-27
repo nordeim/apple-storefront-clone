@@ -323,3 +323,162 @@ session-2 capture):**
   structure, and can be re-captured next cycle. The accordion-expansion semantics
   (independent toggles) keep the clone's footer convention (unchanged from
   session 2's Reasoned disposition).
+
+---
+
+# Session 4 (2026-11-27, night — the store-surface parity cycle)
+
+Inputs: the operator's standing review prompt on the pulled tree (7b8a3ec =
+e16a436 + two operator docs commits: the session_3.md log paste and a worklog
+trim). Baseline re-observed exactly as documented (lint 0 errors · 2× typecheck
+clean · 7 files/71 unit · build 307.09 kB · e2e 25/25 · smoke 45, zero console
+errors · sitemap 128 routes · PG 17 rootless accepting connections). A
+read-only subagent audit (web-application methodology, `skills/` excluded) ran
+on the tree; the live-parity pass this cycle re-captured **all eleven reference
+flyouts fresh** (with section headings), the mobile bar/menu, the /sg/store
+page chip row and the category-page h1.
+
+## Session-4 findings (counts by severity)
+
+| Severity | Count | Key items |
+|---|---|---|
+| CRITICAL | 0 | — |
+| HIGH | 0 | — |
+| MEDIUM | 2 | Home flyout restructured on the live reference; Explore product-family rows missing in 5 categories |
+| LOW | 5 | audit LOW-1 (phone `65` strip); audit LOW-2 (`?buy` grammar unowned + hand-built hrefs); PAD §7 stale counts; store chip row label/order/count; category-page h1 short forms |
+| INFO | 8 | audit INFO set (slugify duplication, router leniency, cart no-op refs, smoke.mjs gate gap, locale sort, a11y posture, error boundary, react-refresh warnings — posture items documented as deferred) |
+
+### Verified evidence (this cycle, both sites)
+
+- **Mobile navigation (operator's standing focus): CONFIRMED WORKING.** Clone
+  bar at 390×844: logo x=0/w=48, Search x=246, Bag x=294, Menu x=342, all 48px
+  targets — byte-equal to the reference's pinned measurements (logo w=49 is the
+  documented 1px deviation). Menu opens at top=48, height 796, rgba(22,22,23,.98);
+  all 11 rows carry expand buttons; Mac expansion shows 21 links across 3
+  sections; sub-links 39px; "Compare Mac" click → `#/info/compare-mac`, menu
+  closed, h1 "Compare Mac", zero console errors. **No Tailwind v4 bug** (the
+  mount/unmount-via-state contract holds; e2e pins it).
+- **Home flyout (M-1):** the live reference RESTRUCTURED its Home flyout from
+  the session-3 "single Quick Links" model to a full three-section model
+  (measured both at 390×844 and 1440×900 — desktop = mobile):
+  Explore Home (Explore Home, Apple HomeView, Apple TV 4K, HomePod, HomePod
+  mini 2) / Shop Home (Shop Home, Shop Home Accessories, Personal Setup) /
+  More from Home (Home Support, AppleCare for Apple TV, AppleCare for HomePod,
+  Apple TV app, Apple TV, Home app, Apple Music, AirPlay) — 16 links. The clone
+  still renders the single Quick Links row (5 links).
+- **Explore product-family rows (M-2):** the reference's Explore sections list
+  the full product family per category — Mac: MacBook Neo, MacBook Air, MacBook
+  Pro, iMac, Mac mini, Mac Studio, Displays (7 rows); iPad: iPad Pro, iPad Air,
+  iPad, iPad mini, Apple Pencil, Keyboards (6); iPhone: iPhone Duo, iPhone 18
+  Pro, iPhone Air, iPhone 17, iPhone 17e, iPhone 16 (6); Watch: Apple Watch
+  Series 12, Ultra 4, SE 3, Nike, Hermès (5); AirPods: AirPods 5, Pro 3, Max 2
+  (3). The clone renders only its catalog products (2/1/2/1/1) — the session-3
+  D6 disposition. Shop/More-from sections match byte-for-byte in every category;
+  Store/Support/Entertainment/Accessories/Vision flyouts match exactly.
+- **Store chip row (measured at 1440×900, y=126):** reference = Mac, iPhone,
+  iPad, Apple Watch, Apple Vision Pro, Home, AirPods, AirTag, Accessories (9
+  chips, full-form labels, iPhone before iPad). Clone = All, Mac, iPad, iPhone,
+  Watch, Vision, AirPods, Home, Accessories (short forms, no AirTag).
+- **Category-page h1:** reference `/sg/shop/buy-watch` → "Shop Apple Watch"
+  (full form). Clone `#/store/watch` → "Shop Watch" (short form).
+- **/sg/store page:** h1 "Store" parity confirmed; the reference's body is an
+  editorial layout (The latest. / Personalisation. / Holiday picks. …) while
+  the clone renders the functional catalog — the documented superset posture
+  (README "What is in it"); full editorial mirroring is deferred as the
+  next-cycle target (product-page sweep).
+- **Audit (subagent, read-only):** 0 CRITICAL/HIGH/MEDIUM · 2 LOW + 8 INFO, all
+  evidence-backed; 13/13 doc anchors PASS. LOW-1: `checkout.ts` strips a bare
+  `65` prefix (a valid 8-digit SG number starting 65 is rejected with a
+  contradictory error). LOW-2: home tiles hand-build `#/product/x?buy` hrefs —
+  the `?buy` deep-link grammar is owned by no factory and pinned by no test;
+  `home-content.ts` is the only untested `src/lib` module. FYI: PAD §7 still
+  carries pre-session-3 counts (7/62, 24) — a missed lockstep sweep.
+
+## Remediation ToDo list (session 4 — S4-*)
+
+### Phase 1 — content seam (TDD-first)
+
+- **S4-1.** `flyoutSections()` Home case → the measured three-section model
+  (16 links): Apple HomeView and Apple TV 4K route to their catalog product
+  pages; Explore Home/Shop Home → `#/store/home`; Shop Home Accessories →
+  `#/store/accessories`; the remaining labels → info routes. The single
+  Quick-Links model is replaced (its "Apple Intelligence" info route retires
+  with it — the reference moved it; no other consumer links it).
+- **S4-2.** `flyoutSections()` Explore rows for mac/ipad/iphone/watch/airpods
+  → the reference's full product-family label lists. Labels that match a
+  catalog product route to its product page (MacBook Pro, iPad, iPhone Duo,
+  iPhone 18 Pro, Apple Watch Series 12, AirPods Pro 3); all other family
+  labels route to info pages. **D6 revised:** the reference's family labels are
+  the flyout model; catalog-only products (MacBook Pro with PROLED XDR
+  Display, AirTag 4-Pack, MagSafe Charger) stay reachable via the store pages —
+  the superset contract, one click deeper.
+- Tests RED first in `site-content.test.ts` (Home test inverted to 3 sections;
+  family-row label lists pinned per category; product-route assertions for the
+  6 matching labels; the routeHref grammar + no-dead-slugs invariants unchanged).
+
+### Phase 2 — audit fixes (TDD)
+
+- **S4-3.** `src/lib/checkout.ts` phone normalization: strip only an explicit
+  `+65` country code (`.replace(/^\+65/, "")`); regression tests for
+  "65123456" (valid, must pass) and "+65 6512 3456" (valid, must pass).
+- **S4-4.** `src/lib/router.ts`: add `routeHref.productBuy(id)`; use it in
+  `home-content.ts` (both CTA hrefs + the `#/store` fallback via
+  `routeHref.store()` in `Tile.tsx`); NEW `src/lib/home-content.test.ts` —
+  every tile CTA href satisfies the route grammar and every product id resolves
+  in the catalog (closes the untested-module gap).
+- **S4-5.** Store chip row → the measured model: `All` (superset affordance,
+  documented deviation — the reference has none), then Mac, iPhone, iPad,
+  Apple Watch, Apple Vision Pro, Home, AirPods, AirTag, Accessories. AirTag chip
+  → `#/info/airtag` (resolves in INFO_TITLES via the Accessories flyout). Chip
+  label map exported from the content seam; category h1 → full form
+  ("Shop Apple Watch") via the same map.
+- **S4-6.** Opportunistic INFO one-liners: `StaticPages.tsx` uses `slugify()`
+  from the seam (drops the duplicated transform); `tsconfig.tests.json` includes
+  `tests/**/*.mjs` (smoke battery under checkJs); `cart.ts` returns the same
+  reference on rejected actions (React bail-out); `sitemap.test.ts` expected
+  sort uses `localeCompare` (locale-safe assertion).
+- **S4-7.** PAD §7.1/§7.3 stale counts (7/62, 24 → the current numbers) — the
+  missed session-3 lockstep sweep, folded into this cycle's doc sweep.
+
+### Phase 3 — e2e + regeneration
+
+- **S4-8.** `home.spec.ts`: Home flyout test rewritten to the three-section
+  model; iPhone flyout test extended with a family-row pin (iPhone Air).
+  `mobile-navigation.spec.ts` and `smoke.mjs` pins audited (MacBook Pro /
+  iPhone 18 Pro survive the model change — no edits).
+- **S4-9.** `npm run sitemap` — regenerate; measure the new route count
+  (~128 + ~29 new info labels − 1 retired); count-lockstep sweep across the
+  doc set in the same commit.
+
+### Phase 4 — evidence & delivery
+
+- **S4-10.** Screenshots: re-capture the affected shots (desktop Home flyout,
+  desktop Mac flyout with the family rows, mobile Home expansion) + re-validate
+  the family via the capture script.
+- **S4-11.** Docs sweep: README (Home-flyout prose), AGENTS.md (counts),
+  CLAUDE.md (counts), PAD v1.3 revision block (§7 counts), SKILL v1.3.0
+  (project_state + D6 revision), reference-investigation (D6 rewritten +
+  deviations refresh), worklog Task 116.
+- **S4-12.** Full gate → atomic Conventional Commits on `main` → SSH-wrapper
+  push.
+
+## Plan validation notes (session 4, against the codebase)
+
+- `flyoutSections()` remains the single seam feeding the desktop flyouts, the
+  mobile accordion bodies and (via `INFO_TITLES`) the sitemap's info routes —
+  the Home and family-row changes propagate with no component edits (the
+  `Flyout` and `MobileMenuRow` renderers are content-agnostic, read in full).
+- Blast radius verified by reading every consumer: `home.spec.ts` Home-flyout
+  test (rewritten), `site-content.test.ts` Home + Mac-Explore tests (rewritten),
+  `mobile-navigation.spec.ts` (pins Mac/iPhone section structure + MacBook Pro +
+  iPhone 18 Pro — both labels survive the new model), `smoke.mjs` (pins
+  flyout "iPhone 18 Pro" + search "MacBook Pro" — both survive), store-flow
+  specs (no flyout/chip pins). Unit and sitemap counts move; both swept
+  lockstep in the same commit.
+- The AirTag chip's `#/info/airtag` destination resolves in INFO_TITLES today
+  (the Accessories flyout's Explore "AirTag" label) — no new derivation needed.
+- Risk control: the reference's product-family lists are its live state at
+  capture time (Season 2026 lineup); they are modeled as content in the seam,
+  re-capturable next cycle. The clone's catalog is untouched — the superset
+  (12 products, configurator, bag, checkout) is fully preserved; only the
+  flyout's label surface moves to the reference's model.

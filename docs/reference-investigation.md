@@ -40,9 +40,9 @@ Verified for Chromium at 1440×900 and 390×844 by `tests/e2e/smoke.mjs` ("token
 | D1 | Product imagery and hero videos replaced by original SVG art | Apple's assets are proprietary; keeps single-file build small |
 | D2 | Which promo/hero tile height maps to which breakpoint is Assumed (the reference exposes the set of values, not the mapping) | CSS values read, media-query pairing partly inferred |
 | D3 | Global nav is `position: sticky` (reference scrolls away) | Superset: bag/search reachable anywhere |
-| D4 | Flyout content follows the reference's measured per-category structures (session-3 full-sweep: device categories Explore/Shop/More-from; Home a single Quick-Links row; Entertainment Explore+Support; Accessories Shop+Explore; Store and Support their captured three-section models; informational labels from the live flyouts; product rows from the clone's catalog); destinations outside the clone resolve to generated info pages | All eleven flyouts captured live (session 3, 2026-11-27); the clone's product list is thinner than the reference's (12 illustrative models); the seasonal "Shop Gifts" label rotates on the reference and is modeled as content |
+| D4 | Flyout content follows the reference's measured per-category structures (session-4 sweep: device categories Explore/Shop/More-from with the reference's full product-family rows in Explore; Home the restructured Explore/Shop/More-from model; Entertainment Explore+Support; Accessories Shop+Explore; Store and Support their captured three-section models; informational labels from the live flyouts; family labels that match a catalog product route to its product page); destinations outside the clone resolve to generated info pages | All eleven flyouts captured live twice (session 3 + session 4, 2026-11-27); the reference's family lists are its live Season-2026 state, re-capturable; the seasonal "Shop Gifts" label rotates on the reference and is modeled as content |
 | D5 | Gallery backdrops are generated gradients; links go to `tv.apple.com/sg` | No hot-linking of `mzstatic.com` artwork |
-| D6 | Catalog prices/specs are illustrative | Reference home page has no price data |
+| D6 | Catalog prices/specs are illustrative; the flyout's Explore rows model the reference's family labels (catalog-only products — MacBook Pro with PROLED XDR Display, AirTag 4-Pack, MagSafe Charger — stay reachable via the store pages, one click deeper) | Reference home page has no price data; the superset catalog is the clone's own (revised session 4) |
 | D7 | Hash routing instead of path routing | Works from `file://` and any static host |
 | D8 | Side gutters of 12px on ≥735px, none on mobile | Assumed from CSS padding rules; not pixel-compared |
 | D9 | Mobile navigation restructured to the reference's measured layout (session 2): bar = logo flush left + Search/Bag/hamburger flush right; menu = two-level accordion (top rows navigate, expand buttons reveal the flyout sections); independent section toggles | Bar geometry measured live (x=0/246/294/342, 48px targets) and replicated byte-equal; the accordion's exclusivity semantics could not be conclusively measured live, so the clone follows its own footer-accordion convention (Reasoned) |
@@ -58,15 +58,15 @@ Verified for Chromium at 1440×900 and 390×844 by `tests/e2e/smoke.mjs` ("token
 |---|---|
 | `npx tsc --noEmit` | clean (Verified) |
 | `npx tsc --noEmit -p tsconfig.tests.json` (incl. scripts checkJs) | clean (Verified) |
-| `npx vitest run` | 7 files, 71 tests pass (Verified, session-3) |
+| `npx vitest run` | 8 files, 86 tests pass (Verified, session-4) |
 | `npm run lint` | 0 errors (Verified) |
-| `npm run build` | succeeds, `dist/index.html` single file, 307.1 kB / 92.3 kB gzip, CSS 32.1 kB / 489 rules (Verified, session-3 re-measure) |
-| `npm run test:e2e` (Playwright over `vite preview`) | 25/25 PASS (Verified, session-3) |
+| `npm run build` | succeeds, `dist/index.html` single file, 309.6 kB / 93.2 kB gzip, CSS 33.3 kB / 503 rules (Verified, session-4 re-measure) |
+| `npm run test:e2e` (Playwright over `vite preview`) | 25/25 PASS (Verified, session-4) |
 | `tests/e2e/smoke.mjs` (headless Chromium, `file://`) | 45/45 PASS, 0 console errors/warnings (Verified) |
 | Mobile navigation re-measured on the dev server (agent-browser, 390×844) | bar geometry byte-equal to the live reference (logo x=0 w=48, Search x=246, Bag x=294, Menu x=342); accordion opens/expands/navigates/closes; no Tailwind v4 display-toggling defect (Verified) |
 | Live parity pass against apple.com/sg (session 2) | gallery autoplay (dwell ≈4.16 s) and holiday animation confirmed matching; flyout three-section structure and mobile accordion modeled on live captures (Verified) |
 | Live parity full-sweep against apple.com/sg (session 3) | all eleven flyouts re-captured; Entertainment/Home/Accessories structures and per-category label drift closed to the seam; every mobile row carries an expand button; sub-links 39px vs reference 33px; search typeahead and /store h1 parity confirmed; zero console errors (Verified) |
-| Sitemap regeneration (session 3) | 128 routes / 103 info pages; `.env`-file VITE_SITE_URL verified by a custom-origin run stamped into both sitemap.xml and robots.txt (Verified) |
+| Sitemap regeneration (session 4) | 156 routes / 131 info pages; `.env`-file VITE_SITE_URL verified by a custom-origin run stamped into both sitemap.xml and robots.txt (Verified) |
 | Visual review of screenshots (desktop home, mobile, product) | done by eye; no pixel diff (Verified for what was viewed) |
 | Safari / Firefox / real devices / screen readers | not run (Unknown: not available in this sandbox) |
 

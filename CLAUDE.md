@@ -109,10 +109,10 @@ connect to it): `bash docs/setup_pg_z.sh` — see `docs/DEPLOYMENT.md` §4.
 | `npm run preview` | Serve `dist/` (bind `--host 127.0.0.1`) |
 | `npm run lint` | ESLint 10 flat config — must exit 0 |
 | `npm run typecheck` / `npm run typecheck:tests` | `tsc --noEmit` (app / tests+configs) |
-| `npm run test` | Vitest run (7 files / 71 tests) |
+| `npm run test` | Vitest run (8 files / 86 tests) |
 | `npm run test:e2e` | Playwright (25 tests; builds + serves the artifact) |
 | `npm run test:smoke` | 45-assertion file:// battery over `dist/` |
-| `npm run sitemap` | Regenerate `public/sitemap.xml` + `public/robots.txt` (128 routes) |
+| `npm run sitemap` | Regenerate `public/sitemap.xml` + `public/robots.txt` (156 routes) |
 
 ## Testing Strategy
 

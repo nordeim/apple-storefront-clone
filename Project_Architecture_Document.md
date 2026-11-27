@@ -1,4 +1,4 @@
-# apple-storefront-clone — Master Project Architecture Document (PAD) v1.0
+# apple-storefront-clone — Master Project Architecture Document (PAD) v1.3
 
 **Classification:** Internal Engineering Reference
 **Status:** DEFINITIVE, PRODUCTION-LOCKED BLUEPRINT
@@ -7,6 +7,44 @@
 **Audience:** Senior Engineers, Tech Leads, DevOps, and Onboarding Engineers
 **Rule:** Every architectural decision in this document traces to a specific rationale.
 Nothing is here "because it's popular."
+
+#### Revision Block — v1.3 (the session-4 store-surface parity cycle)
+
+- `[SR]` The session-4 cycle (2026-11-27 night, `docs/REMEDIATION_PLAN.md` session-4 section) ran
+  the standing verification on the pulled tree (7b8a3ec) — baseline gates exactly as documented —
+  plus a read-only audit (0 CRITICAL/HIGH/MEDIUM; 2 LOW + 8 INFO, 13/13 anchors PASS) and a
+  fresh agent-browser sweep of all eleven reference flyouts, the mobile bar/menu, the /sg/store
+  chip row and the category-page h1. Measured deltas: the live reference had RESTRUCTURED its
+  Home flyout into the full three-section category model (Explore Home / Shop Home / More from
+  Home, 16 links), its Explore sections list the full product family per category (Mac: MacBook
+  Neo/Air/Pro/iMac/mini/Studio/Displays; iPhone: Duo/18 Pro/Air/17/17e/16; iPad: Pro/Air/iPad/
+  mini/Pencil/Keyboards; Watch: Series 12/Ultra 4/SE 3/Nike/Hermès; AirPods: 5/Pro 3/Max 2), and
+  its store chip row uses full-form labels in iPhone-before-iPad order with an AirTag chip;
+  category pages carry full-form h1s ("Shop Apple Watch").
+- `[FIX]` `flyoutSections()` re-modeled: the Home case to the measured three-section structure;
+  the five device categories' Explore rows to the reference's family labels routed via a
+  `familyLink()` helper (labels matching a catalog product route to its product page — MacBook Pro,
+  iPad, iPhone Duo, iPhone 18 Pro, Apple Watch Series 12, AirPods Pro 3 — all others to info
+  routes; **D6 revised**: catalog-only products stay reachable via the store pages, one click
+  deeper). New `STORE_CHIPS` seam (order, full-form labels, AirTag chip → `#/info/airtag`);
+  `StorePage` renders the seam's chips and the full-form category h1. `routeHref.productBuy()`
+  factory added; `home-content.ts`/`Tile.tsx` hrefs now all factory-built with a new
+  `home-content.test.ts` (the module was the only untested `src/lib` seam). Audit LOW-1 fixed:
+  checkout phone normalization strips only an explicit `+65` (a bare `65`-leading 8-digit
+  number survives). INFO closes: `StaticPages` uses the seam's `slugify()`; `tests/**/*.mjs`
+  (the smoke battery, now JSDoc-typed) under the `typecheck:tests` gate; the cart reducer
+  returns the same reference on rejected actions; the sitemap test sorts with `localeCompare`.
+- `[VERIFY]` Full gate green after the change: lint 0 errors · typecheck clean ×2 · unit 8 files /
+  86 tests · build 309.6 kB / 93.2 kB gzip (CSS 33.3 kB / 503 rules) · e2e 25/25 · smoke 45/45,
+  zero console errors. Live on the dev server: the Home flyout renders the reference's 3-section
+  16-link model; the Mac flyout the 10-link Explore with family rows; the mobile Home accordion
+  expansion carries 16 sub-links at 39px; the store chip row matches the measured order and the
+  watch-category h1 reads "Shop Apple Watch". Sitemap regenerated: 156 routes / 131 info pages.
+- `[CHORE]` README/AGENTS/CLAUDE/PAD/SKILL/reference-investigation swept in lockstep (counts
+  7/71 → 8/86 unit, 128 → 156 routes); the stale §7 counts (7/62, 24 tests) this cycle's audit
+  caught were corrected; 17 screenshots under `docs/screenshots/` (the standing 13 + the Home
+  flyout, the Mac family rows, the mobile Home expansion, the store-watch page);
+  `scripts/capture-screenshots.sh` extended; worklog Task 116.
 
 #### Revision Block — v1.2 (the session-3 full-sweep content-model cycle)
 
@@ -162,7 +200,7 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
   storefront clone does not need a server); plain static HTML (no componentization).
 
 **ADR-002: Hash-based routing.**
-- **Context:** A single-file artifact with no server rewrites must handle ~128 routes.
+- **Context:** A single-file artifact with no server rewrites must handle ~156 routes.
 - **Decision:** `src/lib/router.ts` parses `location.hash` (`#/store/mac`,
   `#/product/iphone-18-pro`, `#/search?q=…`); `routeHref.*` factories build every href.
 - **Rationale:** Works from `file://` and any static host; no 404-handling server
@@ -192,7 +230,7 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 - **Decision:** All logic in `src/lib/*` (catalog, cart reducer, router, money, checkout
   validation, content, sitemap); the single shared store is
   `src/context/BagContext.tsx` (React context + reducer, in-memory only).
-- **Rationale:** The seam is unit-testable without rendering (62 tests); "no backend,
+- **Rationale:** The seam is unit-testable without rendering (86 tests); "no backend,
   nothing transmitted" is an explicit documented deviation, not an accident.
 - **Consequences:** Bag/order state resets on reload (documented limitation).
 - **Alternatives rejected:** localStorage persistence (silently changes the privacy
@@ -209,8 +247,8 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 
 **ADR-006: Three-tier test suite against the production artifact.**
 - **Context:** The dev server is not the build; parity claims must be executable.
-- **Decision:** Vitest for the seam (62 tests); Playwright against
-  `npm run build && vite preview --host 127.0.0.1` (24 tests: tokens,
+- **Decision:** Vitest for the seam (86 tests); Playwright against
+  `npm run build && vite preview --host 127.0.0.1` (25 tests: tokens,
   mobile-navigation state machine, store flow incl. hostile routes); the exhaustive
   45-assertion `file://` smoke battery as the parity net.
 - **Rationale:** The token assertions ARE the parity evidence; the mobile spec pins
@@ -326,7 +364,7 @@ apple-storefront-clone/
 ├── scripts/
 │   └── build-sitemap.mjs       ← regenerates public/sitemap.xml + public/robots.txt from the seam
 ├── public/
-│   ├── sitemap.xml             ← 123 routes, generated (npm run sitemap)
+│   ├── sitemap.xml             ← 156 routes, generated (npm run sitemap)
 │   └── robots.txt              ← generated alongside the sitemap (same VITE_SITE_URL)
 ├── docs/                       ← reference-investigation.md (parity dossier), DEPLOYMENT.md,
 │                                 REMEDIATION_PLAN.md (this cycle's audits), screenshots/,
@@ -514,9 +552,9 @@ credentials.
 
 - [ ] `npm run lint` exit 0
 - [ ] `npm run typecheck` && `npm run typecheck:tests` clean
-- [ ] `npm run test` — 7 files / 62 tests
+- [ ] `npm run test` — 8 files / 86 tests
 - [ ] `npm run build` — single-file `dist/index.html`
-- [ ] `npm run test:e2e` — 24 passed
+- [ ] `npm run test:e2e` — 25 passed
 - [ ] `npm run test:smoke` — 45 assertions, zero console errors
 - [ ] Docs touched in the same commit; counts in lockstep
 
@@ -527,8 +565,8 @@ credentials.
 ### 8.1 Production Build
 
 `npm run build` → `vite build` with `react()`, `@tailwindcss/vite`, and
-`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 307.1 kB /
-92.3 kB gzip this cycle; CSS 32.1 kB / 489 rules). No server bundle, no image
+`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 309.6 kB /
+93.2 kB gzip this cycle; CSS 33.3 kB / 503 rules). No server bundle, no image
 pipeline, no external requests.
 
 ### 8.2 Environment Variables

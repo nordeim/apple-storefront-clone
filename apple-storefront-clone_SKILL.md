@@ -8,12 +8,12 @@ description: >
   to it. Covers the architecture, design tokens, the Tailwind v4 trap log, the
   three-tier test suite, the build/SEO posture, and the hard lessons of the 2026-11
   remediation cycle.
-version: 1.2.0
+version: 1.3.0
 last_updated: 2026-11-27
 tags: [react, vite, tailwindcss-v4, typescript, spa, e-commerce-clone, e2e-testing]
 ---
 
-# apple-storefront-clone — Engineering Skill (v1.2.0)
+# apple-storefront-clone — Engineering Skill (v1.3.0)
 
 > **What this is:** the distilled, codebase-verified engineering reference for
 > the remediated `apple-storefront-clone`. Every number below was measured in
@@ -48,7 +48,7 @@ entertainment/support pages. Philosophy:
 | TypeScript | 5.9.3 | `strict`, `noUnusedLocals/Parameters`, bundler resolution, `@/*` → `src/*` |
 | Vite | 7.3.7 | `react()` + `@tailwindcss/vite` + `viteSingleFile()`; dep scan pinned to `index.html` |
 | Tailwind CSS | 4.1.17 | CSS-first: `@theme` tokens in `src/index.css`; NO JS config; NO PostCSS config |
-| Vitest | 4.1.12 (jsdom 29.1.1) | 7 files / 71 tests over the seam |
+| Vitest | 4.1.12 (jsdom 29.1.1) | 8 files / 86 tests over the seam |
 | Playwright | 1.65.1 | 25 e2e over the production build; Chromium only (WebKit unavailable in the sandbox) |
 | ESLint | 10.15.0 (typescript-eslint 8.74.0) | Flat config; `skills/**` and `docs/**` ignored |
 | (removed) | — | `clsx`/`tailwind-merge` and the dead `cn()` helper were dropped in session 3 (zero importers) |
@@ -139,7 +139,7 @@ token-substring AND-match search), `src/lib/site-content.ts` (nav links, the
 per entry, shared by the desktop flyouts and the mobile accordion menu; the
 full footer directory + info-page map via `slugify`), `src/lib/home-content.ts`
 (hero/promo tile copy + footnotes). The sitemap seam (`src/lib/sitemap.ts`)
-enumerates 128 routes from exactly these sources — the route set can never
+enumerates 156 routes from exactly these sources — the route set can never
 drift from the catalog.
 
 ## §8 Accessibility Implementation
@@ -202,8 +202,8 @@ real screen readers (documented Unknown).
 
 ```bash
 npm run lint && npm run typecheck && npm run typecheck:tests   # 0 / clean / clean
-npm run test                       # 7 files / 71 tests
-npm run build                      # dist/index.html ~307 kB (CSS 32.1 kB)
+npm run test                       # 8 files / 86 tests
+npm run build                      # dist/index.html ~310 kB (CSS 33.3 kB)
 npm run test:e2e                   # 25/25
 npm run test:smoke                 # 45 assertions, 0 console errors
 npm run sitemap                    # if routes changed: regenerate + re-check 128→N
@@ -359,22 +359,33 @@ lockfiles, running app) → IMPLEMENT (small typed test-backed increments) →
 VERIFY (the full gate, browser-verified UI) → DELIVER (atomic conventional
 commits to `main`, docs lockstep, evidence labels, deferred-debt honesty).
 
-## Appendix B — project_state (measured 2026-11-27, session 3)
+## Appendix B — project_state (measured 2026-11-27, session 4)
 
-- Unit: **7 files / 71 tests** (seam: cart, catalog, checkout, the per-category
-  flyout content model, money, router, sitemap + robots)
+- Unit: **8 files / 86 tests** (seam: cart, catalog, checkout, the per-category
+  flyout content model, home tiles, money, router, sitemap + robots)
 - E2e: **25 tests** (home 8, mobile-navigation 11, store-flow 6) over
   `vite preview --host 127.0.0.1:4173`
-- Smoke: **45 assertions**, `file://dist/index.html`, 0 console errors
-- Sitemap: **128 routes / 103 info pages** generated from the seam; robots.txt
+- Smoke: **45 assertions**, `file://dist/index.html`, 0 console errors — the
+  battery is now JSDoc-typed and covered by `typecheck:tests`
+- Sitemap: **156 routes / 131 info pages** generated from the seam; robots.txt
   rendered by the same seam + generator (one `VITE_SITE_URL` stamps both; the
   value resolves from the shell or a `.env` file via Vite `loadEnv`)
-- Build: `dist/index.html` **307.1 kB / 92.3 kB gzip**; CSS **32,125 bytes /
-  489 rules**; build time ~1.1 s
+- Build: `dist/index.html` **309.6 kB / 93.2 kB gzip**; CSS **33,322 bytes /
+  503 rules**; build time ~1.0 s
 - Gate: `npm run gate` — lint 0 errors · typecheck clean · tests green · build · e2e · smoke
+- Flyout model (session-4): Home is the reference's restructured three-section
+  model (Explore/Shop/More from Home, 16 links); Mac/iPad/iPhone/Watch/AirPods
+  Explore rows carry the reference's full product-family labels (family
+  labels that match a catalog product route to its product page — MacBook Pro,
+  iPad, iPhone Duo, iPhone 18 Pro, Apple Watch Series 12, AirPods Pro 3 — the
+  rest to info routes; catalog-only products stay reachable via the store —
+  deviation D6 as revised in session 4)
+- Store surfaces (session-4): the chip row matches the reference's measured
+  order and full-form labels (+ AirTag chip; the leading All chip is the
+  superset affordance); category h1s are full-form ("Shop Apple Watch")
 - Local PG 17 (optional): `postgresql://postgres:postgres@127.0.0.1:5432/app_db` — installed rootless, unused by the SPA
-- Mobile nav parity (session-3 re-measure at 390×844): bar geometry byte-equal
+- Mobile nav parity (session-4 re-measure at 390×844): bar geometry byte-equal
   (logo x=0 w=48, Search x=246, Bag x=294, Menu x=342); all 11 accordion rows
-  carry expand buttons (Entertainment included — the live reference grew its
-  flyout); sub-links 39px vs reference 33px; the desktop flyout content model
-  matches all eleven live-captured flyouts
+  carry expand buttons; the Home expansion renders the 16-link three-section
+  model at 39px sub-links; the desktop flyout content model matches all eleven
+  live-captured flyouts

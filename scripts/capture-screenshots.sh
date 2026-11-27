@@ -3,7 +3,9 @@
 # Usage: bash scripts/capture-screenshots.sh
 # Shots 1-10 are the standing family; 11-13 pin the session-3 flyout
 # remediation (the new Entertainment flyout, the iPhone three-section content,
-# and the mobile accordion expansion).
+# and the mobile accordion expansion). Shots 14-17 pin the session-4 parity
+# work (the Home flyout restructure, the Mac family rows, the mobile Home
+# expansion, the store chip row + full-form category h1).
 # NOTE: agent-browser keeps the session viewport across `open` calls — the
 # `--viewport` flag on open does not reset it — so every capture explicitly
 # `set viewport` after navigation.
@@ -72,6 +74,38 @@ agent-browser eval "document.querySelector('#mobile-menu button[aria-label=\"Ent
 sleep 1
 agent-browser screenshot "$OUT/13-mobile-menu-entertainment.png" >/dev/null 2>&1
 echo "captured 13-mobile-menu-entertainment"
+
+# 14 — desktop Home flyout (session-4: the reference's restructured three-section model)
+agent-browser open "$BASE" >/dev/null 2>&1
+agent-browser set viewport 1440 900 >/dev/null 2>&1
+sleep 2
+agent-browser hover 'nav a[href*="store/home"]' >/dev/null 2>&1
+sleep 1
+agent-browser screenshot "$OUT/14-desktop-flyout-home.png" >/dev/null 2>&1
+echo "captured 14-desktop-flyout-home"
+
+# 15 — desktop Mac flyout (session-4: the reference's full product-family rows)
+agent-browser open "$BASE" >/dev/null 2>&1
+agent-browser set viewport 1440 900 >/dev/null 2>&1
+sleep 2
+agent-browser hover 'nav a[href*="store/mac"]' >/dev/null 2>&1
+sleep 1
+agent-browser screenshot "$OUT/15-desktop-flyout-mac.png" >/dev/null 2>&1
+echo "captured 15-desktop-flyout-mac"
+
+# 16 — mobile accordion with Home expanded (session-4: the new three-section content)
+agent-browser open "$BASE" >/dev/null 2>&1
+agent-browser set viewport 390 844 >/dev/null 2>&1
+sleep 2
+agent-browser eval "document.querySelector('nav button[aria-label=\"Menu\"]').click(); 'opened'" >/dev/null 2>&1
+sleep 1
+agent-browser eval "document.querySelector('#mobile-menu button[aria-label=\"Home menu\"]').click(); 'expanded'" >/dev/null 2>&1
+sleep 1
+agent-browser screenshot "$OUT/16-mobile-menu-home.png" >/dev/null 2>&1
+echo "captured 16-mobile-menu-home"
+
+# 17 — the store category page (session-4: chip row + full-form h1)
+capture_desktop 17-desktop-store-watch "#/store/watch"
 
 # validate every file is a non-blank PNG
 python3 - "$OUT" << 'PY'
