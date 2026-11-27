@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { PageShell, PageTitle } from "@/components/PageShell";
 import { ProductCard } from "@/components/ProductCard";
-import { CATEGORIES, PRODUCTS, getCategory, productsByCategory, type CategoryId, type Product } from "@/lib/catalog";
-import { routeHref } from "@/lib/router";
+import { PRODUCTS, getCategory, productsByCategory, type CategoryId, type Product } from "@/lib/catalog";
+import { STORE_CATEGORY_LABELS, STORE_CHIPS } from "@/lib/site-content";
 
 type SortKey = "featured" | "price-asc" | "price-desc" | "name";
 
@@ -28,24 +28,24 @@ export function StorePage({ category }: { category?: CategoryId }) {
   return (
     <PageShell>
       <PageTitle sub={current?.blurb ?? "The best way to buy the products you love."}>
-        {current ? `Shop ${current.label}` : "Store"}
+        {current ? `Shop ${STORE_CATEGORY_LABELS[current.id]}` : "Store"}
       </PageTitle>
 
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <nav aria-label="Product categories">
           <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-            {[{ id: undefined, label: "All" }, ...CATEGORIES].map((c) => {
-              const active = c.id === category;
+            {STORE_CHIPS.map((chip) => {
+              const active = chip.category === category;
               return (
-                <li key={c.id ?? "all"}>
+                <li key={chip.label}>
                   <a
-                    href={routeHref.store(c.id)}
+                    href={chip.href}
                     aria-current={active ? "page" : undefined}
                     className={`inline-block rounded-full border px-4 py-1.5 text-sm no-underline transition-colors ${
                       active ? "border-[#1d1d1f] bg-[#1d1d1f] text-white" : "border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7]"
                     }`}
                   >
-                    {c.label}
+                    {chip.label}
                   </a>
                 </li>
               );

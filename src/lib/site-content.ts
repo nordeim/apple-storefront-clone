@@ -1,4 +1,4 @@
-import { CATEGORIES, productsByCategory, type CategoryId } from "./catalog";
+import { CATEGORIES, PRODUCTS, type CategoryId } from "./catalog";
 import { routeHref } from "./router";
 
 export interface NavLinkSpec {
@@ -27,14 +27,56 @@ export interface FlyoutLink {
   href: string;
 }
 
-export function flyoutLinks(category: CategoryId): FlyoutLink[] {
-  return productsByCategory(category).map((p) => ({ label: p.name, href: routeHref.product(p.id) }));
-}
-
 export interface FlyoutSection {
   heading: string;
   links: FlyoutLink[];
 }
+
+/**
+ * A reference product-family label routes to the clone's catalog product when
+ * one carries the exact name; every other family label routes to an
+ * informational page (deviation D6, revised session 4: the flyout models the
+ * reference's family rows — catalog-only products stay reachable via the store).
+ */
+const familyLink = (label: string): FlyoutLink => {
+  const product = PRODUCTS.find((p) => p.name === label);
+  return product ? { label, href: routeHref.product(product.id) } : infoLink(label);
+};
+
+/** The reference's measured Explore product-family rows per category
+ * (session-4 live capture, docs/REMEDIATION_PLAN.md). */
+const EXPLORE_FAMILY: Readonly<Partial<Record<CategoryId, readonly string[]>>> = {
+  mac: ["MacBook Neo", "MacBook Air", "MacBook Pro", "iMac", "Mac mini", "Mac Studio", "Displays"],
+  ipad: ["iPad Pro", "iPad Air", "iPad", "iPad mini", "Apple Pencil", "Keyboards"],
+  iphone: ["iPhone Duo", "iPhone 18 Pro", "iPhone Air", "iPhone 17", "iPhone 17e", "iPhone 16"],
+  watch: ["Apple Watch Series 12", "Apple Watch Ultra 4", "Apple Watch SE 3", "Apple Watch Nike", "Apple Watch Hermès"],
+  airpods: ["AirPods 5", "AirPods Pro 3", "AirPods Max 2"],
+};
+
+export interface StoreChip {
+  label: string;
+  href: string;
+  /** The category page this chip marks active; undefined for the All view. */
+  category?: CategoryId;
+}
+
+/** The reference's measured store chip row — order and full-form labels
+ * (session-4 capture, /sg/store at 1440×900). The leading All chip is the
+ * clone's superset affordance (the reference row carries none); the AirTag
+ * chip routes to its informational page (the clone's AirTag products live in
+ * the accessories store). */
+export const STORE_CHIPS: readonly StoreChip[] = [
+  { label: "All", href: routeHref.store() },
+  { label: "Mac", href: routeHref.store("mac"), category: "mac" },
+  { label: "iPhone", href: routeHref.store("iphone"), category: "iphone" },
+  { label: "iPad", href: routeHref.store("ipad"), category: "ipad" },
+  { label: "Apple Watch", href: routeHref.store("watch"), category: "watch" },
+  { label: "Apple Vision Pro", href: routeHref.store("vision"), category: "vision" },
+  { label: "Home", href: routeHref.store("home"), category: "home" },
+  { label: "AirPods", href: routeHref.store("airpods"), category: "airpods" },
+  { label: "AirTag", href: routeHref.info("airtag") },
+  { label: "Accessories", href: routeHref.store("accessories"), category: "accessories" },
+];
 
 /**
  * Informational flyout labels routed to generated info pages — captured from
@@ -44,8 +86,9 @@ export interface FlyoutSection {
  */
 const infoLink = (label: string): FlyoutLink => ({ label, href: routeHref.info(slugify(label)) });
 
-/** The reference's full-label forms for the store flyout's category rows. */
-const STORE_CATEGORY_LABELS: Readonly<Record<CategoryId, string>> = {
+/** The reference's full-label forms for the store flyout's category rows — and
+ * for the store page's category h1 ("Shop Apple Watch", measured live). */
+export const STORE_CATEGORY_LABELS: Readonly<Record<CategoryId, string>> = {
   mac: "Mac",
   ipad: "iPad",
   iphone: "iPhone",
@@ -113,16 +156,36 @@ export function flyoutSections(link: NavLinkSpec): FlyoutSection[] {
         },
       ];
     case "home":
+      // session-4 capture: the reference restructured Home to the full
+      // category model (Explore Home / Shop Home / More from Home).
       return [
         {
-          heading: "Quick Links",
+          heading: "Explore Home",
           links: [
-            infoLink("Shop Gifts"),
-            infoLink("Find a Store"),
-            { label: "AirPods", href: routeHref.store("airpods") },
-            infoLink("Apple Intelligence"),
-            infoLink("Apple Trade In"),
+            { label: "Explore Home", href: routeHref.store("home") },
+            ...["Apple HomeView", "Apple TV 4K", "HomePod", "HomePod mini 2"].map(familyLink),
           ],
+        },
+        {
+          heading: "Shop Home",
+          links: [
+            { label: "Shop Home", href: routeHref.store("home") },
+            { label: "Shop Home Accessories", href: routeHref.store("accessories") },
+            infoLink("Personal Setup"),
+          ],
+        },
+        {
+          heading: "More from Home",
+          links: [
+            "Home Support",
+            "AppleCare for Apple TV",
+            "AppleCare for HomePod",
+            "Apple TV app",
+            "Apple TV",
+            "Home app",
+            "Apple Music",
+            "AirPlay",
+          ].map(infoLink),
         },
       ];
     case "entertainment":
@@ -179,7 +242,7 @@ export function flyoutSections(link: NavLinkSpec): FlyoutSection[] {
   const explore: FlyoutLink[] =
     c === "vision"
       ? [{ label: "Explore Apple Vision Pro", href: routeHref.store(c) }, ...exploreExtras]
-      : [{ label: `Explore All ${label}`, href: routeHref.store(c) }, ...flyoutLinks(c), ...exploreExtras];
+      : [{ label: `Explore All ${label}`, href: routeHref.store(c) }, ...(EXPLORE_FAMILY[c] ?? []).map(familyLink), ...exploreExtras];
 
   const shop: FlyoutLink[] =
     c === "watch"

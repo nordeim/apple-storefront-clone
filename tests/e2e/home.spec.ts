@@ -27,6 +27,10 @@ test.describe("home (desktop)", () => {
     await expect(flyout.locator("a", { hasText: "Personal Setup" })).toBeVisible();
     // session-3 live capture: Wallet, Pay joined iPhone's More-from section
     await expect(flyout.locator("a", { hasText: "Wallet, Pay" })).toBeVisible();
+    // session-4 live capture: the reference's Explore row lists the full
+    // product family — iPhone Air / 17 / 17e / 16 included
+    await expect(flyout.locator("a", { hasText: "iPhone Air" })).toBeVisible();
+    await expect(flyout.locator("a", { hasText: "iPhone 16" })).toBeVisible();
     await page.mouse.move(700, 850); // beyond the reference-height flyout panel
     await expect(page.locator("#flyout-iphone")).toHaveCount(0);
   });
@@ -45,13 +49,18 @@ test.describe("home (desktop)", () => {
     await expect(ent.locator("a", { hasText: "Apple TV Support" })).toBeVisible();
     await page.mouse.move(700, 850);
     await expect(page.locator("#flyout-entertainment")).toHaveCount(0);
-    // Home: the reference's single Quick Links section
+    // Home: the reference restructured this flyout again (session-4 capture) —
+    // the full Explore Home / Shop Home / More from Home category model
     await page.locator("a.globalnav-link", { hasText: "Home" }).hover();
     const home = page.locator("#flyout-home");
     await expect(home).toBeVisible();
-    await expect(home.locator("p", { hasText: "Quick Links" })).toBeVisible();
-    await expect(home.locator("a", { hasText: "Shop Gifts" })).toBeVisible();
-    await expect(home.locator("a", { hasText: "Apple Intelligence" })).toBeVisible();
+    for (const heading of ["Explore Home", "Shop Home", "More from Home"]) {
+      await expect(home.locator("p", { hasText: heading })).toBeVisible();
+    }
+    await expect(home.locator("a", { hasText: "Apple HomeView" })).toBeVisible();
+    await expect(home.locator("a", { hasText: "HomePod mini 2" })).toBeVisible();
+    await expect(home.locator("a", { hasText: "Shop Home Accessories" })).toBeVisible();
+    await expect(home.locator("a", { hasText: "AirPlay" })).toBeVisible();
     await page.mouse.move(700, 850);
     await expect(page.locator("#flyout-home")).toHaveCount(0);
   });

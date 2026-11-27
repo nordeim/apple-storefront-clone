@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { NAV_LINKS } from "./site-content";
-import { flyoutSections, INFO_TITLES, type FlyoutSection } from "./site-content";
-import { productsByCategory } from "./catalog";
+import { flyoutSections, INFO_TITLES, STORE_CHIPS, type FlyoutSection } from "./site-content";
 
 const nav = (id: string) => {
   const link = NAV_LINKS.find((l) => l.id === id);
@@ -41,11 +40,28 @@ describe("flyoutSections", () => {
     expect(topics).toEqual(["Get AppleCare", "Apple Account and Password", "Billing & Subscriptions", "Accessibility"]);
   });
 
-  it("models the Home flyout as the reference's single Quick Links section", () => {
-    expect(headings(flyoutSections(nav("home")))).toEqual(["Quick Links"]);
-    const links = flyoutSections(nav("home"))[0].links;
-    expect(links.map((l) => l.label)).toEqual(["Shop Gifts", "Find a Store", "AirPods", "Apple Intelligence", "Apple Trade In"]);
-    expect(links[2]).toEqual({ label: "AirPods", href: "#/store/airpods" });
+  it("models the Home flyout on the reference's measured three-section structure", () => {
+    // session-4 capture: the live reference restructured Home from the single
+    // Quick-Links row (session 3) to the full category model.
+    expect(headings(flyoutSections(nav("home")))).toEqual(["Explore Home", "Shop Home", "More from Home"]);
+    const [explore, shop, more] = flyoutSections(nav("home"));
+    expect(explore.links.map((l) => l.label)).toEqual(["Explore Home", "Apple HomeView", "Apple TV 4K", "HomePod", "HomePod mini 2"]);
+    expect(explore.links[0]).toEqual({ label: "Explore Home", href: "#/store/home" });
+    expect(explore.links[1]).toEqual({ label: "Apple HomeView", href: "#/product/apple-homeview" });
+    expect(explore.links[2]).toEqual({ label: "Apple TV 4K", href: "#/product/apple-tv-4k" });
+    expect(shop.links.map((l) => l.label)).toEqual(["Shop Home", "Shop Home Accessories", "Personal Setup"]);
+    expect(shop.links[0]).toEqual({ label: "Shop Home", href: "#/store/home" });
+    expect(shop.links[1]).toEqual({ label: "Shop Home Accessories", href: "#/store/accessories" });
+    expect(more.links.map((l) => l.label)).toEqual([
+      "Home Support",
+      "AppleCare for Apple TV",
+      "AppleCare for HomePod",
+      "Apple TV app",
+      "Apple TV",
+      "Home app",
+      "Apple Music",
+      "AirPlay",
+    ]);
   });
 
   it("models the Entertainment flyout (Explore Entertainment + Support)", () => {
@@ -84,12 +100,70 @@ describe("flyoutSections", () => {
     expect(explore).toEqual(["Made by Apple", "Beats", "AirTag"]);
   });
 
-  it("lists the category's real catalog products in the Explore section (deviation D6)", () => {
+  it("lists the reference's measured product family in the Explore section (D6 revised)", () => {
     const explore = flyoutSections(nav("mac"))[0].links;
     expect(explore[0]).toEqual({ label: "Explore All Mac", href: "#/store/mac" });
-    for (const p of productsByCategory("mac")) {
-      expect(explore.some((l) => l.label === p.name && l.href === `#/product/${p.id}`)).toBe(true);
-    }
+    expect(explore.map((l) => l.label)).toEqual([
+      "Explore All Mac",
+      "MacBook Neo",
+      "MacBook Air",
+      "MacBook Pro",
+      "iMac",
+      "Mac mini",
+      "Mac Studio",
+      "Displays",
+      "Compare Mac",
+      "Switch from PC to Mac",
+    ]);
+    // the label that matches a catalog product routes to its product page
+    expect(explore.find((l) => l.label === "MacBook Pro")).toEqual({ label: "MacBook Pro", href: "#/product/macbook-pro-m6" });
+  });
+
+  it("carries the reference's measured family rows for iPad", () => {
+    const explore = flyoutSections(nav("ipad"))[0].links;
+    expect(explore.map((l) => l.label)).toEqual([
+      "Explore All iPad",
+      "iPad Pro",
+      "iPad Air",
+      "iPad",
+      "iPad mini",
+      "Apple Pencil",
+      "Keyboards",
+      "Compare iPad",
+    ]);
+    expect(explore.find((l) => l.label === "iPad")).toEqual({ label: "iPad", href: "#/product/ipad" });
+  });
+
+  it("carries the reference's measured family rows for iPhone", () => {
+    const explore = flyoutSections(nav("iphone"))[0].links;
+    expect(explore.map((l) => l.label)).toEqual([
+      "Explore All iPhone",
+      "iPhone Duo",
+      "iPhone 18 Pro",
+      "iPhone Air",
+      "iPhone 17",
+      "iPhone 17e",
+      "iPhone 16",
+      "Compare iPhone",
+      "Switch from Android",
+    ]);
+    expect(explore.find((l) => l.label === "iPhone Duo")).toEqual({ label: "iPhone Duo", href: "#/product/iphone-duo" });
+    expect(explore.find((l) => l.label === "iPhone 18 Pro")).toEqual({ label: "iPhone 18 Pro", href: "#/product/iphone-18-pro" });
+  });
+
+  it("carries the reference's measured family rows for Watch", () => {
+    const explore = flyoutSections(nav("watch"))[0].links;
+    expect(explore.map((l) => l.label)).toEqual([
+      "Explore All Apple Watch",
+      "Apple Watch Series 12",
+      "Apple Watch Ultra 4",
+      "Apple Watch SE 3",
+      "Apple Watch Nike",
+      "Apple Watch Hermès",
+      "Compare Watch",
+      "Why Apple Watch",
+    ]);
+    expect(explore.find((l) => l.label === "Apple Watch Series 12")).toEqual({ label: "Apple Watch Series 12", href: "#/product/apple-watch-series-12" });
   });
 
   it("carries the captured More-from labels for Mac", () => {
@@ -183,7 +257,6 @@ describe("flyoutSections", () => {
 
   it("carries the captured AirPods sections (model shops, Hearing Health)", () => {
     const [explore, shop, more] = flyoutSections(nav("airpods"));
-    expect(explore.links.map((l) => l.label)).toEqual(["Explore All AirPods", "AirPods Pro 3", "Compare AirPods"]);
     expect(shop.links.map((l) => l.label)).toEqual([
       "Shop AirPods 5",
       "Shop AirPods Pro 3",
@@ -192,6 +265,7 @@ describe("flyoutSections", () => {
     ]);
     expect(shop.links[1]).toEqual({ label: "Shop AirPods Pro 3", href: "#/product/airpods-pro-3" });
     expect(more.links.map((l) => l.label)).toEqual(["AirPods Support", "AppleCare", "Hearing Health", "Apple Music", "Apple Fitness+"]);
+    expect(explore.links.find((l) => l.label === "Compare AirPods")).toBeTruthy();
   });
 
   it("emits only routeHref-factory hrefs — never hand-built strings", () => {
@@ -215,6 +289,27 @@ describe("flyoutSections", () => {
         }
       }
     }
+  });
+
+  it("carries the reference's measured family rows for AirPods", () => {
+    const explore = flyoutSections(nav("airpods"))[0].links;
+    expect(explore.map((l) => l.label)).toEqual(["Explore All AirPods", "AirPods 5", "AirPods Pro 3", "AirPods Max 2", "Compare AirPods"]);
+    expect(explore.find((l) => l.label === "AirPods Pro 3")).toEqual({ label: "AirPods Pro 3", href: "#/product/airpods-pro-3" });
+  });
+
+  it("routes the family rows that match catalog products to product pages and the rest to info routes", () => {
+    const expectProductRoute = (category: string, label: string, id: string) => {
+      const found = flyoutSections(nav(category))[0].links.find((l) => l.label === label);
+      expect(found, `${category} / ${label}`).toEqual({ label, href: `#/product/${id}` });
+    };
+    expectProductRoute("mac", "MacBook Pro", "macbook-pro-m6");
+    expectProductRoute("ipad", "iPad", "ipad");
+    expectProductRoute("iphone", "iPhone Duo", "iphone-duo");
+    expectProductRoute("watch", "Apple Watch Series 12", "apple-watch-series-12");
+    expectProductRoute("airpods", "AirPods Pro 3", "airpods-pro-3");
+    // family labels without a clone catalog counterpart route to info pages
+    expect(flyoutSections(nav("mac"))[0].links.find((l) => l.label === "MacBook Neo")?.href).toBe("#/info/macbook-neo");
+    expect(flyoutSections(nav("home"))[0].links.find((l) => l.label === "HomePod")?.href).toBe("#/info/homepod");
   });
 
   it("routes Shop-section rows through the store (Shop X, X Accessories) and info pages", () => {
@@ -247,5 +342,34 @@ describe("INFO_TITLES derivation", () => {
     expect(INFO_TITLES.get("privacy-policy")).toBe("Privacy Policy");
     expect(INFO_TITLES.get("site-map")).toBe("Site Map");
     expect(INFO_TITLES.get("apple-account-and-password")).toBe("Apple Account and Password");
+  });
+});
+
+describe("store chip row (the reference's measured model)", () => {
+  it("carries the measured order, full-form labels and the AirTag chip", () => {
+    expect(STORE_CHIPS.map((c) => c.label)).toEqual([
+      "All", // the clone's superset affordance — the reference row has none
+      "Mac",
+      "iPhone",
+      "iPad",
+      "Apple Watch",
+      "Apple Vision Pro",
+      "Home",
+      "AirPods",
+      "AirTag",
+      "Accessories",
+    ]);
+    expect(STORE_CHIPS.find((c) => c.label === "AirTag")?.href).toBe("#/info/airtag");
+    expect(STORE_CHIPS.find((c) => c.label === "Apple Watch")?.href).toBe("#/store/watch");
+  });
+
+  it("routes category chips to their store pages with the filter category attached", () => {
+    for (const chip of STORE_CHIPS) {
+      if (chip.category) {
+        expect(chip.href, chip.label).toBe(`#/store/${chip.category}`);
+      }
+    }
+    expect(STORE_CHIPS.find((c) => c.label === "All")?.href).toBe("#/store");
+    expect(STORE_CHIPS.find((c) => c.label === "All")?.category).toBeUndefined();
   });
 });

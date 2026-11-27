@@ -21,6 +21,21 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/airplay</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/airpods-5</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/airpods-max-2</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/airpods-support</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
@@ -91,11 +106,6 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/apple-intelligence</loc>
-    <priority>0.3</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
     <loc>http://localhost:5173/#/info/apple-intelligence-and-siri</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
@@ -117,6 +127,11 @@
   </url>
   <url>
     <loc>http://localhost:5173/#/info/apple-pay</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/apple-pencil</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -146,6 +161,11 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/apple-tv-app</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/apple-tv-support</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
@@ -166,6 +186,21 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/apple-watch-herm-s</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/apple-watch-nike</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/apple-watch-se-3</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/apple-watch-straps</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
@@ -176,7 +211,22 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/apple-watch-ultra-4</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/applecare</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/applecare-for-apple-tv</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/applecare-for-homepod</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -266,6 +316,11 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/displays</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/education</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
@@ -321,12 +376,37 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/home-app</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/home-support</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/homepod</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/homepod-mini-2</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/icloud</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>http://localhost:5173/#/info/icloud-com</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/imac</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -341,12 +421,47 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/ipad-air</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/ipad-mini</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/ipad-pro</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/ipad-support</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>http://localhost:5173/#/info/ipados-27</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/iphone-16</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/iphone-17</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/iphone-17e</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/iphone-air</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -361,6 +476,11 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/keyboards</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/legal</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
@@ -371,7 +491,27 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/mac-mini</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/mac-studio</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/mac-support</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/macbook-air</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/macbook-neo</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
