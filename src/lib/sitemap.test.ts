@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CATEGORIES, PRODUCTS } from "./catalog";
 import { INFO_TITLES } from "./site-content";
-import { buildSitemapXml, siteRoutes } from "./sitemap";
+import { buildSitemapXml, renderRobots, siteRoutes } from "./sitemap";
 
 describe("siteRoutes", () => {
   it("enumerates the real route set: home, store, categories, products, bag, entertainment, support, info pages", () => {
@@ -54,5 +54,23 @@ describe("buildSitemapXml", () => {
 
   it("normalizes a trailing slash on the base", () => {
     expect(buildSitemapXml("https://x.example/")).toBe(buildSitemapXml("https://x.example"));
+  });
+});
+
+describe("renderRobots", () => {
+  it("stamps the Sitemap directive with the base origin joined to sitemap.xml", () => {
+    const txt = renderRobots("https://clone.example");
+    expect(txt).toContain("User-agent: *");
+    expect(txt).toContain("Allow: /");
+    expect(txt).toContain("Sitemap: https://clone.example/sitemap.xml");
+  });
+
+  it("normalizes a trailing slash on the base like the sitemap renderer", () => {
+    expect(renderRobots("https://clone.example/")).toContain("Sitemap: https://clone.example/sitemap.xml");
+  });
+
+  it("documents the hash-routing caveat to crawlers (the honest SEO posture)", () => {
+    const txt = renderRobots("https://clone.example");
+    expect(txt.toLowerCase()).toContain("hash");
   });
 });

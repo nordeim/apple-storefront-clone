@@ -1,4 +1,6 @@
-// Generates public/sitemap.xml from the tested src/lib/sitemap.ts seam.
+// Generates public/sitemap.xml AND public/robots.txt from the tested
+// src/lib/sitemap.ts seam (one VITE_SITE_URL stamps both files, so the
+// robots Sitemap directive can never drift from the sitemap's origin).
 // The seam is TypeScript with path-free relative imports, so load it through
 // Vite (the repo's own toolchain) instead of shelling out to another runner.
 // Usage: npm run sitemap  (VITE_SITE_URL overrides the base; default is the
@@ -13,12 +15,15 @@ const vite = await createServer({
   optimizeDeps: { noDiscovery: true },
 });
 try {
-  const { buildSitemapXml } = await vite.ssrLoadModule("/src/lib/sitemap.ts");
+  const { buildSitemapXml, renderRobots } = await vite.ssrLoadModule("/src/lib/sitemap.ts");
   const xml = buildSitemapXml(base);
+  const robots = renderRobots(base);
   await mkdir("public", { recursive: true });
   await writeFile("public/sitemap.xml", xml, "utf8");
+  await writeFile("public/robots.txt", robots, "utf8");
   const urls = (xml.match(/<url>/g) ?? []).length;
   console.log(`sitemap.xml written: ${urls} routes, base ${base}`);
+  console.log(`robots.txt written: Sitemap directive -> ${base.replace(/\/+$/, "")}/sitemap.xml`);
 } finally {
   await vite.close();
 }

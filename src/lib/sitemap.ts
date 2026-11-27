@@ -52,3 +52,24 @@ export function buildSitemapXml(base: string): string {
     .join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
+
+/**
+ * Renders the complete `robots.txt` for the same base origin the sitemap uses —
+ * the deploy contract stamps BOTH files from one `VITE_SITE_URL` value, so the
+ * `Sitemap:` directive can never drift from the generated route set's origin.
+ */
+export function renderRobots(base: string): string {
+  const origin = base.replace(/\/+$/, "");
+  return [
+    "# Educational clone of the Apple Singapore storefront (unaffiliated demo).",
+    "# Crawlers: the app routes by hash fragment, so every route collapses onto",
+    "# the entry URL for indexing; the sitemap still enumerates the full route",
+    "# set for tooling. See README.md \"SEO\" and the PAD's routing ADR.",
+    "",
+    "User-agent: *",
+    "Allow: /",
+    "",
+    `Sitemap: ${origin}/sitemap.xml`,
+    "",
+  ].join("\n");
+}
