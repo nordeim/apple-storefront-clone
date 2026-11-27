@@ -8,7 +8,9 @@ test.describe("home (desktop)", () => {
   test("title, tiles and nav anatomy", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveTitle("Apple (Singapore)");
-    await expect(page.locator("button[aria-controls='mobile-menu']")).toBeHidden();
+    // aria-controls exists only while a panel is mounted; the hamburger itself
+    // is addressed by its accessible name and must be hidden on desktop.
+    await expect(page.locator("button[aria-label='Menu']")).toBeHidden();
     await expect(page.locator(".section-hero .tile")).toHaveCount(3);
     await expect(page.locator(".section-promo .tile")).toHaveCount(6);
     await expect(page.locator("nav.globalnav-bar li")).toHaveCount(11);

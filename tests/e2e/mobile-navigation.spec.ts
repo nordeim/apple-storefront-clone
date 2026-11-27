@@ -31,7 +31,9 @@ test.describe("mobile navigation (390×844, touch)", () => {
 
   test("hamburger opens the menu with all reference links", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("button[aria-controls='mobile-menu']")).toBeVisible();
+    // The hamburger's aria-controls only exists while the menu is mounted; the
+    // button itself is addressed by its accessible name.
+    await expect(page.getByRole("button", { name: "Menu" })).toBeVisible();
     await expect(page.locator("a.globalnav-link", { hasText: "Entertainment" })).toBeHidden();
     await page.getByRole("button", { name: "Menu" }).click();
     const menu = page.locator("#mobile-menu");

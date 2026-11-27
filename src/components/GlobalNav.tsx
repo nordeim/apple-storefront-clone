@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useBag } from "@/context/BagContext";
-import { getProduct } from "@/lib/catalog";
-import { describeSelections, lineKey, unitPrice } from "@/lib/cart";
+import { BagLineList } from "@/components/BagLineRow";
 import { formatSgd } from "@/lib/money";
 import { routeHref } from "@/lib/router";
 import { NAV_LINKS, flyoutSections, type FlyoutSection, type NavLinkSpec } from "@/lib/site-content";
@@ -59,7 +58,7 @@ function MobileMenuRow({ link, sections }: { link: NavLinkSpec; sections: Flyout
             className="flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent text-inherit"
             aria-label={`${link.label} menu`}
             aria-expanded={open}
-            aria-controls={sectionId}
+            aria-controls={open ? sectionId : undefined}
             onClick={() => setOpen((v) => !v)}
           >
             <ChevronIcon open={open} />
@@ -102,23 +101,7 @@ function BagPopover({ onClose }: { onClose: () => void }) {
         <p className="m-0 text-sm text-[#6e6e73]">Your Bag is empty.</p>
       ) : (
         <>
-          <ul className="m-0 mb-3 grid max-h-64 list-none gap-3 overflow-auto p-0">
-            {lines.map((line) => {
-              const product = getProduct(line.productId);
-              if (!product) return null;
-              return (
-                <li key={lineKey(line.productId, line.selections)} className="flex justify-between gap-3 text-sm">
-                  <span>
-                    <span className="block font-semibold">{product.name}</span>
-                    <span className="block text-xs text-[#6e6e73]">
-                      {describeSelections(product, line.selections).join(" · ")} · Qty {line.quantity}
-                    </span>
-                  </span>
-                  <span className="whitespace-nowrap">{formatSgd(unitPrice(product, line.selections) * line.quantity)}</span>
-                </li>
-              );
-            })}
-          </ul>
+          <BagLineList lines={lines} className="mb-3 max-h-64 overflow-auto" />
           <p className="m-0 mb-3 flex justify-between border-t border-[#d2d2d7] pt-3 text-sm font-semibold">
             <span>Subtotal</span>
             <span>{formatSgd(subtotal)}</span>
@@ -201,7 +184,7 @@ export function GlobalNav() {
                   href={link.href}
                   className="globalnav-link px-[0.6em]"
                   aria-expanded={hasFlyout ? open : undefined}
-                  aria-controls={hasFlyout ? `flyout-${link.id}` : undefined}
+                  aria-controls={open ? `flyout-${link.id}` : undefined}
                 >
                   {link.label}
                 </a>
@@ -217,7 +200,7 @@ export function GlobalNav() {
             className="globalnav-icon-button w-12 nav:w-9"
             aria-label="Search apple.com"
             aria-expanded={panel === "search"}
-            aria-controls="search-panel"
+            aria-controls={panel === "search" ? "search-panel" : undefined}
             onClick={() => toggle("search")}
           >
             <SearchIcon />
@@ -227,7 +210,7 @@ export function GlobalNav() {
             className="globalnav-icon-button w-12 nav:w-9"
             aria-label={count > 0 ? `Shopping Bag, ${count} ${count === 1 ? "item" : "items"}` : "Shopping Bag"}
             aria-expanded={panel === "bag"}
-            aria-controls="bag-popover"
+            aria-controls={panel === "bag" ? "bag-popover" : undefined}
             onClick={() => toggle("bag")}
           >
             <BagIcon />
@@ -243,7 +226,7 @@ export function GlobalNav() {
             className="globalnav-icon-button w-12 nav:w-9 nav:hidden"
             aria-label={panel === "menu" ? "Close menu" : "Menu"}
             aria-expanded={panel === "menu"}
-            aria-controls="mobile-menu"
+            aria-controls={panel === "menu" ? "mobile-menu" : undefined}
             onClick={() => toggle("menu")}
           >
             <MenuIcon open={panel === "menu"} />

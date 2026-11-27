@@ -110,8 +110,6 @@ body {
 .button-secondary:hover { background: #0076df; border-color: transparent; color: #fff; }
 .theme-dark .button-secondary { border-color: var(--color-link-dark); color: var(--color-link-dark); }
 .theme-dark .button-secondary:hover { background: #0076df; border-color: transparent; color: #fff; }
-.button-neutral { background: var(--color-ink); color: #fff; }
-.button-neutral:hover { background: #272729; }
 .button-block { display: block; width: 100%; padding: 14px 16px; border-radius: 12px; font-size: 17px; }
 
 .link-cta { color: var(--color-link); text-decoration: none; }
@@ -223,7 +221,6 @@ body {
   padding: 12px 12px 0;
   text-align: center;
 }
-.section-ribbon-host { padding: 0; margin: 0; }
 .section-promo { --tile-h: 580px; }
 @media (min-width: 735px) {
   .section-promo { grid-template-columns: 1fr 1fr; }

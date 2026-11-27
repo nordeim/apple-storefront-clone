@@ -30,7 +30,7 @@ async function page(vp, opts={}) {
 let p = await page({width:1440,height:900});
 await p.goto(url); await p.waitForTimeout(500);
 ok('title home', (await p.title()) === 'Apple (Singapore)', await p.title());
-ok('hamburger hidden on desktop', !(await p.locator('button[aria-controls="mobile-menu"]').isVisible()));
+ok('hamburger hidden on desktop', !(await p.locator('button[aria-label="Menu"]').isVisible()));
 ok('3 hero + 6 promo tiles', (await p.locator('.section-hero .tile').count())===3 && (await p.locator('.section-promo .tile').count())===6);
 // flyout
 await p.locator('a.globalnav-link', {hasText:'iPhone'}).hover();

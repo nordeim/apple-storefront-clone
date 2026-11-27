@@ -1,10 +1,8 @@
 import { useRef, useState, type FormEvent } from "react";
+import { BagLineList } from "@/components/BagLineRow";
 import { PageShell, PageTitle } from "@/components/PageShell";
 import { useBag } from "@/context/BagContext";
-import { describeSelections, lineKey, unitPrice } from "@/lib/cart";
-import { getProduct } from "@/lib/catalog";
-import { generateOrderNumber, validateCheckout, type CheckoutErrors, type CheckoutField, type CheckoutForm } from "@/lib/checkout";
-import { formatSgd } from "@/lib/money";
+import { validateCheckout, generateOrderNumber, type CheckoutErrors, type CheckoutField, type CheckoutForm } from "@/lib/checkout";
 import { routeHref } from "@/lib/router";
 import { BagSummary } from "./BagPage";
 
@@ -105,23 +103,7 @@ export function CheckoutPage() {
         </form>
 
         <aside aria-label="Order summary" className="rounded-[20px] bg-[#f5f5f7] p-6">
-          <ul className="m-0 mb-6 grid list-none gap-3 p-0">
-            {lines.map((line) => {
-              const product = getProduct(line.productId);
-              if (!product) return null;
-              return (
-                <li key={lineKey(line.productId, line.selections)} className="flex justify-between gap-3 text-sm">
-                  <span>
-                    <span className="block font-semibold">{product.name}</span>
-                    <span className="block text-xs text-[#6e6e73]">
-                      {describeSelections(product, line.selections).join(" · ")} · Qty {line.quantity}
-                    </span>
-                  </span>
-                  <span className="whitespace-nowrap">{formatSgd(unitPrice(product, line.selections) * line.quantity)}</span>
-                </li>
-              );
-            })}
-          </ul>
+          <BagLineList lines={lines} className="mb-6" />
           <BagSummary subtotal={subtotal} />
         </aside>
       </div>
