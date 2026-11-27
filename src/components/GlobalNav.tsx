@@ -74,7 +74,7 @@ function MobileMenuRow({ link, sections }: { link: NavLinkSpec; sections: Flyout
               <ul className="m-0 grid list-none gap-2 p-0">
                 {s.links.map((item) => (
                   <li key={item.href}>
-                    <a href={item.href} className="text-[17px] leading-snug text-[rgba(245,245,247,0.88)] no-underline">
+                    <a href={item.href} className="inline-block py-2 text-[17px] leading-snug text-[rgba(245,245,247,0.88)] no-underline">
                       {item.label}
                     </a>
                   </li>
