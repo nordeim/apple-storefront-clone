@@ -8,20 +8,20 @@ description: >
   to it. Covers the architecture, design tokens, the Tailwind v4 trap log, the
   three-tier test suite, the build/SEO posture, and the hard lessons of the 2026-11
   remediation cycle.
-version: 1.0.0
+version: 1.1.0
 last_updated: 2026-11-27
 tags: [react, vite, tailwindcss-v4, typescript, spa, e-commerce-clone, e2e-testing]
 ---
 
-# apple-storefront-clone — Engineering Skill (v1.0.0)
+# apple-storefront-clone — Engineering Skill (v1.1.0)
 
 > **What this is:** the distilled, codebase-verified engineering reference for
 > the remediated `apple-storefront-clone`. Every number below was measured in
-> the 2026-11-27 session. Companion documents: `README.md` (user-facing),
+> the 2026-11-27 sessions. Companion documents: `README.md` (user-facing),
 > `AGENTS.md` (agent traps, compact), `CLAUDE.md` (conventions),
 > `Project_Architecture_Document.md` (deep architecture + ADRs),
 > `docs/reference-investigation.md` (parity dossier),
-> `docs/REMEDIATION_PLAN.md` (this cycle's audit).
+> `docs/REMEDIATION_PLAN.md` (both cycles' audits).
 
 ## §1 Project Identity & Design Philosophy
 
@@ -48,8 +48,8 @@ entertainment/support pages. Philosophy:
 | TypeScript | 5.9.3 | `strict`, `noUnusedLocals/Parameters`, bundler resolution, `@/*` → `src/*` |
 | Vite | 7.3.7 | `react()` + `@tailwindcss/vite` + `viteSingleFile()`; dep scan pinned to `index.html` |
 | Tailwind CSS | 4.1.17 | CSS-first: `@theme` tokens in `src/index.css`; NO JS config; NO PostCSS config |
-| Vitest | 4.1.12 (jsdom 29.1.1) | 6 files / 50 tests over the seam |
-| Playwright | 1.65.1 | 21 e2e over the production build; Chromium only (WebKit unavailable in the sandbox) |
+| Vitest | 4.1.12 (jsdom 29.1.1) | 7 files / 62 tests over the seam |
+| Playwright | 1.65.1 | 24 e2e over the production build; Chromium only (WebKit unavailable in the sandbox) |
 | ESLint | 10.15.0 (typescript-eslint 8.74.0) | Flat config; `skills/**` and `docs/**` ignored |
 | clsx / tailwind-merge | 2.1.1 / 3.4.0 | `cn()` helper |
 
@@ -107,16 +107,19 @@ Layer model (PAD §3.1): Entry → Composition (`App.tsx`, `pages/*`) →
 Components → ONE store (`context/BagContext.tsx`) → pure seam (`lib/*`) →
 design system (`index.css`).
 
-Key components: `GlobalNav` (230 lines — desktop flyouts on hover/focus, the
-**mobile menu mounted conditionally**, bag popover, search trigger),
-`SearchPanel` (live overlay), `Tile`, `EntertainmentGallery` (153 lines — the
-TV+ state machine: timed dwell, pause, dot nav, arrow keys, swipe),
-`ProductArt` (449 lines — the original SVG art library),
-`Footer` (directory + accordion ≤734px), `PageShell`/`ProductCard`/`Ribbon`/`Icons`.
+Key components: `GlobalNav` (270 lines — desktop flyouts in the reference's
+three-section content model, the **mobile bar measured off the live site**
+(logo left; Search/Bag/hamburger right), the **mobile accordion menu** with
+per-row conditional mounting, bag popover, search trigger), `SearchPanel`
+(live overlay), `Tile`, `EntertainmentGallery` (153 lines — the TV+ state
+machine: timed dwell, pause, dot nav, arrow keys, swipe), `ProductArt`
+(449 lines — the original SVG art library), `Footer` (directory +
+accordion ≤734px), `PageShell`/`ProductCard`/`Ribbon`/`Icons`.
 
 **The overlay rule:** panels (`menu`/`search`/`bag`) MOUNT via React state —
-`{panel === "menu" ? <div id="mobile-menu" …/> : null}` — never via JS-toggled
-Tailwind display utilities (§9 trap #2).
+`{panel === "menu" ? <div id="mobile-menu" …/> : null}` — and the mobile
+menu's accordion section bodies mount per-row the same way — never via
+JS-toggled Tailwind display utilities (§9 trap #2).
 
 ## §6 Custom Hooks Deep Dive
 
@@ -131,11 +134,13 @@ Tailwind display utilities (§9 trap #2).
 
 Typed constants, not a CMS: `src/lib/catalog.ts` (8 categories, 12 products,
 option matrices with SGD deltas + colour hex swatches, id→product index,
-token-substring AND-match search), `src/lib/site-content.ts` (nav links,
-flyout link factory, the full footer directory + info-page map via `slugify`),
-`src/lib/home-content.ts` (hero/promo tile copy + footnotes). The sitemap seam
-(`src/lib/sitemap.ts`) enumerates 82 routes from exactly these sources — the
-route set can never drift from the catalog.
+token-substring AND-match search), `src/lib/site-content.ts` (nav links, the
+`flyoutSections()` content model — the reference's three-section structure
+per entry, shared by the desktop flyouts and the mobile accordion menu; the
+full footer directory + info-page map via `slugify`), `src/lib/home-content.ts`
+(hero/promo tile copy + footnotes). The sitemap seam (`src/lib/sitemap.ts`)
+enumerates 123 routes from exactly these sources — the route set can never
+drift from the catalog.
 
 ## §8 Accessibility Implementation
 
@@ -197,11 +202,11 @@ real screen readers (documented Unknown).
 
 ```bash
 npm run lint && npm run typecheck && npm run typecheck:tests   # 0 / clean / clean
-npm run test                       # 6 files / 50 tests
-npm run build                      # dist/index.html ~300 kB (CSS 31.6 kB)
-npm run test:e2e                   # 21/21
+npm run test                       # 7 files / 62 tests
+npm run build                      # dist/index.html ~306 kB (CSS 32.1 kB)
+npm run test:e2e                   # 24/24
 npm run test:smoke                 # 45 assertions, 0 console errors
-npm run sitemap                    # if routes changed: regenerate + re-check 82→N
+npm run sitemap                    # if routes changed: regenerate + re-check 123→N
 ```
 
 Plus: counts swept in README/PAD/SKILL; no `TODO`/placeholder text; docs and
@@ -224,8 +229,10 @@ code in the same commit; `git status` clean before the SSH-wrapper push.
 5. **Port the evidence, not just the code.** The original 45-assertion smoke
    battery was ported into `@playwright/test` specs so the parity evidence
    lives in the gate, not in an optional script.
-6. **Generate what you can derive.** The sitemap seam derives 82 routes from
-   the catalog; hand-maintained artifacts drift by construction.
+6. **Generate what you can derive.** The sitemap seam derives the full route
+   set (123 URLs at the 2026-11-27 measurement) from the catalog + content
+   seam; hand-maintained artifacts drift by construction. The flyout content
+   model and the robots.txt renderer are derived by the same rule.
 
 ## §13 Pitfalls to Avoid
 
@@ -352,13 +359,20 @@ lockfiles, running app) → IMPLEMENT (small typed test-backed increments) →
 VERIFY (the full gate, browser-verified UI) → DELIVER (atomic conventional
 commits to `main`, docs lockstep, evidence labels, deferred-debt honesty).
 
-## Appendix B — project_state (measured 2026-11-27)
+## Appendix B — project_state (measured 2026-11-27, session 2)
 
-- Unit: **6 files / 50 tests** (seam: cart, catalog, checkout, money, router, sitemap)
-- E2e: **21 tests** (home 7, mobile-navigation 8, store-flow 6) over
+- Unit: **7 files / 62 tests** (seam: cart, catalog, checkout, flyout content
+  model, money, router, sitemap + robots)
+- E2e: **24 tests** (home 7, mobile-navigation 11, store-flow 6) over
   `vite preview --host 127.0.0.1:4173`
 - Smoke: **45 assertions**, `file://dist/index.html`, 0 console errors
-- Sitemap: **82 routes** generated from the seam
-- Build: `dist/index.html` **301.5 kB / 91.4 kB gzip**; CSS **31,632 bytes / 476 rules**; build time ~1.3 s
+- Sitemap: **123 routes** generated from the seam; robots.txt rendered by the
+  same seam + generator (one `VITE_SITE_URL` stamps both)
+- Build: `dist/index.html` **305.5 kB / 92.4 kB gzip**; CSS **32,125 bytes /
+  489 rules**; build time ~1.0 s
 - Gate: `npm run gate` — lint 0 errors · typecheck clean · tests green · build · e2e · smoke
 - Local PG 17 (optional): `postgresql://postgres:postgres@127.0.0.1:5432/app_db` — installed rootless, unused by the SPA
+- Mobile nav parity (session-2, measured against the live site at 390×844): bar
+  geometry byte-equal (logo x=0 w=48, Search x=246, Bag x=294, Menu x=342);
+  two-level accordion menu structure matches (top rows navigate, per-row
+  expand buttons, Entertainment without a flyout)

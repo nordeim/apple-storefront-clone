@@ -8,6 +8,34 @@
 **Rule:** Every architectural decision in this document traces to a specific rationale.
 Nothing is here "because it's popular."
 
+#### Revision Block — v1.1 (the session-2 live-parity pass)
+
+- `[SR]` The session-2 cycle (2026-11-27 evening, `docs/REMEDIATION_PLAN.md` session-2 section)
+  re-audited the remediated tree (0 CRITICAL/HIGH findings) and ran an agent-browser live-parity pass
+  against `https://www.apple.com/sg/` at 1440×900 and 390×844. Measured deltas: the reference's mobile
+  bar (logo flush left; Search + Bag + hamburger flush right — measured x=0/246/294/342, 48px targets),
+  its two-level accordion mobile menu, and the desktop flyouts' three-section structure
+  (Explore/Shop/More-from; Store: Shop/Quick Links/Special Stores; Support: Explore Support/Get
+  Help/Helpful Topics). Parity confirmed for gallery autoplay (dwell ≈4.16 s) and the holiday animation.
+- `[FIX]` `src/lib/site-content.ts` gained the tested `flyoutSections()` seam — the reference's
+  three-section content model with informational labels joining the `INFO_TITLES` derivation; the
+  sitemap route set grew 82 → 123 (derived, never hand-listed). `GlobalNav` restructured: mobile bar
+  per the live measurements, accordion mobile menu (top rows navigate; expand buttons reveal the
+  flyout content; independent toggles per the footer-accordion convention), desktop flyouts render
+  the three sections (24px/600 links, 12px #86868b headings — reference-measured). `renderRobots()`
+  joined the sitemap seam: `npm run sitemap` now writes BOTH `sitemap.xml` and `robots.txt` from one
+  `VITE_SITE_URL` (the prior generator silently left the robots `Sitemap:` line at localhost while
+  `.env.example` claimed otherwise — audit MEDIUM-1, fixed). Unused `@testing-library/*` devDeps
+  removed; `tsconfig.tests.json` now covers `scripts/**/*.mjs` (allowJs + checkJs, verified clean);
+  the gallery/duo e2e waits converted from fixed sleeps to state-based polling.
+- `[VERIFY]` Full gate green after the restructure: lint 0 errors · typecheck clean ×2 · unit 7 files /
+  62 tests · build 305.5 kB / 92.4 kB gzip (CSS 32.1 kB / 489 rules) · e2e 24/24 · smoke 45/45, zero
+  console errors. Mobile bar geometry re-measured on the dev server at 390×844 — byte-equal to the
+  live reference's button positions (logo x=0 w=48, Search x=246, Bag x=294, Menu x=342, all 48px).
+- `[CHORE]` README/AGENTS/CLAUDE/PAD/SKILL/reference-investigation swept in lockstep (counts 6/50 →
+  7/62 unit, 21 → 24 e2e, 82 → 123 routes); 10 screenshots re-captured under `docs/screenshots/`;
+  worklog Task 114.
+
 #### Revision Block — v1.0 (the remediation of the `sonnet 5.5 v1` code-drop)
 
 - `[SR]` The repo's `main` carried a wholesale code replacement (commit `eb47784`,
@@ -93,7 +121,7 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 - **Context:** The clone must run from `file://`, any static host, and the repo's own
   tooling without a Node server (the previous tree was Next.js 16 with Prisma + SQLite).
 - **Decision:** React 19 + Vite 7 + `vite-plugin-singlefile` 2.3.0; the build output is
-  exactly `dist/index.html` (~300 kB, ~91 kB gzip).
+  exactly `dist/index.html` (~306 kB, ~92 kB gzip).
 - **Rationale:** Education/parity artifact, not a service; single-file keeps the
   deployment story trivial and the artifact auditable.
 - **Consequences:** No SSR, no server-side metadata, no `next/*` infrastructure; SEO
@@ -102,7 +130,7 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
   storefront clone does not need a server); plain static HTML (no componentization).
 
 **ADR-002: Hash-based routing.**
-- **Context:** A single-file artifact with no server rewrites must handle ~82 routes.
+- **Context:** A single-file artifact with no server rewrites must handle ~123 routes.
 - **Decision:** `src/lib/router.ts` parses `location.hash` (`#/store/mac`,
   `#/product/iphone-18-pro`, `#/search?q=…`); `routeHref.*` factories build every href.
 - **Rationale:** Works from `file://` and any static host; no 404-handling server
@@ -132,7 +160,7 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 - **Decision:** All logic in `src/lib/*` (catalog, cart reducer, router, money, checkout
   validation, content, sitemap); the single shared store is
   `src/context/BagContext.tsx` (React context + reducer, in-memory only).
-- **Rationale:** The seam is unit-testable without rendering (50 tests); "no backend,
+- **Rationale:** The seam is unit-testable without rendering (62 tests); "no backend,
   nothing transmitted" is an explicit documented deviation, not an accident.
 - **Consequences:** Bag/order state resets on reload (documented limitation).
 - **Alternatives rejected:** localStorage persistence (silently changes the privacy
@@ -149,8 +177,8 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 
 **ADR-006: Three-tier test suite against the production artifact.**
 - **Context:** The dev server is not the build; parity claims must be executable.
-- **Decision:** Vitest for the seam (50 tests); Playwright against
-  `npm run build && vite preview --host 127.0.0.1` (21 tests: tokens,
+- **Decision:** Vitest for the seam (62 tests); Playwright against
+  `npm run build && vite preview --host 127.0.0.1` (24 tests: tokens,
   mobile-navigation state machine, store flow incl. hostile routes); the exhaustive
   45-assertion `file://` smoke battery as the parity net.
 - **Rationale:** The token assertions ARE the parity evidence; the mobile spec pins
@@ -162,7 +190,7 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 
 **ADR-007: SEO posture — generated sitemap, honest hash-route caveat.**
 - **Context:** Hash routes collapse to one URL for crawlers (ADR-002 consequence).
-- **Decision:** `src/lib/sitemap.ts` enumerates the real route set (82 URLs) from the
+- **Decision:** `src/lib/sitemap.ts` enumerates the real route set (123 URLs) from the
   live catalog and footer map (tested, never hand-maintained);
   `scripts/build-sitemap.mjs` regenerates `public/sitemap.xml` against
   `VITE_SITE_URL`; `robots.txt`, OG/Twitter meta and JSON-LD ship in the entry HTML.
@@ -242,13 +270,13 @@ apple-storefront-clone/
 ├── vitest.config.ts            ← jsdom environment, src/**/*.test.{ts,tsx}
 ├── playwright.config.ts        ← 2 projects (desktop 1440×900, mobile iPhone 13) over vite preview
 ├── eslint.config.mjs           ← ESLint 10 flat config; skills/docs ignored
-├── tsconfig.json / tsconfig.tests.json ← strict app config / tests+configs config
+├── tsconfig.json / tsconfig.tests.json ← strict app config / tests+configs+scripts config
 ├── docker-compose.yml          ← optional PG 17 (loopback-bound) for the local environment
 ├── src/
 │   ├── main.tsx                ← createRoot mount
 │   ├── App.tsx                 ← route switch, document.title, scroll/focus reset, skip link
 │   ├── index.css               ← Tailwind v4 @theme tokens + @layer components CSS
-│   ├── components/             ← GlobalNav (flyouts + mobile menu), SearchPanel, Tile,
+│   ├── components/             ← GlobalNav (flyouts + mobile accordion menu), SearchPanel, Tile,
 │   │                             EntertainmentGallery, Footer, ProductArt (SVG art),
 │   │                             ProductCard, Ribbon, Icons, PageShell
 │   ├── pages/                  ← HomePage, StorePage, ProductPage, BagPage, CheckoutPage,
@@ -257,18 +285,19 @@ apple-storefront-clone/
 │   ├── hooks/                  ← useRoute (useSyncExternalStore over hashchange), browser.ts
 │   │                             (useMediaQuery, usePrefersReducedMotion, useInView)
 │   ├── lib/                    ← THE SEAM: catalog, cart, router, money, checkout,
-│   │                             home-content, site-content, sitemap (each with *.test.ts)
+│   │                             home-content, site-content (+flyoutSections), sitemap
+│   │                             (each with *.test.ts)
 │   └── utils/cn.ts             ← clsx + tailwind-merge
 ├── tests/
 │   └── e2e/                    ← home.spec.ts, mobile-navigation.spec.ts, store-flow.spec.ts,
 │                                 smoke.mjs (the 45-assertion file:// battery)
 ├── scripts/
-│   └── build-sitemap.mjs       ← regenerates public/sitemap.xml from the seam
+│   └── build-sitemap.mjs       ← regenerates public/sitemap.xml + public/robots.txt from the seam
 ├── public/
-│   ├── sitemap.xml             ← 82 routes, generated (npm run sitemap)
-│   └── robots.txt
+│   ├── sitemap.xml             ← 123 routes, generated (npm run sitemap)
+│   └── robots.txt              ← generated alongside the sitemap (same VITE_SITE_URL)
 ├── docs/                       ← reference-investigation.md (parity dossier), DEPLOYMENT.md,
-│                                 REMEDIATION_PLAN.md (this cycle's audit), screenshots/,
+│                                 REMEDIATION_PLAN.md (this cycle's audits), screenshots/,
 │                                 setup_pg_z.sh + ssh wrapper runbook (operator tooling)
 ├── skills/                     ← vendored reference library — OUT of every toolchain (ADR-008)
 ├── AGENTS.md / CLAUDE.md / README.md / apple-storefront-clone_SKILL.md
@@ -300,8 +329,10 @@ TypeScript with 8 tests; components never parse locations themselves.
 ```tsx
 // src/components/GlobalNav.tsx — the mobile menu MOUNTS; nothing toggles display utilities.
 {panel === "menu" ? (
-  <div id="mobile-menu" className="absolute … nav:hidden">…</div>
+  <div id="mobile-menu" className="absolute … nav:hidden">…accordion rows…</div>
 ) : null}
+// MobileMenuRow — each accordion section body mounts per-row the same way:
+{open ? <div id={`${link.id}-menu-section`}>…flyout sections…</div> : null}
 ```
 
 *Why:* v4 changed display-utility generation order; JS-toggling `hidden` against
@@ -430,9 +461,9 @@ credentials.
 
 | Category | Files | Tests | Location | Framework |
 |---|---|---|---|---|
-| Unit (seam) | 6 | 50 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
+| Unit (seam) | 7 | 62 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
 | E2E — desktop | 1 | 7 | `tests/e2e/home.spec.ts` | Playwright (1440×900) |
-| E2E — mobile nav | 1 | 8 | `tests/e2e/mobile-navigation.spec.ts` | Playwright (iPhone 13 viewport, touch) |
+| E2E — mobile nav | 1 | 11 | `tests/e2e/mobile-navigation.spec.ts` | Playwright (iPhone 13 viewport, touch) |
 | E2E — store flow | 1 | 6 | `tests/e2e/store-flow.spec.ts` | Playwright (1440×900) |
 | File:// smoke battery | 1 | 45 assertions | `tests/e2e/smoke.mjs` | Playwright library |
 
@@ -451,9 +482,9 @@ credentials.
 
 - [ ] `npm run lint` exit 0
 - [ ] `npm run typecheck` && `npm run typecheck:tests` clean
-- [ ] `npm run test` — 6 files / 50 tests
+- [ ] `npm run test` — 7 files / 62 tests
 - [ ] `npm run build` — single-file `dist/index.html`
-- [ ] `npm run test:e2e` — 21 passed
+- [ ] `npm run test:e2e` — 24 passed
 - [ ] `npm run test:smoke` — 45 assertions, zero console errors
 - [ ] Docs touched in the same commit; counts in lockstep
 
@@ -464,8 +495,8 @@ credentials.
 ### 8.1 Production Build
 
 `npm run build` → `vite build` with `react()`, `@tailwindcss/vite`, and
-`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 301.5 kB /
-90.95 kB gzip this cycle; CSS 31.6 kB / 476 rules). No server bundle, no image
+`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 305.5 kB /
+92.4 kB gzip this cycle; CSS 32.1 kB / 489 rules). No server bundle, no image
 pipeline, no external requests.
 
 ### 8.2 Environment Variables
@@ -543,15 +574,15 @@ The full remediation history of this cycle: `docs/REMEDIATION_PLAN.md`.
 | `src/lib/catalog.ts` | 357 | The typed catalog: 8 categories, 12 products, option matrices, search |
 | `src/lib/cart.ts` | 93 | The bag reducer + price/line-key seam |
 | `src/lib/checkout.ts` | 43 | Singapore checkout validation + order numbers |
-| `src/lib/sitemap.ts` | 55 | Route-set enumeration + sitemap.xml rendering (82 URLs) |
-| `src/lib/site-content.ts` | 125 | Nav links, flyouts, footer directory, info-page map |
+| `src/lib/sitemap.ts` | 75 | Route-set enumeration + sitemap.xml/robots.txt rendering (123 URLs) |
+| `src/lib/site-content.ts` | 282 | Nav links, the flyout content model (three sections per entry), footer directory, info-page map |
 | `src/index.css` | 390 | Tailwind v4 tokens + all component CSS + source scoping |
-| `src/components/GlobalNav.tsx` | 230 | Desktop flyouts, mobile menu, bag popover, search trigger |
+| `src/components/GlobalNav.tsx` | 270 | Desktop flyouts, mobile accordion menu, bag popover, search trigger |
 | `src/components/ProductArt.tsx` | 449 | The original SVG art library |
 | `src/components/EntertainmentGallery.tsx` | 153 | The TV+ gallery state machine (dwell, pause, keys) |
 | `src/App.tsx` | 120 | Route switch, titles, navigation side-effects |
-| `tests/e2e/mobile-navigation.spec.ts` | 118 | The mobile-menu contract (pins the v4 display trap) |
-| `tests/e2e/smoke.mjs` | 117 | The exhaustive file:// parity battery (45 assertions) |
+| `tests/e2e/mobile-navigation.spec.ts` | 143 | The mobile-menu contract (bar layout, accordion, the v4 display trap) |
+| `tests/e2e/smoke.mjs` | 120 | The exhaustive file:// parity battery (45 assertions) |
 | `vite.config.ts` | 30 | Build pipeline + dep-scan scoping (ADR-003) |
 | `playwright.config.ts` | 47 | The two-project e2e harness over `vite preview` |
 

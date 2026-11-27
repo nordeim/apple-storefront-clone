@@ -80,3 +80,118 @@ Order is the execution order; TDD applies wherever a behavior is assertable.
 - Every deletion target above was re-verified to exist and to be referenced by nothing in `src/`/`index.html` (`next.config.ts`, `prisma/`, `scripts/`, `public/images/`, `postcss.config.mjs`, old `tsconfig.tests.json`).
 - The doc rewrites' source of truth is the current `src/` tree (verified by reading every component/page/lib file) plus this session's measured evidence.
 - The PostgreSQL 17 instance required by the operator contract was installed rootless via `docs/setup_pg_z.sh` (Verified: `postgresql://postgres:postgres@127.0.0.1:5432/app_db` accepting connections); the app itself reads no database — the DEPLOYMENT rewrite documents it honestly as the local standard environment for the repo family, with the docker-compose as the alternative.
+
+---
+
+# Remediation Plan — session 2: the live-parity pass (2026-11-27, evening)
+
+**Mode C audit → remediation.** The prior cycle left a green, verified gate at `059f675`
+(pushed). This cycle re-ran the full ritual on the pulled tree (`e9ee951` = 059f675 +
+`docs/session_1.md`, docs-only): baseline gates (all green, exact counts re-observed),
+a read-only subagent audit of the remediation commits using the `web-application`
+skill methodology, and an **agent-browser live-parity pass against
+`https://www.apple.com/sg/`** (desktop 1440×900 + mobile 390×844). `skills/` remains
+out of audit scope.
+
+## Audit + live-parity findings (counts by severity)
+
+| Severity | Count | Key items |
+|---|---|---|
+| CRITICAL | 0 | — |
+| HIGH | 0 | — |
+| MEDIUM | 4 | robots.txt generator gap; mobile bar layout; mobile menu structure; flyout depth |
+| LOW | 3 | unused devDeps; scripts/ not typechecked; timing-based e2e waits |
+| INFO | 4 | OG image/og:url absent (documented); docker creds (documented); cart no-op copies; hash-route SEO (ADR-007) |
+
+### Verified evidence (live reference, agent-browser)
+
+- **Mobile bar (390×844, measured):** reference = Apple logo **left** (x=0, w=49) +
+  Search (x=246) + Bag (x=294) + hamburger "Menu" (x=342) right cluster; the hamburger
+  is on the **far right** (`globalnav-menutrigger-bread`), and a back-chevron replaces
+  it while the menu is open. Clone = hamburger left + logo center + bag right, no
+  search icon in the bar (search was a row inside the menu). **P-1.**
+- **Mobile menu (real click interaction):** reference = two-level accordion — 11
+  category rows ("Store menu"/"Mac menu" buttons, `aria-expanded`), each expanding to
+  headed sub-link groups (Store: "Shop" / "Quick Links" / "Shop Special Stores" with
+  Find a Store, Order Status, Apple Trade In, Financing, Personal Setup, Certified
+  Refurbished, Education, Business). Clone = flat 11 links + in-menu Search row. **P-2.**
+- **Desktop flyouts (hover, captured):** reference = three headed sections —
+  "Explore X" (Explore All X, models, Compare X, Switch from…), "Shop X" (Shop X,
+  X Accessories, Apple Trade In, Financing, Personal Setup), "More from X" (X Support,
+  AppleCare, macOS 27 / iOS 27, Apple Intelligence and Siri, Apps by Apple, iCloud+, …);
+  Support = "Explore Support"/"Get Help"/"Helpful Topics". Clone = one flat
+  catalog-derived section. **P-3.**
+- **Parity confirmed (no action):** TV+ gallery **auto-advances on a clean load** at
+  the reference dwell ≈4.16 s (measured item 1→3→4 over 17 s; an earlier paused
+  observation was the region-modal artifact); holiday colour animation autoplays;
+  ribbon/hero/promo tiles, nav link sets, footer directory + legal rows and the
+  footer accordion all match.
+- **Audit (subagent):** `build-sitemap.mjs` writes only `sitemap.xml`, but
+  `.env.example` claims `VITE_SITE_URL` also stamps `public/robots.txt` — the
+  `Sitemap:` line is hardcoded localhost, silently breaking the documented deploy
+  path. **M-1.** Unused devDeps `@testing-library/react`+`/dom`; `scripts/` outside
+  `tsconfig.tests.json`; fixed `waitForTimeout` races in the gallery/duo specs.
+
+## Remediation ToDo list (session 2 — S2-*)
+
+Execution order = the table order; TDD wherever a behavior is assertable
+(seam tests red first; e2e specs updated before/with the implementation).
+
+### Phase 1 — content seam (TDD)
+
+| # | Item | TDD / regression evidence |
+|---|---|---|
+| S2-1 | `src/lib/sitemap.ts`: new `renderRobots(base)` (full robots.txt document, `Sitemap:` stamped from the base); tests first in `sitemap.test.ts` | RED → GREEN; `scripts/build-sitemap.mjs` writes BOTH `public/sitemap.xml` and `public/robots.txt`; regenerate at default base; custom-base run verified then restored |
+| S2-2 | `src/lib/site-content.ts`: new `flyoutSections(link)` seam — the reference's three-section model per nav entry (Explore/Shop/More from; Store = Shop/Quick Links/Special Stores; Support = Explore Support/Get Help/Helpful Topics), labels from the captured live sets, hrefs only from `routeHref.*` factories; new informational labels join the `INFO_TITLES` derivation (sitemap + info routes stay derived, never hand-listed) | new `src/lib/site-content.test.ts` RED → GREEN: section shape, every href matches `#/…` route grammar, every info slug resolves in `INFO_TITLES` |
+
+### Phase 2 — GlobalNav restructure (e2e-first)
+
+| # | Item | TDD / regression evidence |
+|---|---|---|
+| S2-3 | Mobile bar: logo left; Search + Bag + hamburger right cluster (48px targets); mobile search button `nav:hidden` (desktop keeps its own); drop the in-menu Search row (the bar icon is the reference's entry point) | `mobile-navigation.spec.ts` rewritten against the live-measured geometry (RED on the old code → GREEN) |
+| S2-4 | Mobile menu → accordion: top row = category link (navigates) + "`X menu`" expand button (`aria-expanded`/`aria-controls`, chevron); expanded body renders `flyoutSections` (smaller type, headed groups); independent toggles (the clone's footer-accordion convention); panel scrolls; **conditional mounting preserved** (the v4 display-trap contract) | same spec: accordion expand/collapse, sub-link navigate + menu closes, no-overflow, console-zero |
+| S2-5 | Desktop flyout: render the three-section `flyoutSections` content (headings + link grid), replacing the flat catalog list | `home.spec.ts` flyout test asserts the 3 headings + representative links (incl. "iPhone 18 Pro") |
+
+### Phase 3 — hygiene + gates
+
+| # | Item |
+|---|---|
+| S2-6 | Remove unused devDeps `@testing-library/react` + `@testing-library/dom` (npm uninstall; lockfile via npm only) |
+| S2-7 | `home.spec.ts`/`smoke.mjs`: replace fixed sleeps with state-based polling (`expect.poll`) where a DOM state is observable (gallery dot change, duo reveal) — assertion strength preserved |
+| S2-8 | `tsconfig.tests.json`: evaluate `checkJs` coverage for `scripts/`; if it adds noise without value, document as accepted LOW (single .mjs, exercised by `npm run sitemap`) |
+
+### Phase 4 — regeneration, evidence, docs, delivery
+
+| # | Item |
+|---|---|
+| S2-9 | `npm run sitemap` — regenerate sitemap.xml + robots.txt; count the new route total; **lockstep sweep** of the route/test counts across README/AGENTS/CLAUDE/PAD/SKILL/reference-investigation |
+| S2-10 | Recapture affected screenshots (mobile home with the new bar, mobile menu accordion open, desktop home/flyout) + re-validate the full set |
+| S2-11 | Docs sweep: README (mobile-menu description), PAD (§3 patterns, §7 counts, §8.1, §10, §11), SKILL (§5/§7/§9/project_state), reference-investigation (deviations D4 → measured flyouts; ledger refresh), worklog Task 114 |
+| S2-12 | Full gate `npm run gate` → atomic Conventional Commits on `main` → SSH-wrapper push |
+
+## Plan validation notes (session 2, against the codebase)
+
+- `src/lib/sitemap.ts` (55 lines) exports `buildSitemapXml(base)`; `renderRobots(base)` is
+  additive and follows the same base-handling contract (`routeUrl` normalizes the
+  trailing slash). `scripts/build-sitemap.mjs` already loads the seam via
+  `vite.ssrLoadModule` — adding the second `writeFile` is a two-line change.
+- `src/lib/site-content.ts` already owns `flyoutLinks(category)` + `INFO_TITLES`
+  (derived from footer/legal labels); `flyoutSections` extends the same file and the
+  same derivation, so `sitemap.ts`'s `INFO_TITLES.keys()` loop picks the new routes up
+  automatically — no hand-maintained route list is introduced anywhere.
+- `GlobalNav.tsx` (230 lines): the `Panel` state machine, `hashchange` close,
+  outside-pointerdown close, Escape handling and the conditional-mount rule
+  (`{panel === "menu" ? … : null}`) stay untouched; only the bar layout, the mobile
+  menu body and the `Flyout` renderer change. `tests/e2e/mobile-navigation.spec.ts`
+  (8 tests) and the smoke battery's mobile section were read in full — the top-level
+  category links remain links, so "mobile nav navigates + closes" pins survive the
+  restructure by design.
+- The e2e count will move (8 → ~10 mobile tests, flyout assertions extended); the
+  sitemap route count will grow from 82 (5 core + 8 categories + 12 products + 57 info)
+  by the new informational labels — the exact total is measured after S2-2 and swept
+  through the doc set in the same commit (the AGENTS.md count-lockstep rule).
+- Risk control: the live-parity evidence is Chromium-only; the reference-side captures
+  are stored in this document, and the accordion-expansion semantics (independent vs
+  exclusive toggles) could not be conclusively measured on the live site in this
+  environment — the clone follows its own footer-accordion convention (Reasoned, not
+  Verified).

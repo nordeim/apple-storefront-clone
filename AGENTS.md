@@ -13,11 +13,11 @@ in-memory bag, Singapore checkout). The evidence dossier (measured tokens, devia
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest/jsdom — **6 files / 50 tests**; update this count in README + PAD when it changes) |
-| Production build | `npm run build` (single file → `dist/index.html`, ~300 kB) |
-| E2E | `npm run test:e2e` (Playwright — **21 tests**; builds and serves `dist/` itself) |
+| Unit tests | `npm run test` (Vitest/jsdom — **7 files / 62 tests**; update this count in README + PAD when it changes) |
+| Production build | `npm run build` (single file → `dist/index.html`, ~306 kB) |
+| E2E | `npm run test:e2e` (Playwright — **24 tests**; builds and serves `dist/` itself) |
 | File:// smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
-| Regenerate sitemap | `npm run sitemap` (writes `public/sitemap.xml` from the tested `src/lib/sitemap.ts` seam) |
+| Regenerate sitemap | `npm run sitemap` (writes `public/sitemap.xml` + `public/robots.txt` from the tested `src/lib/sitemap.ts` seam — **123 routes**) |
 | Clean gate order | lint → typecheck → typecheck:tests → test → build → test:e2e → test:smoke |
 
 Use `npm`; the lockfile is `package-lock.json`. Commit to `main` only (no feature branches);
@@ -44,9 +44,10 @@ remediation.
 3. **Tailwind v4 auto-content-detection scans the whole repo.** Without the `@source not` exclusions,
    class-shaped tokens in skills/docs prose leak into the shipped CSS (measured: 136 kB → 31.6 kB CSS
    after scoping) and `skills/**.html` module scripts break Vite's dependency scan.
-4. **Tailwind v4 display utilities are never JS-toggled.** The mobile menu mounts/unmounts via React
-   state (`panel === "menu"`), which is the contract that pins `tests/e2e/mobile-navigation.spec.ts`;
-   `hidden`/`nav:flex` pairs are static classes resolved by the cascade at ≥834px.
+4. **Tailwind v4 display utilities are never JS-toggled.** The mobile menu (and its accordion sections)
+   mount/unmount via React state (`panel === "menu"`, per-row `open`), which is the contract that pins
+   `tests/e2e/mobile-navigation.spec.ts`; `hidden`/`nav:flex` pairs are static classes resolved by the
+   cascade at ≥834px.
 5. **Component CSS lives in `@layer components`** so Tailwind utilities (e.g. `nav:hidden`) can
    override it — an unlayered rule would silently win the cascade.
 6. **Hash routing owns navigation semantics** (`src/lib/router.ts` parses `#/store/mac`-style routes;
@@ -58,14 +59,16 @@ remediation.
 ## Environment
 
 The app reads **no** environment variables (verified: zero `import.meta.env`/`process.env` in `src/`).
-`VITE_SITE_URL` exists for `scripts/build-sitemap.mjs` only. See `.env.example`.
+`VITE_SITE_URL` exists for `scripts/build-sitemap.mjs` only — one value stamps the sitemap base AND
+the robots.txt `Sitemap:` directive. See `.env.example`.
 
 ## Testing posture
 
 - Unit tests cover the pure seam only (`src/lib/*`) — the SPA's logic is deliberately pure and testable
   without React rendering.
 - E2E pins three contracts: reference tokens (computed styles), the mobile navigation state machine
-  (390×844 touch viewport), and the store flow (search → configurator → bag → checkout → confirmation →
-  order lookup, incl. hostile routes rendered as text).
+  (390×844 touch viewport — bar layout, accordion menu, sub-link navigation), and the store flow
+  (search → configurator → bag → checkout → confirmation → order lookup, incl. hostile routes rendered
+  as text).
 - `tests/e2e/smoke.mjs` is the exhaustive file:// battery (45 assertions) kept as the parity net;
   it needs `npm run build` first and uses the same Playwright Chromium as the spec suite.

@@ -40,32 +40,35 @@ Verified for Chromium at 1440×900 and 390×844 by `tests/e2e/smoke.mjs` ("token
 | D1 | Product imagery and hero videos replaced by original SVG art | Apple's assets are proprietary; keeps single-file build small |
 | D2 | Which promo/hero tile height maps to which breakpoint is Assumed (the reference exposes the set of values, not the mapping) | CSS values read, media-query pairing partly inferred |
 | D3 | Global nav is `position: sticky` (reference scrolls away) | Superset: bag/search reachable anywhere |
-| D4 | Flyout menus are generated from the catalog | Reference flyout content is not in the HTML |
+| D4 | Flyout content follows the reference's measured three-section structure (Explore/Shop/More-from; informational labels from the live flyouts; product rows from the clone's catalog); destinations outside the clone resolve to generated info pages | Structure and labels captured live (session 2); the clone's product list is thinner than the reference's (12 illustrative models) |
 | D5 | Gallery backdrops are generated gradients; links go to `tv.apple.com/sg` | No hot-linking of `mzstatic.com` artwork |
 | D6 | Catalog prices/specs are illustrative | Reference home page has no price data |
 | D7 | Hash routing instead of path routing | Works from `file://` and any static host |
 | D8 | Side gutters of 12px on ≥735px, none on mobile | Assumed from CSS padding rules; not pixel-compared |
+| D9 | Mobile navigation restructured to the reference's measured layout (session 2): bar = logo flush left + Search/Bag/hamburger flush right; menu = two-level accordion (top rows navigate, expand buttons reveal the flyout sections); independent section toggles | Bar geometry measured live (x=0/246/294/342, 48px targets) and replicated byte-equal; the accordion's exclusivity semantics could not be conclusively measured live, so the clone follows its own footer-accordion convention (Reasoned) |
 
 ## Verification ledger (this build)
 
-> Refreshed 2026-11-27 by the remediation cycle (`docs/REMEDIATION_PLAN.md`).
-> The as-committed `sonnet 5.5 v1` tree could NOT satisfy these rows — the
-> stale `postcss.config.mjs` broke both the build and the dev server until it
-> was removed (see the deviations note below).
+> Refreshed 2026-11-27 by the remediation cycle (`docs/REMEDIATION_PLAN.md`) and
+> the session-2 live-parity pass. The as-committed `sonnet 5.5 v1` tree could
+> NOT satisfy these rows — the stale `postcss.config.mjs` broke both the build
+> and the dev server until it was removed (see the deviations note below).
 
 | Check | Result |
 |---|---|
 | `npx tsc --noEmit` | clean (Verified) |
-| `npx tsc --noEmit -p tsconfig.tests.json` | clean (Verified) |
-| `npx vitest run` | 6 files, 50 tests pass (Verified) |
+| `npx tsc --noEmit -p tsconfig.tests.json` (incl. scripts checkJs) | clean (Verified) |
+| `npx vitest run` | 7 files, 62 tests pass (Verified) |
 | `npm run lint` | 0 errors (Verified) |
-| `npm run build` | succeeds, `dist/index.html` single file, 301.5 kB / 91.4 kB gzip, CSS 31.6 kB / 476 rules (Verified) |
-| `npm run test:e2e` (Playwright over `vite preview`) | 21/21 PASS (Verified) |
+| `npm run build` | succeeds, `dist/index.html` single file, 305.5 kB / 92.4 kB gzip, CSS 32.1 kB / 489 rules (Verified) |
+| `npm run test:e2e` (Playwright over `vite preview`) | 24/24 PASS (Verified) |
 | `tests/e2e/smoke.mjs` (headless Chromium, `file://`) | 45/45 PASS, 0 console errors/warnings (Verified) |
-| Mobile navigation re-measured on the dev server (agent-browser, 390×844) | menu opens/navigates/closes; geometry + typography correct; no Tailwind v4 display-toggling defect (Verified) |
+| Mobile navigation re-measured on the dev server (agent-browser, 390×844) | bar geometry byte-equal to the live reference (logo x=0 w=48, Search x=246, Bag x=294, Menu x=342); accordion opens/expands/navigates/closes; no Tailwind v4 display-toggling defect (Verified) |
+| Live parity pass against apple.com/sg (session 2) | gallery autoplay (dwell ≈4.16 s) and holiday animation confirmed matching; flyout three-section structure and mobile accordion modeled on live captures (Verified) |
 | Visual review of screenshots (desktop home, mobile, product) | done by eye; no pixel diff (Verified for what was viewed) |
 | Safari / Firefox / real devices / screen readers | not run (Unknown: not available in this sandbox) |
 
 Deviation D8's side-gutter behavior and all other rows above remain as
-originally measured; the remediation did not change any visual token (the
-e2e token assertions are byte-identical to the original smoke assertions).
+originally measured; the session-2 restructure changed no pinned visual token
+(the e2e token assertions are byte-identical; the flyout/mobile-menu structure
+follows the reference's own measured layout).

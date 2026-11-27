@@ -66,6 +66,10 @@ SVG art. Two properties must survive every change:
   `src/context/BagContext.tsx` (in-memory; nothing persists or transmits).
 - **Routing** — hash-based only via `src/lib/router.ts` (`routeHref.*`
   factories); navigation side-effects (title/scroll/focus) live in `App.tsx`.
+- **Nav content** — `flyoutSections()` in `src/lib/site-content.ts` is the
+  single content source for the desktop flyouts AND the mobile accordion
+  menu; informational labels join the `INFO_TITLES` derivation so sitemap
+  routes and flyout content cannot drift apart.
 
 ### Language & Framework Guidelines
 
@@ -105,8 +109,8 @@ connect to it): `bash docs/setup_pg_z.sh` — see `docs/DEPLOYMENT.md` §4.
 | `npm run preview` | Serve `dist/` (bind `--host 127.0.0.1`) |
 | `npm run lint` | ESLint 10 flat config — must exit 0 |
 | `npm run typecheck` / `npm run typecheck:tests` | `tsc --noEmit` (app / tests+configs) |
-| `npm run test` | Vitest run (6 files / 50 tests) |
-| `npm run test:e2e` | Playwright (21 tests; builds + serves the artifact) |
+| `npm run test` | Vitest run (7 files / 62 tests) |
+| `npm run test:e2e` | Playwright (24 tests; builds + serves the artifact) |
 | `npm run test:smoke` | 45-assertion file:// battery over `dist/` |
 | `npm run sitemap` | Regenerate `public/sitemap.xml` |
 
@@ -114,10 +118,11 @@ connect to it): `bash docs/setup_pg_z.sh` — see `docs/DEPLOYMENT.md` §4.
 
 - **Unit (Vitest, jsdom)** — the pure seam `src/lib/*`: catalog, cart
   reducer, router parsing (incl. malformed inputs), money/GST, checkout
-  validation, sitemap route enumeration.
-- **E2E (Playwright, production build)** — `home.spec.ts` (tokens, flyouts,
-  gallery state machine, zero console errors), `mobile-navigation.spec.ts`
-  (390×844 touch: menu open/geometry/links/search/navigates+close, no
+  validation, flyout content model, sitemap route enumeration.
+- **E2E (Playwright, production build)** — `home.spec.ts` (tokens, the
+  three-section flyouts, gallery state machine, zero console errors),
+  `mobile-navigation.spec.ts` (390×844 touch: the reference's bar layout,
+  accordion menu open/expand/sub-link navigation/close, geometry, no
   horizontal overflow), `store-flow.spec.ts` (search → configurator → bag →
   checkout validation → confirmation → order lookup → hostile routes).
 - **Smoke** — `tests/e2e/smoke.mjs`, the exhaustive file:// parity battery.
@@ -175,7 +180,7 @@ in-memory (documented deviation D1/D6/D7 in the reference dossier).
 
 | Variable | Purpose | Example |
 |---|---|---|
-| `VITE_SITE_URL` | Sitemap generator base (`scripts/build-sitemap.mjs`) only | `https://your-deploy.example` |
+| `VITE_SITE_URL` | Sitemap + robots.txt generator base (`scripts/build-sitemap.mjs`) only | `https://your-deploy.example` |
 
 The app itself reads no env vars.
 
