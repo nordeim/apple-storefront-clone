@@ -37,55 +37,11 @@ export interface FlyoutSection {
 }
 
 /**
- * Informational flyout labels captured from the live reference's flyouts that
- * have no dedicated route in this clone. They resolve to generated info pages
- * and join the INFO_TITLES derivation, so the sitemap and the flyout content
- * stay derived from one source and can never drift apart.
+ * Informational flyout labels routed to generated info pages — captured from
+ * the live reference (2026-11-27 full-sweep, docs/REMEDIATION_PLAN.md session 3).
+ * Resolved against the INFO_TITLES derivation, so the sitemap and the flyout
+ * content stay derived from one source and can never drift apart.
  */
-const FLYOUT_INFO_LABELS: readonly string[] = [
-  "AppleCare",
-  "Get AppleCare",
-  "macOS 27",
-  "iOS 27",
-  "Apple Intelligence and Siri",
-  "Apps by Apple",
-  "Apple Creator Studio",
-  "Better with iPhone",
-  "Better with Mac",
-  "iCloud+",
-  "Mac for Business",
-  "Apple at Work",
-  "iPhone Privacy",
-  "Switch from PC to Mac",
-  "Switch from Android",
-  "Personal Setup",
-  "Community",
-  "Check Coverage",
-  "Repair",
-  "Apple Account and Password",
-  "Billing & Subscriptions",
-  "Music",
-  "TV",
-  "Explore Support",
-  "Business",
-  "Compare Mac",
-  "Compare iPad",
-  "Compare iPhone",
-  "Compare Apple Watch",
-  "Compare Apple Vision Pro",
-  "Compare AirPods",
-  "Compare Home",
-  "Compare Accessories",
-  "Mac Support",
-  "iPad Support",
-  "iPhone Support",
-  "Apple Watch Support",
-  "Apple Vision Pro Support",
-  "AirPods Support",
-  "Home Support",
-  "Accessories Support",
-];
-
 const infoLink = (label: string): FlyoutLink => ({ label, href: routeHref.info(slugify(label)) });
 
 /** The reference's full-label forms for the store flyout's category rows. */
@@ -101,89 +57,219 @@ const STORE_CATEGORY_LABELS: Readonly<Record<CategoryId, string>> = {
 };
 
 /**
- * The three-section flyout content model, measured off the live reference
- * (docs/REMEDIATION_PLAN.md, session-2 evidence): every category carries
- * "Explore X" / "Shop X" / "More from X"; Store carries
- * "Shop" / "Quick Links" / "Shop Special Stores"; Support carries
- * "Explore Support" / "Get Help" / "Helpful Topics"; Entertainment has no
- * flyout. Product rows come from the live catalog (deviation D6); every
- * other row uses the reference's own labels routed to this clone's honest
- * destinations.
+ * The flyout content model, measured off the live reference's eleven flyouts
+ * (docs/REMEDIATION_PLAN.md, session-3 full-sweep evidence): device categories
+ * carry "Explore X" / "Shop X" / "More from X" with the reference's own label
+ * lists; Store carries "Shop" / "Quick Links" / "Shop Special Stores"; Support
+ * carries "Explore Support" / "Get Help" / "Helpful Topics"; Home is a single
+ * "Quick Links" row; Entertainment is "Explore Entertainment" + "Support";
+ * Accessories is "Shop Accessories" + "Explore Accessories". Product rows come
+ * from the live catalog (deviation D6); every other row uses the reference's
+ * own labels routed to this clone's honest destinations.
  */
 export function flyoutSections(link: NavLinkSpec): FlyoutSection[] {
-  if (link.id === "store") {
-    return [
-      {
-        heading: "Shop",
-        links: [
-          { label: "Shop All", href: routeHref.store() },
-          ...CATEGORIES.map((c) => ({ label: STORE_CATEGORY_LABELS[c.id], href: routeHref.store(c.id) })),
-        ],
-      },
-      {
-        heading: "Quick Links",
-        links: ["Find a Store", "Order Status", "Apple Trade In", "Financing", "Personal Setup"].map(infoLink),
-      },
-      {
-        heading: "Shop Special Stores",
-        links: ["Certified Refurbished", "Education", "Business"].map(infoLink),
-      },
-    ];
-  }
-  if (link.id === "support") {
-    return [
-      {
-        heading: "Explore Support",
-        links: [
-          { label: "iPhone", href: routeHref.store("iphone") },
-          { label: "Mac", href: routeHref.store("mac") },
-          { label: "iPad", href: routeHref.store("ipad") },
-          { label: "Watch", href: routeHref.store("watch") },
-          { label: "Apple Vision Pro", href: routeHref.store("vision") },
-          { label: "AirPods", href: routeHref.store("airpods") },
-          { label: "Home", href: routeHref.store("home") },
-          infoLink("Music"),
-          infoLink("TV"),
-          infoLink("Explore Support"),
-        ],
-      },
-      {
-        heading: "Get Help",
-        links: ["Community", "Check Coverage", "Genius Bar", "Repair"].map(infoLink),
-      },
-      {
-        heading: "Helpful Topics",
-        links: ["Get AppleCare", "Apple Account and Password", "Billing & Subscriptions", "Accessibility"].map(infoLink),
-      },
-    ];
+  switch (link.id) {
+    case "store":
+      return [
+        {
+          heading: "Shop",
+          links: [
+            infoLink("Shop Gifts"),
+            ...CATEGORIES.map((c) => ({ label: STORE_CATEGORY_LABELS[c.id], href: routeHref.store(c.id) })),
+          ],
+        },
+        {
+          heading: "Quick Links",
+          links: ["Find a Store", "Order Status", "Apple Trade In", "Financing", "Personal Setup"].map(infoLink),
+        },
+        {
+          heading: "Shop Special Stores",
+          links: ["Certified Refurbished", "Education", "Business"].map(infoLink),
+        },
+      ];
+    case "support":
+      return [
+        {
+          heading: "Explore Support",
+          links: [
+            { label: "iPhone", href: routeHref.store("iphone") },
+            { label: "Mac", href: routeHref.store("mac") },
+            { label: "iPad", href: routeHref.store("ipad") },
+            { label: "Watch", href: routeHref.store("watch") },
+            { label: "Apple Vision Pro", href: routeHref.store("vision") },
+            { label: "AirPods", href: routeHref.store("airpods") },
+            infoLink("Music"),
+            infoLink("TV"),
+            infoLink("Explore Support"),
+          ],
+        },
+        {
+          heading: "Get Help",
+          links: ["Community", "Check Coverage", "Genius Bar", "Repair"].map(infoLink),
+        },
+        {
+          heading: "Helpful Topics",
+          links: ["Get AppleCare", "Apple Account and Password", "Billing & Subscriptions", "Accessibility"].map(infoLink),
+        },
+      ];
+    case "home":
+      return [
+        {
+          heading: "Quick Links",
+          links: [
+            infoLink("Shop Gifts"),
+            infoLink("Find a Store"),
+            { label: "AirPods", href: routeHref.store("airpods") },
+            infoLink("Apple Intelligence"),
+            infoLink("Apple Trade In"),
+          ],
+        },
+      ];
+    case "entertainment":
+      return [
+        {
+          heading: "Explore Entertainment",
+          links: [
+            { label: "Explore Entertainment", href: routeHref.entertainment },
+            ...["Apple TV", "Apple Music", "Apple Arcade", "Apple Fitness+", "Apple Podcasts", "Apple Books", "App Store"].map(infoLink),
+          ],
+        },
+        {
+          heading: "Support",
+          links: ["Apple TV Support", "Apple Music Support"].map(infoLink),
+        },
+      ];
+    case "accessories":
+      return [
+        {
+          heading: "Shop Accessories",
+          links: [
+            { label: "Shop All Accessories", href: routeHref.store("accessories") },
+            { label: "Mac", href: routeHref.store("mac") },
+            { label: "iPad", href: routeHref.store("ipad") },
+            { label: "iPhone", href: routeHref.store("iphone") },
+            { label: "Apple Watch", href: routeHref.store("watch") },
+            { label: "Apple Vision Pro", href: routeHref.store("vision") },
+            { label: "AirPods", href: routeHref.store("airpods") },
+            { label: "Home", href: routeHref.store("home") },
+          ],
+        },
+        {
+          heading: "Explore Accessories",
+          links: ["Made by Apple", "Beats", "AirTag"].map(infoLink),
+        },
+      ];
   }
   if (!link.category) return [];
   const c = link.category;
   const label = STORE_CATEGORY_LABELS[c];
-  const explore: FlyoutLink[] = [
-    { label: `Explore All ${label}`, href: routeHref.store(c) },
-    ...flyoutLinks(c),
-    infoLink(`Compare ${label}`),
-  ];
-  if (c === "mac") explore.push(infoLink("Switch from PC to Mac"));
-  if (c === "iphone") explore.push(infoLink("Switch from Android"));
-  const more: FlyoutLink[] = [infoLink(`${label} Support`), infoLink("AppleCare"), infoLink("Apple Intelligence and Siri"), infoLink("Apps by Apple"), infoLink("iCloud+")];
-  if (c === "mac") more.unshift(infoLink("macOS 27"));
-  if (c === "iphone") more.unshift(infoLink("iOS 27"), infoLink("iPhone Privacy"));
-  if (c === "mac") more.push(infoLink("Apple Creator Studio"), infoLink("Better with iPhone"), infoLink("Mac for Business"), infoLink("Apple at Work"));
-  if (c === "iphone") more.push(infoLink("Better with Mac"), infoLink("Apple at Work"));
+
+  const exploreExtras: FlyoutLink[] =
+    c === "mac"
+      ? [infoLink("Compare Mac"), infoLink("Switch from PC to Mac")]
+      : c === "iphone"
+        ? [infoLink("Compare iPhone"), infoLink("Switch from Android")]
+        : c === "watch"
+          ? [infoLink("Compare Watch"), infoLink("Why Apple Watch")]
+          : c === "airpods"
+            ? [infoLink("Compare AirPods")]
+            : c === "ipad"
+              ? [infoLink("Compare iPad")]
+              : [infoLink("Tech Specs")]; // vision — the reference's 2-row Explore
+  const explore: FlyoutLink[] =
+    c === "vision"
+      ? [{ label: "Explore Apple Vision Pro", href: routeHref.store(c) }, ...exploreExtras]
+      : [{ label: `Explore All ${label}`, href: routeHref.store(c) }, ...flyoutLinks(c), ...exploreExtras];
+
+  const shop: FlyoutLink[] =
+    c === "watch"
+      ? [
+          { label: `Shop ${label}`, href: routeHref.store(c) },
+          infoLink("Apple Watch Straps"),
+          { label: `${label} Accessories`, href: routeHref.store("accessories") },
+          infoLink("Apple Trade In"),
+          infoLink("Financing"),
+          infoLink("Personal Setup"),
+        ]
+      : c === "vision"
+        ? [
+            { label: `Shop ${label}`, href: routeHref.store(c) },
+            { label: `${label} Accessories`, href: routeHref.store("accessories") },
+            infoLink("Book a Demo"),
+            infoLink("Financing"),
+            infoLink("Personal Setup"),
+          ]
+        : c === "airpods"
+          ? [
+              infoLink("Shop AirPods 5"),
+              { label: "Shop AirPods Pro 3", href: routeHref.product("airpods-pro-3") },
+              infoLink("Shop AirPods Max 2"),
+              { label: "AirPods Accessories", href: routeHref.store("accessories") },
+            ]
+          : [
+              { label: `Shop ${label}`, href: routeHref.store(c) },
+              { label: `${label} Accessories`, href: routeHref.store("accessories") },
+              infoLink("Apple Trade In"),
+              infoLink("Financing"),
+              infoLink("Personal Setup"),
+            ];
+
+  const more: FlyoutLink[] =
+    c === "mac"
+      ? [
+          "Mac Support",
+          "AppleCare",
+          "macOS 27",
+          "Apple Intelligence and Siri",
+          "Apps by Apple",
+          "Apple Creator Studio",
+          "Better with iPhone",
+          "iCloud+",
+          "Mac for Business",
+          "Education",
+          "Apple at Work",
+        ].map(infoLink)
+      : c === "ipad"
+        ? [
+            "iPad Support",
+            "AppleCare",
+            "iPadOS 27",
+            "Apple Intelligence and Siri",
+            "Apps by Apple",
+            "Apple Creator Studio",
+            "iCloud+",
+            "Education",
+            "Apple at Work",
+          ].map(infoLink)
+        : c === "iphone"
+          ? [
+              "iPhone Support",
+              "AppleCare",
+              "iOS 27",
+              "Apple Intelligence and Siri",
+              "Apps by Apple",
+              "iPhone Privacy",
+              "Better with Mac",
+              "iCloud+",
+              "Wallet, Pay",
+              "Apple at Work",
+            ].map(infoLink)
+          : c === "watch"
+            ? [
+                "Apple Watch Support",
+                "AppleCare",
+                "watchOS 27",
+                "Apple Watch For Your Kids",
+                "Apps by Apple",
+                "Apple Fitness+",
+                "Education",
+              ].map(infoLink)
+            : c === "vision"
+              ? ["Apple Vision Pro Support", "AppleCare", "visionOS 27", "Apple Vision Pro for Enterprise"].map(infoLink)
+              : ["AirPods Support", "AppleCare", "Hearing Health", "Apple Music", "Apple Fitness+"].map(infoLink);
   return [
     { heading: `Explore ${link.label}`, links: explore },
-    {
-      heading: `Shop ${link.label}`,
-      links: [
-        { label: `Shop ${label}`, href: routeHref.store(c) },
-        { label: `${label} Accessories`, href: routeHref.store("accessories") },
-        infoLink("Apple Trade In"),
-        infoLink("Financing"),
-        infoLink("Personal Setup"),
-      ],
-    },
+    { heading: `Shop ${link.label}`, links: shop },
     { heading: `More from ${link.label}`, links: more },
   ];
 }
@@ -272,9 +358,19 @@ export const FOOTER_GROUPS: readonly (readonly FooterSection[])[] = [
 
 export const LEGAL_LINKS: readonly FooterLink[] = ["Privacy Policy", "Terms of Use", "Sales and Refunds", "Legal", "Site Map"].map(info);
 
-/** slug -> display title for every footer/legal/flyout destination. */
+/** slug -> display title for every footer/legal/flyout info destination.
+ * Derived only from links that actually route to #/info/ — store-routed
+ * footer labels never seed orphan routes. */
+const isInfoRouted = (l: { href: string }): boolean => l.href.startsWith(routeHref.info(""));
+
+const FLYOUT_MODEL_INFO_LINKS: readonly FlyoutLink[] = NAV_LINKS.flatMap((link) =>
+  flyoutSections(link).flatMap((section) => section.links.filter(isInfoRouted)),
+);
+
 export const INFO_TITLES: ReadonlyMap<string, string> = new Map([
-  ...[...FOOTER_GROUPS.flat().flatMap((s) => s.links), ...LEGAL_LINKS, ...FLYOUT_INFO_LABELS.map((label) => info(label))].map((l) => [slugify(l.label), l.label] as const),
+  ...[...FOOTER_GROUPS.flat().flatMap((s) => s.links), ...LEGAL_LINKS, ...FLYOUT_MODEL_INFO_LINKS]
+    .filter(isInfoRouted)
+    .map((l) => [slugify(l.label), l.label] as const),
   ["singapore", "Singapore"] as const,
 ]);
 
