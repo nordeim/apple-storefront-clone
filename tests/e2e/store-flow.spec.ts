@@ -20,6 +20,8 @@ test.describe("store flow (desktop)", () => {
   test("configurator changes price; add to bag; popover and bag page", async ({ page }) => {
     await page.goto("/#/product/iphone-18-pro?buy");
     await page.reload();
+    // The ?buy deep link scrolls to the configurator, not the page top.
+    await expect(page.locator("#configure-heading")).toBeVisible();
     await page.locator("label", { hasText: "512GB" }).click();
     await expect(page.getByText("S$2,099").first()).toBeVisible();
     await page.getByRole("button", { name: "Add to Bag" }).click();
@@ -91,5 +93,15 @@ test.describe("store flow (desktop)", () => {
   test("info page resolves a footer destination", async ({ page }) => {
     await page.goto("/#/info/privacy");
     await expect(page).toHaveTitle(/^Privacy/);
+  });
+
+  test("store tab title matches the store h1's full-form category label", async ({ page }) => {
+    // The tab title and the visible h1 must share the STORE_CATEGORY_LABELS
+    // map — "Shop Apple Watch", never the short category label.
+    await page.goto("/#/store/watch");
+    await expect(page).toHaveTitle("Shop Apple Watch - Apple (Singapore)");
+    await expect(page.getByRole("heading", { level: 1, name: "Shop Apple Watch" })).toBeVisible();
+    await page.goto("/#/store");
+    await expect(page).toHaveTitle("Store - Apple (Singapore)");
   });
 });

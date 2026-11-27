@@ -6,7 +6,7 @@ import { PageShell } from "@/components/PageShell";
 import { defaultSelections, describeSelections, unitPrice } from "@/lib/cart";
 import { getCategory, type Product } from "@/lib/catalog";
 import { formatSgd } from "@/lib/money";
-import { routeHref } from "@/lib/router";
+import { hasBuyParam, routeHref } from "@/lib/router";
 
 function Configurator({ product }: { product: Product }) {
   const { dispatch } = useBag();
@@ -17,7 +17,7 @@ function Configurator({ product }: { product: Product }) {
   const price = unitPrice(product, selections);
 
   useEffect(() => {
-    if (!hash.includes("?buy")) return;
+    if (!hasBuyParam(hash)) return;
     headingRef.current?.scrollIntoView({ block: "center" });
     headingRef.current?.focus({ preventScroll: true });
   }, [hash]);

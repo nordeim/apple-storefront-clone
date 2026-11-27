@@ -35,6 +35,13 @@ function parseSearchQuery(queryString: string): string {
   return "";
 }
 
+/** Exact `?buy` deep-link detection: the param is a discrete query key, never
+ * a substring of the hash — `?buyfoo` or `?q=buy` are not the buy deep link. */
+export function hasBuyParam(hash: string): boolean {
+  const queryPart = hash.replace(/^#/, "").split("?")[1] ?? "";
+  return new URLSearchParams(queryPart).has("buy");
+}
+
 export function parseHash(hash: string): Route {
   const withoutHash = hash.replace(/^#/, "");
   const [pathPart = "", queryPart = ""] = withoutHash.split("?");

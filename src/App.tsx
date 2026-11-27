@@ -3,10 +3,10 @@ import { Footer } from "@/components/Footer";
 import { GlobalNav } from "@/components/GlobalNav";
 import { BagProvider } from "@/context/BagContext";
 import { useRoute } from "@/hooks/useRoute";
-import { getCategory, getProduct } from "@/lib/catalog";
+import { getProduct } from "@/lib/catalog";
 import { HOME_FOOTNOTES } from "@/lib/home-content";
-import type { Route } from "@/lib/router";
-import { INFO_TITLES } from "@/lib/site-content";
+import { routeTitle } from "@/lib/route-title";
+import { hasBuyParam, type Route } from "@/lib/router";
 import { BagPage } from "@/pages/BagPage";
 import { CheckoutPage } from "@/pages/CheckoutPage";
 import { ConfirmationPage } from "@/pages/ConfirmationPage";
@@ -15,35 +15,6 @@ import { ProductPage } from "@/pages/ProductPage";
 import { SearchPage } from "@/pages/SearchPage";
 import { EntertainmentPage, InfoPage, NotFoundPage, SupportPage } from "@/pages/StaticPages";
 import { StorePage } from "@/pages/StorePage";
-
-const SITE = "Apple (Singapore)";
-
-function routeTitle(route: Route): string {
-  switch (route.name) {
-    case "home":
-      return SITE;
-    case "store":
-      return `${route.category ? `Shop ${getCategory(route.category)?.label ?? ""}` : "Store"} - ${SITE}`;
-    case "product":
-      return `${getProduct(route.id)?.name ?? "Product"} - ${SITE}`;
-    case "bag":
-      return `Bag - ${SITE}`;
-    case "checkout":
-      return `Check Out - ${SITE}`;
-    case "confirmation":
-      return `Order confirmed - ${SITE}`;
-    case "search":
-      return `${route.query.trim() ? `Search results for ${route.query.trim()}` : "Search"} - ${SITE}`;
-    case "entertainment":
-      return `Entertainment - ${SITE}`;
-    case "support":
-      return `Support - ${SITE}`;
-    case "info":
-      return `${INFO_TITLES.get(route.slug) ?? "Page not found"} - ${SITE}`;
-    case "not-found":
-      return `Page not found - ${SITE}`;
-  }
-}
 
 function RouteView({ route }: { route: Route }) {
   switch (route.name) {
@@ -86,7 +57,7 @@ function Shell() {
     previousPath.current = path;
     if (!isNavigation) return;
     // Hash routing never reloads the page, so reset scroll and focus the way a real navigation would.
-    if (!hash.includes("?buy")) window.scrollTo(0, 0);
+    if (!hasBuyParam(hash)) window.scrollTo(0, 0);
     mainRef.current?.focus({ preventScroll: true });
   }, [route, hash, path]);
 

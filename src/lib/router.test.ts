@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseHash, routeHref } from "./router";
+import { hasBuyParam, parseHash, routeHref } from "./router";
 
 describe("parseHash", () => {
   it("treats empty and root hashes as home", () => {
@@ -62,5 +62,27 @@ describe("routeHref factories", () => {
     // The ?buy suffix is a scroll hint consumed by App/ProductPage; the route
     // itself must still parse to the product page.
     expect(parseHash(routeHref.productBuy("iphone-18-pro"))).toEqual({ name: "product", id: "iphone-18-pro" });
+  });
+});
+
+describe("hasBuyParam", () => {
+  it("recognises the exact bare-key buy param the factory builds", () => {
+    expect(hasBuyParam("#/product/iphone-18-pro?buy")).toBe(true);
+    expect(hasBuyParam("#/product/iphone-18-pro?buy=true")).toBe(true);
+    expect(hasBuyParam("#/product/iphone-18-pro?color=gold&buy")).toBe(true);
+  });
+
+  it("does not substring-match the buy grammar", () => {
+    // "?buyfoo" is not the buy param; "?q=buy" is a search query value.
+    expect(hasBuyParam("#/product/iphone-18-pro?buyfoo")).toBe(false);
+    expect(hasBuyParam("#/store?buyfoo")).toBe(false);
+    expect(hasBuyParam("#/search?q=buy")).toBe(false);
+    expect(hasBuyParam("#/product/iphone-18-pro?b=buy")).toBe(false);
+  });
+
+  it("is false without any query part", () => {
+    expect(hasBuyParam("#/product/iphone-18-pro")).toBe(false);
+    expect(hasBuyParam("#/")).toBe(false);
+    expect(hasBuyParam("")).toBe(false);
   });
 });
