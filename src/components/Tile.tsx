@@ -1,6 +1,7 @@
 import { useState, type CSSProperties } from "react";
 import { useInView, usePrefersReducedMotion } from "@/hooks/browser";
 import type { TileSpec } from "@/lib/home-content";
+import { routeHref } from "@/lib/router";
 import { PauseIcon, PlayIcon } from "./Icons";
 import { HOLIDAY_PALETTES, ProductArt, type HolidayColor } from "./ProductArt";
 
@@ -51,7 +52,7 @@ export function Tile({ spec, tier }: { spec: TileSpec; tier: Tier }) {
 
   const background = isHoliday ? HOLIDAY_PALETTES[holidayColor].background : spec.background;
   const artLabel = isHoliday ? `${spec.artLabel}, ${HOLIDAY_PALETTES[holidayColor].label}` : spec.artLabel;
-  const primaryHref = spec.ctas[0]?.href ?? "#/store";
+  const primaryHref = spec.ctas[0]?.href ?? routeHref.store();
 
   return (
     <div

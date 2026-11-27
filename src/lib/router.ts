@@ -75,6 +75,8 @@ export const routeHref = {
   home: "#/",
   store: (category?: CategoryId) => (category ? `#/store/${category}` : "#/store"),
   product: (id: string) => `#/product/${id}`,
+  /** Product deep link that scrolls straight to the configurator (App/ProductPage consume the `?buy` hint). */
+  productBuy: (id: string) => `#/product/${id}?buy`,
   bag: "#/bag",
   checkout: "#/checkout",
   confirmation: (orderNo: string) => `#/confirmation/${orderNo}`,

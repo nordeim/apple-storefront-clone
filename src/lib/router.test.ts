@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseHash } from "./router";
+import { parseHash, routeHref } from "./router";
 
 describe("parseHash", () => {
   it("treats empty and root hashes as home", () => {
@@ -44,5 +44,23 @@ describe("parseHash", () => {
 
   it("returns not-found for unknown routes", () => {
     expect(parseHash("#/nope")).toEqual({ name: "not-found" });
+  });
+});
+
+describe("routeHref factories", () => {
+  it("builds every route from one grammar — including the ?buy deep link", () => {
+    expect(routeHref.home).toBe("#/");
+    expect(routeHref.store()).toBe("#/store");
+    expect(routeHref.store("mac")).toBe("#/store/mac");
+    expect(routeHref.product("iphone-18-pro")).toBe("#/product/iphone-18-pro");
+    expect(routeHref.productBuy("iphone-18-pro")).toBe("#/product/iphone-18-pro?buy");
+    expect(routeHref.bag).toBe("#/bag");
+    expect(routeHref.info("privacy")).toBe("#/info/privacy");
+  });
+
+  it("round-trips the buy deep link through parseHash to the product page", () => {
+    // The ?buy suffix is a scroll hint consumed by App/ProductPage; the route
+    // itself must still parse to the product page.
+    expect(parseHash(routeHref.productBuy("iphone-18-pro"))).toEqual({ name: "product", id: "iphone-18-pro" });
   });
 });

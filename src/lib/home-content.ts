@@ -1,4 +1,5 @@
 import type { ArtId } from "./catalog";
+import { routeHref } from "./router";
 
 export type TileTheme = "light" | "dark";
 
@@ -22,8 +23,8 @@ export interface TileSpec {
 }
 
 const learnBuy = (name: string, productId: string): TileCta[] => [
-  { label: "Learn more", href: `#/product/${productId}`, ariaLabel: `Learn more, ${name}`, variant: "primary" },
-  { label: "Buy", href: `#/product/${productId}?buy`, ariaLabel: `Buy, ${name}`, variant: "secondary" },
+  { label: "Learn more", href: routeHref.product(productId), ariaLabel: `Learn more, ${name}`, variant: "primary" },
+  { label: "Buy", href: routeHref.productBuy(productId), ariaLabel: `Buy, ${name}`, variant: "secondary" },
 ];
 
 export const HERO_TILES: readonly TileSpec[] = [
@@ -35,7 +36,7 @@ export const HERO_TILES: readonly TileSpec[] = [
     art: "holiday",
     artLabel: "Montage of Apple products, centred Apple logo gift wrapped in a white bow",
     background: "#3b0a1c",
-    ctas: [{ label: "Shop gifts", href: "#/store", ariaLabel: "Shop gifts, Holiday 2026", variant: "primary" }],
+    ctas: [{ label: "Shop gifts", href: routeHref.store(), ariaLabel: "Shop gifts, Holiday 2026", variant: "primary" }],
   },
   {
     id: "iphone-duo",
