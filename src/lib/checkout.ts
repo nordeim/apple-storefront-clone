@@ -19,7 +19,13 @@ export function validateCheckout(form: CheckoutForm): CheckoutErrors {
   const email = form.email.trim();
   const address = form.address.trim();
   const postalCode = form.postalCode.trim();
-  const phone = form.phone.replace(/[\s-]/g, "").replace(/^\+?65/, "");
+  // Strip only an explicit country code: a leading "+65", or a bare "65"
+  // followed by exactly 8 digits. A legal 8-digit number that merely starts
+  // with 65 (e.g. 65123456) must survive normalization untouched.
+  const phone = form.phone
+    .replace(/[\s-]/g, "")
+    .replace(/^\+65/, "")
+    .replace(/^65(?=\d{8}$)/, "");
 
   if (!fullName) errors.fullName = "Enter your full name.";
   if (!email) errors.email = "Enter your email address.";

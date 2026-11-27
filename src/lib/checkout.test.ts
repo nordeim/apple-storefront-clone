@@ -31,6 +31,16 @@ describe("validateCheckout", () => {
     expect(validateCheckout({ ...valid, phone: "9123456" }).phone).toBeDefined();
   });
 
+  it("keeps a valid 8-digit number that starts with 65 (regression: only an explicit +65 is stripped)", () => {
+    // "65123456" is a legal SG number (6 prefix landline); the normalizer must
+    // not mistake its leading "65" for a country code and mangle it.
+    expect(validateCheckout({ ...valid, phone: "65123456" }).phone).toBeUndefined();
+    expect(validateCheckout({ ...valid, phone: "+65 6512 3456" }).phone).toBeUndefined();
+    expect(validateCheckout({ ...valid, phone: "+65 65123456" }).phone).toBeUndefined();
+    // A bare 10-digit 65-prefixed form is accepted as an explicit country code.
+    expect(validateCheckout({ ...valid, phone: "65 6512 3456" }).phone).toBeUndefined();
+  });
+
   it("rejects malformed emails", () => {
     expect(validateCheckout({ ...valid, email: "not-an-email" }).email).toBeDefined();
     expect(validateCheckout({ ...valid, email: "a@b" }).email).toBeDefined();
