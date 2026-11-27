@@ -231,9 +231,22 @@ code in the same commit; `git status` clean before the SSH-wrapper push.
    battery was ported into `@playwright/test` specs so the parity evidence
    lives in the gate, not in an optional script.
 6. **Generate what you can derive.** The sitemap seam derives the full route
-   set (128 URLs at the 2026-11-27 session-3 measurement) from the catalog + content
+   set (156 URLs at the 2026-11-28 session-5 measurement) from the catalog + content
    seam; hand-maintained artifacts drift by construction. The flyout content
    model and the robots.txt renderer are derived by the same rule.
+7. **Extract a tab-title seam the moment two surfaces disagree about a label**
+   (session 5): the store h1 and the browser tab rendered different category
+   labels for one shared concept — one label map in the seam (`route-title.ts`)
+   now feeds both, and an e2e test pins the agreement.
+8. **Query-string grammar is exact-match territory** (session 5): a substring
+   `includes("?buy")` accepts a superset nobody specified (`?buyfoo`,
+   `?q=buy`); the grammar belongs to one exact parser (`hasBuyParam`,
+   URLSearchParams) next to the href factory that builds it.
+9. **ARIA attributes that reference conditionally-mounted DOM should exist
+   only while that DOM exists** (session 5): dangling `aria-controls` on
+   closed panels is the price of the mount/unmount rule — gate the attribute
+   on the same state that mounts the panel, and keep spec locators on
+   stable attributes (aria-label/role), never on the gated one.
 
 ## §13 Pitfalls to Avoid
 
