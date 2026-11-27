@@ -3,12 +3,18 @@
 // robots Sitemap directive can never drift from the sitemap's origin).
 // The seam is TypeScript with path-free relative imports, so load it through
 // Vite (the repo's own toolchain) instead of shelling out to another runner.
-// Usage: npm run sitemap  (VITE_SITE_URL overrides the base; default is the
-// dev origin — set it to the deployed origin when generating for production.)
-import { createServer } from "vite";
+// Usage: npm run sitemap  (VITE_SITE_URL overrides the base — from the shell,
+// or from a .env file per .env.example; default is the dev origin — set it to
+// the deployed origin when generating for production.)
+import { createServer, loadEnv } from "vite";
 import { mkdir, writeFile } from "node:fs/promises";
 
-const base = process.env.VITE_SITE_URL ?? "http://localhost:5173/";
+// Precedence: the shell environment wins over .env (the Vite convention), and
+// a .env file in the repo root is honored for the documented `cp .env.example
+// .env` flow — loadEnv is what Vite itself uses, applied BEFORE the server
+// exists (process.env is not populated from .env by Vite's node-side APIs).
+const envFromFile = loadEnv("production", process.cwd(), "");
+const base = process.env.VITE_SITE_URL ?? envFromFile.VITE_SITE_URL ?? "http://localhost:5173/";
 const vite = await createServer({
   logLevel: "error",
   server: { middlewareMode: true },
