@@ -42,6 +42,14 @@ describe("parseHash", () => {
     expect(parseHash("#/info/..%2F..")).toEqual({ name: "not-found" });
   });
 
+  it("rejects trailing segments on the argless heads (uniform 404 grammar)", () => {
+    // bag/checkout already 404 these; search/entertainment/support must not
+    // silently truncate a trailing segment into a valid route.
+    expect(parseHash("#/search/xyz")).toEqual({ name: "not-found" });
+    expect(parseHash("#/entertainment/tv")).toEqual({ name: "not-found" });
+    expect(parseHash("#/support/iphone")).toEqual({ name: "not-found" });
+  });
+
   it("returns not-found for unknown routes", () => {
     expect(parseHash("#/nope")).toEqual({ name: "not-found" });
   });

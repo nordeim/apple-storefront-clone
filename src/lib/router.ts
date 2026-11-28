@@ -66,11 +66,11 @@ export function parseHash(hash: string): Route {
     case "confirmation":
       return arg !== undefined && ORDER_NO.test(arg) ? { name: "confirmation", orderNo: arg } : NOT_FOUND;
     case "search":
-      return { name: "search", query: parseSearchQuery(queryPart) };
+      return arg === undefined ? { name: "search", query: parseSearchQuery(queryPart) } : NOT_FOUND;
     case "entertainment":
-      return { name: "entertainment" };
+      return arg === undefined ? { name: "entertainment" } : NOT_FOUND;
     case "support":
-      return { name: "support" };
+      return arg === undefined ? { name: "support" } : NOT_FOUND;
     case "info":
       return arg !== undefined && SLUG.test(arg) ? { name: "info", slug: arg } : NOT_FOUND;
     default:
