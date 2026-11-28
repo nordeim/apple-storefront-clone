@@ -115,5 +115,30 @@ test.describe("store flow (desktop)", () => {
     await expect(page).toHaveURL(/#\/product\/iphone-duo\?buy$/);
     await expect(page.locator("#configure-heading")).toBeVisible();
     expect(await page.evaluate(() => document.activeElement?.id)).toBe("configure-heading");
+    // The popstate path (back, then forward) re-enters the same ?buy route
+    // through the hash router without a shell focus steal.
+    await page.goBack();
+    // Back lands on the bare entry URL (the browser collapses the hash);
+    // the app renders home.
+    await expect(page.getByRole("heading", { name: /Gifts they/ })).toBeVisible();
+    await page.goForward();
+    await expect(page).toHaveURL(/#\/product\/iphone-duo\?buy$/);
+    await expect(page.locator("#configure-heading")).toBeVisible();
+    expect(await page.evaluate(() => document.activeElement?.id)).toBe("configure-heading");
+  });
+
+  test("?buy on a ghost product still resets focus to main (404 path)", async ({ page }) => {
+    // The App.tsx focus gate's false branch: an in-app navigation to an
+    // unknown product id degrades to not-found, and the shell's standard
+    // focus reset runs (the Configurator that would own focus never mounts).
+    // Fresh loads never move focus (the effect's isNavigation guard), so the
+    // pin drives an in-app hash navigation.
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: /Gifts they/ })).toBeVisible();
+    await page.evaluate(() => {
+      window.location.hash = "#/product/ghost?buy";
+    });
+    await expect(page.getByText("We couldn’t find that page.")).toBeVisible();
+    expect(await page.evaluate(() => document.activeElement?.id)).toBe("main");
   });
 });

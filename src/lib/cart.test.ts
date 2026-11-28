@@ -104,6 +104,12 @@ describe("bagLineSummary", () => {
       bagLineSummary(phone, { productId: phone.id, selections: { color: "black", storage: "512" }, quantity: 3 }),
     ).toBe("Black · 512GB · Qty 3");
   });
+
+  it("drops unknown choice ids without leaking separators", () => {
+    expect(
+      bagLineSummary(phone, { productId: phone.id, selections: { color: "bogus", storage: "256" }, quantity: 1 }),
+    ).toBe("256GB · Qty 1");
+  });
 });
 
 describe("cartSubtotal", () => {
