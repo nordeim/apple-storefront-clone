@@ -1,4 +1,4 @@
-# apple-storefront-clone — Master Project Architecture Document (PAD) v1.4
+# apple-storefront-clone — Master Project Architecture Document (PAD) v1.5
 
 **Classification:** Internal Engineering Reference
 **Status:** DEFINITIVE, PRODUCTION-LOCKED BLUEPRINT
@@ -7,6 +7,37 @@
 **Audience:** Senior Engineers, Tech Leads, DevOps, and Onboarding Engineers
 **Rule:** Every architectural decision in this document traces to a specific rationale.
 Nothing is here "because it's popular."
+
+#### Revision Block — v1.5 (the session-6 re-verification + grammar-hygiene cycle)
+
+- `[SR]` The session-6 cycle (2026-11-28, `docs/REMEDIATION_PLAN.md` session-6 section)
+  re-verified the pulled tree (6a3f2be) — baseline gates exactly as documented (9 files/99
+  unit → after the fixes 9/102 · 27/27 e2e · 45/45 smoke · 156 routes) — plus a read-only
+  audit (0 CRITICAL/HIGH/MEDIUM; 2 LOW + 4 INFO) and a fresh agent-browser parity sweep:
+  the clone's mobile navigation re-measured working at 390×844 and **all eleven reference
+  flyout models re-extracted from the live DOM and programmatically re-diffed against
+  `flyoutSections()` — all match** (headings + link sets, NBSP-normalized); nav order,
+  hero/promo sequences and the TV+ gallery titles also match. No reference drift found.
+- `[FIX]` Audit fixes: the shell's navigation focus reset no longer steals focus from the
+  Configurator's heading on in-app `?buy` deep links (`App.tsx` gates the scroll+focus
+  reset on `!(route.name === "product" && hasBuyParam(hash))` — a defect that was real on
+  the production artifact and masked on the dev server by StrictMode's double effect
+  invocation; pinned by the new store-flow e2e "in-app Buy CTA keeps the configurator
+  heading focused"); the bag-line summary grammar extracted into the tested
+  `bagLineSummary()` seam in `src/lib/cart.ts` (option-less products render "Qty n" with
+  no stray leading "·"); the duplicated `ORDER_NO` regex deduped (exported from
+  `router.ts`, imported by `StaticPages.tsx`). The holiday tile's random lazy initializer
+  was accepted as-is (React's documented CSR idiom; it carries the reference's 4-colourway
+  variety) — decision recorded in the remediation plan.
+- `[VERIFY]` Full gate green after the change: lint 0 errors · typecheck clean ×2 · unit 9
+  files / 102 tests · build 309.3 kB / 93.2 kB gzip (CSS 33,212 bytes / 501 rules) · e2e
+  27/27 · smoke 45/45, zero console errors. Live on the dev server: the bag popover line
+  for an option-less product reads "AirTag (4 Pack) / Qty 1" (no stray separator); the
+  in-app Buy CTA leaves `#configure-heading` focused; the support-page order lookup
+  unchanged.
+- `[CHORE]` README/AGENTS/CLAUDE/PAD/SKILL/DEPLOYMENT swept in lockstep (counts 9/99 →
+  9/102 unit, 26 → 27 e2e, 309.2 → 309.3 kB, CSS 33,214 → 33,212 bytes); the 17
+  screenshots re-captured; worklog Task 118.
 
 #### Revision Block — v1.4 (the session-5 verification + hygiene cycle)
 
@@ -258,7 +289,7 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 - **Decision:** All logic in `src/lib/*` (catalog, cart reducer, router, money, checkout
   validation, content, sitemap); the single shared store is
   `src/context/BagContext.tsx` (React context + reducer, in-memory only).
-- **Rationale:** The seam is unit-testable without rendering (99 tests); "no backend,
+- **Rationale:** The seam is unit-testable without rendering (102 tests); "no backend,
   nothing transmitted" is an explicit documented deviation, not an accident.
 - **Consequences:** Bag/order state resets on reload (documented limitation).
 - **Alternatives rejected:** localStorage persistence (silently changes the privacy
@@ -275,8 +306,8 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 
 **ADR-006: Three-tier test suite against the production artifact.**
 - **Context:** The dev server is not the build; parity claims must be executable.
-- **Decision:** Vitest for the seam (99 tests); Playwright against
-  `npm run build && vite preview --host 127.0.0.1` (26 tests: tokens,
+- **Decision:** Vitest for the seam (102 tests); Playwright against
+  `npm run build && vite preview --host 127.0.0.1` (27 tests: tokens,
   mobile-navigation state machine, store flow incl. hostile routes); the exhaustive
   45-assertion `file://` smoke battery as the parity net.
 - **Rationale:** The token assertions ARE the parity evidence; the mobile spec pins
@@ -579,9 +610,9 @@ credentials.
 
 - [ ] `npm run lint` exit 0
 - [ ] `npm run typecheck` && `npm run typecheck:tests` clean
-- [ ] `npm run test` — 9 files / 99 tests
+- [ ] `npm run test` — 9 files / 102 tests
 - [ ] `npm run build` — single-file `dist/index.html`
-- [ ] `npm run test:e2e` — 26 passed
+- [ ] `npm run test:e2e` — 27 passed
 - [ ] `npm run test:smoke` — 45 assertions, zero console errors
 - [ ] Docs touched in the same commit; counts in lockstep
 
@@ -592,7 +623,7 @@ credentials.
 ### 8.1 Production Build
 
 `npm run build` → `vite build` with `react()`, `@tailwindcss/vite`, and
-`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 309.2 kB /
+`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 309.3 kB /
 93.2 kB gzip this cycle; CSS 33.2 kB / 501 rules). No server bundle, no image
 pipeline, no external requests.
 

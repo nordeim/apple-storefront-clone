@@ -19,9 +19,9 @@ Apple's proprietary assets were deliberately not copied or hot-linked.
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest, jsdom — 9 files / 99 tests) |
+| Unit tests | `npm run test` (Vitest, jsdom — 9 files / 102 tests) |
 | Production build (single file → `dist/index.html`) | `npm run build` |
-| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 26 tests) |
+| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 27 tests) |
 | File-protocol smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
 | Regenerate `public/sitemap.xml` | `npm run sitemap` |
 | Clean gate order | `npm run lint && npm run typecheck && npm run typecheck:tests && npm run test && npm run build && npm run test:e2e && npm run test:smoke` |
@@ -43,7 +43,7 @@ npm run dev          # → http://localhost:5173
 
 ```bash
 npm run typecheck    # clean, no output
-npm run test         # 9 files / 99 tests passed
+npm run test         # 9 files / 102 tests passed
 npm run build        # dist/index.html (~309 kB single file)
 npm run test:e2e     # 26 passed
 ```

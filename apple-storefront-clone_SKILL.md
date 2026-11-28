@@ -8,12 +8,12 @@ description: >
   to it. Covers the architecture, design tokens, the Tailwind v4 trap log, the
   three-tier test suite, the build/SEO posture, and the hard lessons of the 2026-11
   remediation cycle.
-version: 1.4.0
+version: 1.5.0
 last_updated: 2026-11-28
 tags: [react, vite, tailwindcss-v4, typescript, spa, e-commerce-clone, e2e-testing]
 ---
 
-# apple-storefront-clone — Engineering Skill (v1.4.0)
+# apple-storefront-clone — Engineering Skill (v1.5.0)
 
 > **What this is:** the distilled, codebase-verified engineering reference for
 > the remediated `apple-storefront-clone`. Every number below was measured in
@@ -48,8 +48,8 @@ entertainment/support pages. Philosophy:
 | TypeScript | 5.9.3 | `strict`, `noUnusedLocals/Parameters`, bundler resolution, `@/*` → `src/*` |
 | Vite | 7.3.7 | `react()` + `@tailwindcss/vite` + `viteSingleFile()`; dep scan pinned to `index.html` |
 | Tailwind CSS | 4.1.17 | CSS-first: `@theme` tokens in `src/index.css`; NO JS config; NO PostCSS config |
-| Vitest | 4.1.12 (jsdom 29.1.1) | 9 files / 99 tests over the seam |
-| Playwright | 1.65.1 | 26 e2e over the production build; Chromium only (WebKit unavailable in the sandbox) |
+| Vitest | 4.1.12 (jsdom 29.1.1) | 9 files / 102 tests over the seam |
+| Playwright | 1.65.1 | 27 e2e over the production build; Chromium only (WebKit unavailable in the sandbox) |
 | ESLint | 10.15.0 (typescript-eslint 8.74.0) | Flat config; `skills/**` and `docs/**` ignored |
 | (removed) | — | `clsx`/`tailwind-merge` and the dead `cn()` helper were dropped in session 3 (zero importers) |
 
@@ -139,7 +139,9 @@ token-substring AND-match search), `src/lib/site-content.ts` (nav links, the
 per entry, shared by the desktop flyouts and the mobile accordion menu; the
 full footer directory + info-page map via `slugify`), `src/lib/home-content.ts`
 (hero/promo tile copy + footnotes), `src/lib/route-title.ts` (the tab-title
-seam — full-form store labels matching the h1). The sitemap seam (`src/lib/sitemap.ts`)
+seam — full-form store labels matching the h1), `src/lib/cart.ts`'s
+`bagLineSummary` (the bag-line summary grammar shared by the popover and the
+checkout aside). The sitemap seam (`src/lib/sitemap.ts`)
 enumerates 156 routes from exactly these sources — the route set can never
 drift from the catalog.
 
@@ -203,9 +205,9 @@ real screen readers (documented Unknown).
 
 ```bash
 npm run lint && npm run typecheck && npm run typecheck:tests   # 0 / clean / clean
-npm run test                       # 9 files / 99 tests
+npm run test                       # 9 files / 102 tests
 npm run build                      # dist/index.html ~309 kB (CSS 33.2 kB)
-npm run test:e2e                   # 26/26
+npm run test:e2e                   # 27/27
 npm run test:smoke                 # 45 assertions, 0 console errors
 npm run sitemap                    # if routes changed: regenerate + re-check 156→N
 ```
@@ -247,6 +249,19 @@ code in the same commit; `git status` clean before the SSH-wrapper push.
    closed panels is the price of the mount/unmount rule — gate the attribute
    on the same state that mounts the panel, and keep spec locators on
    stable attributes (aria-label/role), never on the gated one.
+10. **Verify focus/a11y behavior on the production artifact, not the dev
+   server** (session 6): StrictMode's double effect invocation re-runs child
+   effects after a parent's focus grab, masking real focus-steal defects in
+   dev (the `?buy` heading focus looked correct in dev and was stolen by the
+   shell's `<main>` focus in the shipped build). Reproduce on `vite preview`
+   — the artifact is the truth; pin with an e2e assertion on
+   `document.activeElement` after a real in-app click.
+11. **Separator grammar belongs in one tested seam** (session 6): a
+   presentation string built as `join(" · ") + " · more"` leaks a stray
+   leading separator when the joined list is empty — build the whole line as
+   one join (`[...parts, "Qty n"].join(" · ")`) in a pure seam
+   (`bagLineSummary`), test the empty-part case first, and let both surfaces
+   (popover, checkout aside) consume it.
 
 ## §13 Pitfalls to Avoid
 
@@ -373,40 +388,44 @@ lockfiles, running app) → IMPLEMENT (small typed test-backed increments) →
 VERIFY (the full gate, browser-verified UI) → DELIVER (atomic conventional
 commits to `main`, docs lockstep, evidence labels, deferred-debt honesty).
 
-## Appendix B — project_state (measured 2026-11-28, session 5)
+## Appendix B — project_state (measured 2026-11-28, session 6)
 
-- Unit: **9 files / 99 tests** (seam: cart, catalog, checkout, the per-category
-  flyout content model, home tiles, money, router (+ `hasBuyParam`),
-  route-title, sitemap + robots)
-- E2e: **26 tests** (home 8, mobile-navigation 11, store-flow 7) over
-  `vite preview --host 127.0.0.1:4173`
+- Unit: **9 files / 102 tests** (seam: cart (+ `bagLineSummary`), catalog,
+  checkout, the per-category flyout content model, home tiles, money, router
+  (+ `hasBuyParam`), route-title, sitemap + robots)
+- E2e: **27 tests** (home 8, mobile-navigation 11, store-flow 8 — incl. the
+  in-app `?buy` focus pin) over `vite preview --host 127.0.0.1:4173`
 - Smoke: **45 assertions**, `file://dist/index.html`, 0 console errors — the
   battery is now JSDoc-typed and covered by `typecheck:tests`
 - Sitemap: **156 routes / 131 info pages** generated from the seam; robots.txt
   rendered by the same seam + generator (one `VITE_SITE_URL` stamps both; the
   value resolves from the shell or a `.env` file via Vite `loadEnv`)
-- Build: `dist/index.html` **309.2 kB / 93.2 kB gzip**; CSS **33,214 bytes /
+- Build: `dist/index.html` **309.3 kB / 93.2 kB gzip**; CSS **33,212 bytes /
   501 rules**; build time ~1.0 s
 - Gate: `npm run gate` — lint 0 errors · typecheck clean · tests green · build · e2e · smoke
-- Flyout model (session-4, re-verified session-5): Home is the reference's
+- Flyout model (session-4, re-verified sessions 5+6): Home is the reference's
   restructured three-section model (Explore/Shop/More from Home, 16 links);
   Mac/iPad/iPhone/Watch/AirPods Explore rows carry the reference's full
   product-family labels (family labels that match a catalog product route to
   its product page — MacBook Pro, iPad, iPhone Duo, iPhone 18 Pro, Apple Watch
   Series 12, AirPods Pro 3 — the rest to info routes; catalog-only products
   stay reachable via the store — deviation D6 as revised in session 4);
-  session-5 re-extracted all eleven live models and diffed them against the
+  sessions 5+6 re-extracted all eleven live models and diffed them against the
   seam — all match
 - Store surfaces (session-4): the chip row matches the reference's measured
   order and full-form labels (+ AirTag chip; the leading All chip is the
   superset affordance); category h1s are full-form ("Shop Apple Watch"), and
   the tab title matches via the `route-title` seam (session-5)
 - Local PG 17 (optional): `postgresql://postgres:postgres@127.0.0.1:5432/app_db` — installed rootless, unused by the SPA
-- Mobile nav parity (session-5 re-measure at 390×844): bar geometry byte-equal
+- Mobile nav parity (sessions 5+6 re-measure at 390×844): bar geometry byte-equal
   (logo x=0 w=48, Search x=246, Bag x=294, Menu x=342); all 11 accordion rows
   carry expand buttons; open/expand/navigate/close all verified live with zero
   console errors — no Tailwind v4 display-toggling defect
-- Hygiene (session-5): `aria-controls` exists only while its panel is mounted;
-  the `?buy` deep link is an exact query-key grammar (`hasBuyParam`); the dead
-  `.button-neutral`/`.section-ribbon-host` CSS rules are gone; the bag-line
-  summary row is one component (`components/BagLineRow.tsx`)
+- Hygiene (sessions 5+6): `aria-controls` exists only while its panel is mounted;
+  the `?buy` deep link is an exact query-key grammar (`hasBuyParam`), and on in-app
+  navigation into it the Configurator heading owns focus (shell focus reset gated,
+  e2e-pinned on the artifact); the dead `.button-neutral`/`.section-ribbon-host` CSS
+  rules are gone; the bag-line summary row is one component
+  (`components/BagLineRow.tsx`) fed by the tested `bagLineSummary` seam (no stray
+  separator for option-less products); the order-number regex lives once in
+  `router.ts` (`ORDER_NO` export)

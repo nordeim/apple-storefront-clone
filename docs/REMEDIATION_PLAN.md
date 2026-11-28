@@ -535,3 +535,53 @@ Inputs: the operator's standing review prompt on a fresh clone (HEAD `4390746` =
 - The aria-controls gating touches exactly three pinned locators: `mobile-navigation.spec.ts:34` (→ role locator), `home.spec.ts:11` (→ `aria-label='Menu'`), `smoke.mjs:33` (→ same) — each keeps asserting the same behavior through a stable attribute; the accordion/nav-link aria-controls have no spec consumers (verified by grep).
 - `BagLineRow` is purely presentational over the existing seam (`describeSelections`/`unitPrice`/`lineKey`); both consumer blocks were read in full and are byte-identical apart from surrounding layout.
 - Counts will move (unit files 8 → 9, tests 86 → ~100; CSS bytes/rules drop; build size ~unchanged) — the lockstep sweep (S5-9) covers README/AGENTS/CLAUDE/PAD/SKILL in the same commit.
+
+---
+
+# Session 6 (2026-11-28 — the re-verification + grammar-hygiene cycle)
+
+Inputs: the operator's standing review prompt on a fresh pull (HEAD `6a3f2be` = run-117's docs commits + the session_5.md log paste; `git pull` brought in the log only). Baseline re-observed exactly as documented (lint 0 errors · typecheck ×2 clean · 9 files/99 unit · build 309.24 kB / 93.24 kB gzip · e2e 26/26 · smoke 45/45, zero console errors · sitemap 156 routes · rootless PostgreSQL 17 re-established via `docs/setup_pg_z.sh`, accepting connections at `postgresql://postgres:postgres@127.0.0.1:5432/app_db`). A read-only subagent audit (web-application methodology, `skills/` excluded) ran over the session-5 diffs (`4390746..6a3f2be`) first; the live-parity pass re-measured the clone's mobile navigation, re-extracted **all eleven reference flyout models from the live DOM and re-diffed them programmatically against `flyoutSections()`** (scripts/parity-diff-6.mjs — Vite ssrLoadModule harness), and spot-checked the reference's hero/promo/gallery surfaces.
+
+## Session-6 findings (counts by severity)
+
+| Severity | Count | Key items |
+|---|---|---|
+| CRITICAL | 0 | — |
+| HIGH | 0 | — |
+| MEDIUM | 0 | — |
+| LOW | 2 | stray leading "·" separator in bag-line rows for option-less products (AirTag (4 Pack) · Qty 1"; AirPods Pro 3) — reproduced live on the bag popover; the audit's "?buy focus lands on `<main>`" claim **reproduced on the production artifact** (dev-server probing was misleading: StrictMode's double effect invocation re-focuses the heading after the shell steals focus, so dev looks right while prod — the artifact that ships — leaves focus on `<main>`) |
+| INFO | 4 | `ORDER_NO` regex duplicated (router.ts + StaticPages.tsx); "Apple (Singapore)" site-name constant static-shell duplication (accepted); store sort resets on category-chip remount (deliberate); impure random initializer for the holiday tile palette (StrictMode double-render) |
+
+### Verified evidence (this cycle)
+
+- **Baseline:** every documented gate re-run and green (counts above) — the docs' claims hold at HEAD.
+- **Live parity (agent-browser, both sites):** clone mobile navigation working at 390×844 (bar byte-equal to the pins: logo x=0 w=48, Search x=246, Bag x=294, Menu x=342, all 48px; menu opens at top=48/h=796, rgba(22,22,23,.98); 11 rows (Store…Support), 11 expand buttons; Mac expansion renders the 3-section content; "Compare Mac" navigates + closes; the second Menu tap closes the menu; zero console errors/warnings) — **no Tailwind v4 display-toggling defect**. The live reference's bar pins re-measured byte-equal (logo w=49 at x=0, Search x=246, Bag x=294, Menu x=342). All eleven reference flyout models re-extracted fresh (the Home flyout lives at `globalnav-submenu-link-tv-home`) and diffed programmatically against the seam: **ALL ELEVEN MATCH** (headings + link sets; NBSP-normalized). Reference hero ("Gifts they'll love." → iPhone Duo → iPhone 18 Pro), promo sequence (Apple HomeView · iPad · Apple Watch Series 12 · MacBook Pro PROLED · MacBook Pro M6 · AirPods Pro 3) and TV+ gallery titles (9/9) all match — **no reference drift this cycle**.
+- **Audit:** 2 LOW + 4 INFO; 8 project traps all PASS; count lockstep exact (9/99 · 26 e2e · 45 smoke · 156 routes · 309.2 kB). LOW-1 (?buy focus steal) disproved by direct reproduction — live behavior is correct (the Configurator's heading focus survives the Shell's `<main>` focus on in-app navigation); the audit's own "Reasoned" confidence label flagged it as un-executed, and execution disproved the reasoning.
+- **Test suites:** `vitest.config.ts` + `playwright.config.ts` present and passing — the standing instruction is satisfied by the existing configs; this cycle adds regression pins for the fixes below.
+
+## Remediation ToDo list (session 6 — S6-*)
+
+### Phase 1 — TDD seam fixes
+
+- **S6-1 (LOW-1, real on the artifact).** The audit's finding holds on the production build (verified live against `vite preview`: in-app Buy CTA click → `document.activeElement` = `<main>`, the Configurator's heading focus stolen by the Shell's unconditional `mainRef.focus()`; the dev server masked it via StrictMode re-invocation). Fix: gate the shell's scroll+focus reset so it does not run when the route is a product page carrying the `?buy` deep link — `if (!(route.name === "product" && hasBuyParam(hash))) { window.scrollTo(0, 0); mainRef.current?.focus({ preventScroll: true }); }` — the Configurator's child effect owns focus exactly when it exists. Regression pin (RED first, the failing e2e): store-flow.spec.ts gains "in-app Buy CTA keeps the configurator heading focused" (home → real click on "Buy, iPhone Duo" → activeElement is `#configure-heading`); e2e 26 → 27.
+- **S6-2 (LOW-2).** Extract the bag-line summary grammar into a tested pure seam — `bagLineSummary(product, quantity, selections)` in `src/lib/cart.ts` returning `[...describeSelections(...), `Qty ${quantity}`].join(" · ")` (so option-less products render "Qty 1" with no stray separator); `bagLineSummary.test.ts` RED first (option-less product → "Qty 1"; configured product → "256GB · Natural Titanium · Qty 1"; multi-option join); `BagLineRow.tsx` consumes it. No existing spec pins the old text (verified by grep) — behavior change is safe.
+- **S6-3 (INFO-1).** Dedupe the order-number grammar: export `ORDER_NO` from `src/lib/router.ts` and import it in `StaticPages.tsx` (delete the local `ORDER_NO_PATTERN` copy). Pure refactor over the already-tested regex; no behavior change.
+- **S6-4 (INFO-4) — accepted as-is after re-verification, no code change.** The random lazy initializer (`useState(() => HOLIDAY_COLORS[Math.floor(Math.random() …)] ?? "pink")`) is React's documented idiom for CSR-only random initial state; there is no SSR/hydration surface in this SPA, and StrictMode's double render commits one consistent value. A deterministic start would REMOVE the documented parity behavior (the reference's holiday hero carries 4 colourways — `docs/reference-investigation.md` row 16) and contradict the README's "colour-cycling holiday tile" claim. The e2e pins (`data-playing`, play/pause) do not touch the initial color. Decision: keep the random initializer; record the rationale here.
+
+### Phase 2 — verification
+
+- **S6-5.** Full gate; live dev-server re-verification of the touched surfaces (bag popover line text for an option-less product; in-app CTA focus; holiday tile renders).
+
+### Phase 3 — evidence, docs, delivery
+
+- **S6-6.** Re-capture the 17-shot screenshot family via `scripts/capture-screenshots.sh` on the remediated dev server.
+- **S6-7.** Docs lockstep sweep: counts (unit 99 → +N, e2e 26 → 27) across README/AGENTS/CLAUDE/PAD §7.1/SKILL project_state; PAD revision block v1.5; SKILL → v1.5.0; `docs/reference-investigation.md` session-6 re-verification row; worklog Task 118; `.env.example` re-verified unchanged.
+- **S6-8.** Atomic Conventional Commits on `main` → SSH-wrapper push (`docs/ssh_git_wrapper_v3.py --remote git@github.com:nordeim/apple-storefront-clone.git`).
+
+## Plan validation notes (session 6, against the codebase)
+
+- `bagLineSummary` lives in `cart.ts` next to `describeSelections`/`lineKey` (same domain family); it needs `Product` from catalog (cart.ts already imports it). `BagLineRow.tsx`, both consumers (`GlobalNav.tsx:104`, `CheckoutPage.tsx:106`), and `cart.ts` were read in full; the component stays purely presentational over the seam (the repo's layer rule).
+- The audit's LOW-1 was first probed on the dev server (heading stayed focused — a StrictMode artifact: the double effect re-invocation re-runs the Configurator's heading focus after the Shell's `<main>` focus, masking the steal) and then **confirmed on the production artifact** (`vite preview`, `document.activeElement` = `<main>`), matching the e2e RED run. The fix gates the Shell effect's focus+scroll on `!(route.name === "product" && hasBuyParam(hash))` — read in full in `App.tsx:54-62`; the Configurator effect (`ProductPage.tsx:19-23`) remains the focus owner on exactly that path (valid product routes always render it; `#/product/ghost?buy` degrades to not-found, where the normal main focus applies).
+- `ORDER_NO` at `router.ts:17` is module-private today; exporting it adds a consumer in `StaticPages.tsx:40` (deleting the duplicate) — no new tests needed (the regex is pinned in `router.test.ts`; the support-page lookup flow is pinned in store-flow e2e).
+- INFO-2 (SITE name duplication with the static `index.html` boot title) is **accepted as-is**: the shell title is deliberately static pre-hydration (no generator exists to stamp it; adding an export with zero TS consumers would be dead code — the repo forbids it). INFO-3 (sort reset on chip switch) is the documented remount-key decision — no change. INFO-4 (random holiday initializer) is likewise accepted (see S6-4: React's documented CSR idiom; removing the randomness would break the 4-colourway parity behavior).
+- Counts will move: unit 99 → 102 (+3 bagLineSummary tests, S6-2), e2e 26 → 27 (+1 in-app focus pin, S6-1) — the lockstep sweep (S6-7) covers README/AGENTS/CLAUDE/PAD/SKILL in the same commit.
