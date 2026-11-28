@@ -380,21 +380,24 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 
 **ADR-006: Three-tier test suite against the production artifact.**
 - **Context:** The dev server is not the build; parity claims must be executable.
-- **Decision:** Vitest for the seam + the one render-level component spec (105 tests);
-  Playwright against
-  `npm run build && vite preview --host 127.0.0.1` (28 tests: tokens,
-  mobile-navigation state machine, store flow incl. hostile routes); the exhaustive
+- **Decision:** Vitest for the seam + the one render-level component spec (108 tests
+  at the session-8 measurement); Playwright against
+  `npm run build && vite preview --host 127.0.0.1` (40 tests: tokens,
+  mobile-navigation state machine, store flow incl. hostile routes, axe-core
+  WCAG 2 A+AA scans); the exhaustive
   45-assertion `file://` smoke battery as the parity net.
 - **Rationale:** The token assertions ARE the parity evidence; the mobile spec pins
   the v4 display-utility trap class; hostile-route assertions pin XSS-as-text.
-- **Consequences:** `npm run test:e2e` costs ~35 s (build included); acceptable for
+- **Consequences:** `npm run test:e2e` costs ~60 s (build included; the axe
+  tier added ~25 s); acceptable for
   the gate.
 - **Alternatives rejected:** Component-mount tests as the main tier (seam-first is
   faster and the DOM contracts are already covered by e2e).
 
 **ADR-007: SEO posture — generated sitemap, honest hash-route caveat.**
 - **Context:** Hash routes collapse to one URL for crawlers (ADR-002 consequence).
-- **Decision:** `src/lib/sitemap.ts` enumerates the real route set (128 URLs) from the
+- **Decision:** `src/lib/sitemap.ts` enumerates the real route set (156 URLs at the
+  session-8 measurement) from the
   live catalog and footer map (tested, never hand-maintained);
   `scripts/build-sitemap.mjs` regenerates `public/sitemap.xml` against
   `VITE_SITE_URL`; `robots.txt`, OG/Twitter meta and JSON-LD ship in the entry HTML.
