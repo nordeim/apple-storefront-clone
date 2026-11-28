@@ -70,11 +70,11 @@ export function EntertainmentGallery() {
         onPointerUp={onPointerUp}
         onPointerCancel={() => (dragStartX.current = null)}
       >
-        <ul className="gallery-track m-0 list-none p-0" style={{ "--i": index } as CSSProperties}>
+        <div className="gallery-track m-0 p-0" style={{ "--i": index } as CSSProperties}>
           {TV_GALLERY.map((item, i) => {
             const active = i === index;
             return (
-              <li
+              <div
                 key={item.id}
                 id={`tv-gallery-item-${i + 1}`}
                 role="tabpanel"
@@ -105,10 +105,10 @@ export function EntertainmentGallery() {
                     </span>
                   </span>
                 </a>
-              </li>
+              </div>
             );
           })}
-        </ul>
+        </div>
       </div>
 
       <div className="gallery-controls">
