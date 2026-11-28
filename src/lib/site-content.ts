@@ -1,5 +1,7 @@
 import { CATEGORIES, PRODUCTS, type CategoryId } from "./catalog";
 import { routeHref } from "./router";
+import { ACCESSORIES_INFO_LABELS } from "./accessories-page";
+import { AIRPODS_INFO_LABELS } from "./airpods-page";
 import { CATEGORY_RAIL_INFO_LABELS } from "./category-rails";
 import { RAIL_INFO_LABELS } from "./store-rails";
 import { slugify } from "./slug";
@@ -435,6 +437,8 @@ export const INFO_TITLES: ReadonlyMap<string, string> = new Map([
     ...FLYOUT_MODEL_INFO_LINKS,
     ...RAIL_INFO_LABELS,
     ...CATEGORY_RAIL_INFO_LABELS,
+    ...AIRPODS_INFO_LABELS,
+    ...ACCESSORIES_INFO_LABELS,
   ]
     .filter(isInfoRouted)
     .map((l) => [slugify(l.label), l.label] as const),

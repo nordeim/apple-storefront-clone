@@ -67,6 +67,8 @@ const PRODUCT_ALIASES: Readonly<Record<string, string>> = {
   "Apple HomeView - New": "apple-homeview",
   "iPhone 18 Pro - New": "iphone-18-pro",
   "Apple TV 4K - New": "apple-tv-4k",
+  // the accessories grid quotes the charger with its cable length (session-11)
+  "MagSafe Charger (1m)": "magsafe-charger",
 };
 
 function findProduct(label: string): Product | undefined {

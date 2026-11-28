@@ -25,6 +25,8 @@ const ROUTES: Array<{ hash: string; label: string }> = [
   { hash: "#/store", label: "store" },
   { hash: "#/store/watch", label: "store watch" },
   { hash: "#/store/mac", label: "store mac (the session-10 category shelves)" },
+  { hash: "#/store/airpods", label: "store airpods (the session-11 marketing page)" },
+  { hash: "#/store/accessories", label: "store accessories (the session-11 filtered grid)" },
   { hash: "#/product/iphone-18-pro", label: "product" },
   { hash: "#/bag", label: "bag" },
   { hash: "#/checkout", label: "checkout" },

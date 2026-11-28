@@ -25,13 +25,19 @@ describe("routeTitle", () => {
     const cases: [Route, string][] = [
       [{ name: "store", category: "ipad" }, "Shop iPad"],
       [{ name: "store", category: "iphone" }, "Shop iPhone"],
-      [{ name: "store", category: "airpods" }, "Shop AirPods"],
       [{ name: "store", category: "home" }, "Shop Home"],
-      [{ name: "store", category: "accessories" }, "Shop Accessories"],
     ];
     for (const [route, expected] of cases) {
       expect(routeTitle(route)).toBe(`${expected} - ${SITE}`);
     }
+  });
+
+  it("titles the two non-store page families with their reference's own titles (D14/D15)", () => {
+    // airpods renders the reference's marketing page (h1 "AirPods"), and
+    // accessories renders its filtered grid (h1 "Accessories") — neither is a
+    // "Shop X" store page, so neither title carries the prefix.
+    expect(routeTitle({ name: "store", category: "airpods" })).toBe(`AirPods - ${SITE}`);
+    expect(routeTitle({ name: "store", category: "accessories" })).toBe(`Accessories - ${SITE}`);
   });
 
   it("titles product pages with the product's catalogue name", () => {

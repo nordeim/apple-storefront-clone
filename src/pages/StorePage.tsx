@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { AccessoriesPageSections } from "@/components/AccessoriesSections";
+import { AirPodsPageSections } from "@/components/AirPodsSections";
 import { PageShell, PageTitle } from "@/components/PageShell";
 import { ProductCard } from "@/components/ProductCard";
 import { CategoryShelves, StoreQuickLinks, StoreRails } from "@/components/StoreRails";
@@ -48,9 +50,17 @@ function ProductGrid({ products }: { products: readonly Product[] }) {
   );
 }
 
+/** The two categories whose reference pages are different families (session-11
+ * D14/D15): airpods is the /sg/airpods/ marketing page, accessories is the
+ * /sg/shop/accessories/all filtered grid — neither renders the "Shop X" h1. */
+const isAirPods = (category: CategoryId): boolean => category === "airpods";
+const isAccessories = (category: CategoryId): boolean => category === "accessories";
+
 export function StorePage({ category }: { category?: CategoryId }) {
   const [sort, setSort] = useState<SortKey>("featured");
   const current = category ? getCategory(category) : undefined;
+  const airpods = category !== undefined && isAirPods(category);
+  const accessories = category !== undefined && isAccessories(category);
 
   const products = useMemo(() => {
     const base = category ? productsByCategory(category) : PRODUCTS;
@@ -59,15 +69,29 @@ export function StorePage({ category }: { category?: CategoryId }) {
 
   return (
     <PageShell>
-      <PageTitle sub={current?.blurb ?? "The best way to buy the products you love."}>
-        {current ? `Shop ${STORE_CATEGORY_LABELS[current.id]}` : "Store"}
-      </PageTitle>
+      {/* The AirPods page is the reference's marketing family: an sr-only h1
+          (the reference's 1px pagetitle pattern — the same family as the home
+          page's h1) over the measured chapternav → heroes → compare →
+          consider → music sequence (D14). */}
+      {airpods && <h1 className="sr-only">AirPods</h1>}
+      {/* The Accessories page is the reference's grid family: the h1 carries
+          the reference's exact "Accessories" (not "Shop Accessories") (D15). */}
+      {!airpods && (
+        <PageTitle sub={current?.blurb ?? "The best way to buy the products you love."}>
+          {accessories ? "Accessories" : current ? `Shop ${STORE_CATEGORY_LABELS[current.id]}` : "Store"}
+        </PageTitle>
+      )}
 
       {/* The store index follows the reference's measured order: h1 → the
           quick-links strip → the chip row → the editorial rails; the clone's
-          superset product grid follows below (session-9). Category pages keep
-          their pinned structure (h1 → chips → grid). */}
+          superset product grid follows below (session-9). The six device
+          category pages carry their measured shelves (session-10); the
+          airpods/accessories pages carry their own measured page families
+          (session-11). */}
       {!current && <StoreQuickLinks />}
+
+      {airpods && <AirPodsPageSections />}
+      {accessories && <AccessoriesPageSections />}
 
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <nav aria-label="Product categories">
@@ -95,10 +119,11 @@ export function StorePage({ category }: { category?: CategoryId }) {
 
       {current ? (
         <>
-          {/* The category pages carry the reference's measured shelf model
-              (session-10) with the clone's working store below: the "All
-              models." shelf derives from this catalog (D12), the content
-              shelves carry the reference's measured text. */}
+          {/* The four device category pages' measured shelf model (session-10)
+              with the clone's working store below: the "All models." shelf
+              derives from this catalog (D12), the content shelves carry the
+              reference's measured text. Airpods/accessories render their own
+              page families above instead (session-11). */}
           <CategoryShelves category={current.id} />
           <section aria-labelledby="store-all-products" className="mt-16">
             <h2 id="store-all-products" className="m-0 mb-8 font-display text-[28px] leading-tight font-semibold tracking-[-0.012em]">

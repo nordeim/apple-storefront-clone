@@ -188,6 +188,81 @@ test.describe("store flow (desktop)", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Beats 360 Over‑Ear Headphones – Pink with Pink Performance Knit Cushions" })).toBeVisible();
   });
 
+  test("airpods page renders the measured marketing model with the configurator deep link", async ({ page }) => {
+    // Session-11 parity surface (D14): the nav's AirPods destination is the
+    // reference's /sg/airpods/ marketing family — chapternav → sr-only h1 →
+    // three heroes → compare → consider → music, with the superset below.
+    await page.goto("/#/store/airpods");
+    await expect(page).toHaveTitle("AirPods - Apple (Singapore)");
+    await expect(page.getByRole("heading", { level: 1, name: "AirPods", exact: true })).toBeAttached();
+    const chapternav = page.locator(".airpods-chapternav");
+    await expect(chapternav.getByRole("link")).toHaveCount(6);
+    await expect(chapternav.getByRole("link", { name: "Compare" })).toHaveAttribute("href", "#/info/compare-airpods");
+    const headlines = page.locator(".airpods-hero-headline");
+    await expect(headlines).toHaveCount(3);
+    await expect(headlines.first()).toHaveText("AirPods 5");
+    await expect(headlines.nth(1)).toHaveText("AirPods Pro 3");
+    await expect(headlines.nth(2)).toHaveText("AirPods Max 2");
+    await expect(page.getByRole("heading", { name: "Compare AirPods models" })).toBeVisible();
+    await expect(page.locator(".airpods-compare-column")).toHaveCount(4);
+    await expect(page.getByRole("heading", { name: "Get to know AirPods." })).toBeVisible();
+    await expect(page.locator(".airpods-feature-card")).toHaveCount(5);
+    // D12: the catalog-matched hero's Buy deep-links the working configurator.
+    const proHero = page.locator(".airpods-hero").nth(1);
+    await expect(proHero.getByRole("link", { name: "Buy AirPods Pro 3" })).toHaveAttribute("href", "#/product/airpods-pro-3?buy");
+    await proHero.getByRole("link", { name: "Buy AirPods Pro 3" }).click();
+    await expect(page).toHaveURL(/#\/product\/airpods-pro-3\?buy$/);
+    await expect(page.locator("#configure-heading")).toBeFocused();
+  });
+
+  test("accessories page renders the measured grid model with catalog-matched cards", async ({ page }) => {
+    // Session-11 parity surface (D15): the reference's
+    // /sg/shop/accessories/all — chapternav → gallery → curated tabs → value
+    // props → index nav, with the superset below.
+    await page.goto("/#/store/accessories");
+    await expect(page).toHaveTitle("Accessories - Apple (Singapore)");
+    await expect(page.getByRole("heading", { level: 1, name: "Accessories", exact: true })).toBeVisible();
+    await expect(page.locator(".accessories-chapternav a")).toHaveCount(9);
+    await expect(page.getByRole("heading", { name: "Say hello to what’s new." })).toBeVisible();
+    await expect(page.locator(".accessories-gallery-card")).toHaveCount(8);
+    await expect(page.getByRole("heading", { name: "Our top picks. Their next favourites." })).toBeVisible();
+    // The gallery's Apple TV 4K Buy CTA routes to the clone's product page.
+    const tvCard = page.locator(".accessories-gallery-card").filter({ hasText: "Apple TV 4K" });
+    await expect(tvCard.getByRole("link", { name: "Buy Apple TV 4K" })).toHaveAttribute("href", "#/product/apple-tv-4k?buy");
+    // The value props + the index nav.
+    await expect(page.getByRole("heading", { name: "Why Apple is the best place to buy accessories." })).toBeVisible();
+    await expect(page.locator(".accessories-value-props li")).toHaveCount(4);
+    await expect(page.getByRole("heading", { name: "Shop by Product" })).toBeVisible();
+    await expect(page.locator(".accessories-index-nav a")).toHaveCount(24);
+    // The superset grid follows (the working store below).
+    await expect(page.getByRole("heading", { name: "All products." })).toBeVisible();
+  });
+
+  test("accessories curated tabs switch panels and catalog-matched cards route to products", async ({ page }) => {
+    // The WAI-ARIA tabs pattern (session-11): five tabs over the measured
+    // card sets; the three catalog-matched cards derive their prices (D10)
+    // and route to the clone's product pages.
+    await page.goto("/#/store/accessories");
+    const tabs = page.locator(".accessories-tab");
+    await expect(tabs).toHaveCount(5);
+    await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
+    // The Holiday Picks panel carries its measured 11 items.
+    await expect(page.locator("#accessories-panel-0 .accessories-curated-card")).toHaveCount(11);
+    // Switch to Travel Ready: the AirTag 4 pack card routes to the product
+    // page and quotes the catalog's price (S$135, not the reference's S$149
+    // — the money seam's whole-price grammar drops the cents).
+    await tabs.nth(2).click();
+    await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
+    const airTagCard = page.locator("#accessories-panel-2 .accessories-curated-card").filter({ hasText: "AirTag 4 pack" });
+    await expect(airTagCard.getByText("S$135")).toBeVisible();
+    await expect(airTagCard.locator("a")).toHaveAttribute("href", "#/product/airtag-4-pack");
+    // Keyboard operation: ArrowLeft from Travel Ready lands on Colourful Finds.
+    await tabs.nth(2).focus();
+    await page.keyboard.press("ArrowLeft");
+    await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
+    await expect(page.locator("#accessories-panel-1 .accessories-curated-card")).toHaveCount(11);
+  });
+
   test("in-app Buy CTA keeps the configurator heading focused", async ({ page }) => {
     // In-app navigation into ?buy (not a fresh load): the Configurator's
     // heading must own focus — the shell's <main> focus reset must not
