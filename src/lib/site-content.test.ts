@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { NAV_LINKS } from "./site-content";
 import { flyoutSections, INFO_TITLES, STORE_CHIPS, type FlyoutSection } from "./site-content";
+import { parseHash, routeHref } from "./router";
 
 const nav = (id: string) => {
   const link = NAV_LINKS.find((l) => l.id === id);
@@ -373,5 +374,40 @@ describe("store chip row (the reference's measured model)", () => {
     }
     expect(STORE_CHIPS.find((c) => c.label === "All")?.href).toBe("#/store");
     expect(STORE_CHIPS.find((c) => c.label === "All")?.category).toBeUndefined();
+  });
+});
+
+describe("router round-trip (the S10-1 dead-route guard, seam-wide)", () => {
+  // Session-13 S13-2: this seam was the one content surface whose hrefs were
+  // checked by SHAPE (ROUTE_RE) + INFO_TITLES membership but never actually
+  // round-tripped through parseHash — a future >130-char flyout label would
+  // pass both checks, 404 in the router, and still be emitted into the
+  // sitemap (the S10-1 bug class). This guard closes that hole for every
+  // href this module renders AND every info slug the sitemap enumerates.
+  it("every flyout, nav and chip href resolves through parseHash", () => {
+    const hrefs: string[] = [];
+    for (const link of NAV_LINKS) hrefs.push(link.href);
+    for (const chip of STORE_CHIPS) hrefs.push(chip.href);
+    for (const id of NAV_LINKS.map((l) => l.id)) {
+      for (const section of flyoutSections(nav(id))) {
+        for (const link of section.links) hrefs.push(link.href);
+      }
+    }
+    for (const href of new Set(hrefs)) {
+      const route = parseHash(href);
+      expect(route.name, `dead href: ${href}`).not.toBe("not-found");
+    }
+  });
+
+  it("every INFO_TITLES slug resolves through parseHash (the sitemap's info routes)", () => {
+    expect(INFO_TITLES.size).toBeGreaterThan(500);
+    for (const slug of INFO_TITLES.keys()) {
+      const route = parseHash(routeHref.info(slug));
+      if (route.name !== "info") {
+        expect(route.name, `dead info slug: ${slug}`).toBe("info");
+        continue;
+      }
+      expect(route.slug, `slug mangled: ${slug}`).toBe(slug);
+    }
   });
 });

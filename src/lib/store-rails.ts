@@ -72,6 +72,12 @@ export const PRODUCT_ALIASES: Readonly<Record<string, string>> = {
   "Apple TV 4K - New": "apple-tv-4k",
   // the accessories grid quotes the charger with its cable length (session-11)
   "MagSafe Charger (1m)": "magsafe-charger",
+  // the marketing line-up quotes the two MacBook Pros with their display sizes
+  // (session-13 D17) — the M6 card carries double primes U+2033, the PROLED
+  // card right double quotes U+201D (the reference's own distinction), both
+  // with U+2060 word joiners inside "a⁠n⁠d" and the sizes.
+  "MacBook Pro 14″ a⁠n⁠d⁠ 1⁠6⁠″": "macbook-pro-m6",
+  "MacBook Pro 14” a⁠n⁠d⁠ ⁠1⁠6⁠”": "macbook-pro-proled",
 };
 
 function findProduct(label: string): Product | undefined {
@@ -79,6 +85,13 @@ function findProduct(label: string): Product | undefined {
   if (exact) return exact;
   const aliasId = PRODUCT_ALIASES[label];
   return aliasId ? PRODUCTS.find((p) => p.id === aliasId) : undefined;
+}
+
+/** The catalog-name rule behind `railCardHref`, exported so sibling seams and
+ * their specs share ONE matcher (session-13 S13-4 — the accessories-category
+ * spec's private mirror dropped). */
+export function findProductId(label: string): string | undefined {
+  return findProduct(label)?.id;
 }
 
 /** The rail-card routing rule — the flyout `familyLink` pattern, exported for the seam spec. */

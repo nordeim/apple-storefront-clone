@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { PRODUCTS } from "./catalog";
 import { parseHash, routeHref } from "./router";
 import {
   ACCESSORIES_CATEGORY_INFO_LABELS,
@@ -7,20 +6,11 @@ import {
   DEVICE_CATEGORY_IDS,
   type AccessoriesCategoryPage,
 } from "./accessories-category-pages";
-import { PRODUCT_ALIASES } from "./store-rails";
+import { findProductId } from "./store-rails";
 
 /** Every generated href must survive the router — the session-10 drift guard
  *  (H-1's lesson), applied to this seam from day one. */
 const routeable = (href: string): boolean => parseHash(href).name !== "not-found";
-
-/** The catalog-name rule (the railCardHref findProduct rule mirrored): a label
- *  that names a catalog product — exactly or through PRODUCT_ALIASES. */
-const findProductId = (label: string): string | undefined => {
-  const exact = PRODUCTS.find((p) => p.name === label);
-  if (exact) return exact.id;
-  const aliasId = PRODUCT_ALIASES[label];
-  return aliasId ? PRODUCTS.find((p) => p.id === aliasId)?.id : undefined;
-};
 
 const PAGES = DEVICE_CATEGORY_IDS.map((id) => ACCESSORIES_CATEGORY_PAGES[id]);
 

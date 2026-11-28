@@ -1,5 +1,11 @@
 export type CategoryId = "mac" | "ipad" | "iphone" | "watch" | "vision" | "airpods" | "home" | "accessories";
 
+/** The device categories (every category except accessories itself) — the
+ * categories with a per-category accessories grid (session-12 D16), a
+ * nav-main marketing page (session-13 D17) and a store shelf family. */
+export type DeviceCategoryId = Exclude<CategoryId, "accessories">;
+export const DEVICE_CATEGORY_IDS: readonly DeviceCategoryId[] = ["mac", "ipad", "iphone", "watch", "vision", "airpods", "home"];
+
 export type ArtId =
   | "holiday"
   | "iphone-duo"

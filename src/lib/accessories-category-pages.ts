@@ -1,6 +1,7 @@
 import { routeHref } from "./router";
 import { slugify } from "./slug";
 import type {
+  AccessoriesChapterChip,
   AccessoriesCuratedTab,
   AccessoriesGalleryCard,
   AccessoriesIndexGroup,
@@ -39,12 +40,9 @@ import type {
  * (.scratch/s12/convert.mjs) and hand-verified against the raw DOM extraction.
  */
 
-export interface AccessoriesChapterChip {
-  label: string;
-  /** The reference's accessible name ("{chip} - {h1}"). */
-  ariaLabel: string;
-  href: string;
-}
+// The chip anatomy is the all-page family's (session-13 S13-4: one interface,
+// re-exported — the duplicated local definition dropped).
+export type { AccessoriesChapterChip } from "./accessories-page";
 
 export interface AccessoriesCategoryPage {
   /** The category whose accessories grid this page models. */
@@ -59,8 +57,10 @@ export interface AccessoriesCategoryPage {
 }
 
 /** The categories with a per-category accessories grid — every device category
- * (the accessories category itself is the all-accessories page). */
-export const DEVICE_CATEGORY_IDS = ["mac", "ipad", "iphone", "watch", "vision", "airpods", "home"] as const;
+ * (the accessories category itself is the all-accessories page). One constant
+ * shared with the catalog seam (session-13 S13-3/S13-4: single source). */
+export { DEVICE_CATEGORY_IDS } from "./catalog";
+import { DEVICE_CATEGORY_IDS } from "./catalog";
 
 const info = (label: string): string => routeHref.info(slugify(label));
 
