@@ -14,7 +14,7 @@ export type Route =
   | { name: "not-found" };
 
 const NOT_FOUND: Route = { name: "not-found" };
-const ORDER_NO = /^EL-[A-Z0-9]{8}$/;
+export const ORDER_NO = /^EL-[A-Z0-9]{8}$/;
 const SLUG = /^[a-z0-9-]{1,60}$/;
 
 function safeDecode(raw: string): string | undefined {

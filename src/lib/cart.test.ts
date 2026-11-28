@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { MAX_LINE_QUANTITY, cartCount, cartReducer, cartSubtotal, lineKey, unitPrice, type CartLine } from "./cart";
+import {
+  MAX_LINE_QUANTITY,
+  bagLineSummary,
+  cartCount,
+  cartReducer,
+  cartSubtotal,
+  lineKey,
+  unitPrice,
+  type CartLine,
+} from "./cart";
 import { getProduct } from "./catalog";
 
 const phone = getProduct("iphone-18-pro");
@@ -74,6 +83,26 @@ describe("cartReducer", () => {
   it("clears the bag", () => {
     const one = cartReducer([], { type: "add", line: base });
     expect(cartReducer(one, { type: "clear" })).toEqual([]);
+  });
+});
+
+describe("bagLineSummary", () => {
+  it("renders an option-less product as quantity only, with no leading separator", () => {
+    const airtag = getProduct("airtag-4-pack");
+    if (!airtag) throw new Error("fixture product missing from catalog");
+    expect(bagLineSummary(airtag, { productId: airtag.id, selections: {}, quantity: 1 })).toBe("Qty 1");
+  });
+
+  it("joins the configuration labels and the quantity with single separators", () => {
+    expect(
+      bagLineSummary(phone, { productId: phone.id, selections: { color: "black", storage: "256" }, quantity: 1 }),
+    ).toBe("Black · 256GB · Qty 1");
+  });
+
+  it("reflects quantities above one", () => {
+    expect(
+      bagLineSummary(phone, { productId: phone.id, selections: { color: "black", storage: "512" }, quantity: 3 }),
+    ).toBe("Black · 512GB · Qty 3");
   });
 });
 

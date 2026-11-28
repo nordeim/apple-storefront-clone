@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { EntertainmentGallery } from "@/components/EntertainmentGallery";
 import { PageShell, PageTitle } from "@/components/PageShell";
 import { useBag } from "@/context/BagContext";
-import { routeHref } from "@/lib/router";
+import { ORDER_NO, routeHref } from "@/lib/router";
 import { INFO_TITLES, slugify, SUPPORT_PHONE_DISPLAY, SUPPORT_PHONE_TEL } from "@/lib/site-content";
 
 const SERVICES = [
@@ -37,7 +37,6 @@ export function EntertainmentPage() {
 }
 
 const SUPPORT_TOPICS = ["Order Status", "Shopping Help", "Apple Trade In", "Financing", "Genius Bar", "Contact Apple"];
-const ORDER_NO_PATTERN = /^EL-[A-Z0-9]{8}$/;
 
 export function SupportPage() {
   const { lastOrder } = useBag();
@@ -47,7 +46,7 @@ export function SupportPage() {
   const lookup = (e: FormEvent) => {
     e.preventDefault();
     const candidate = orderNo.trim().toUpperCase();
-    if (!ORDER_NO_PATTERN.test(candidate)) {
+    if (!ORDER_NO.test(candidate)) {
       setResult("Enter an order number in the form EL-XXXXXXXX.");
     } else if (lastOrder?.orderNo === candidate) {
       setResult(`Order ${candidate} is confirmed and being prepared for free delivery.`);

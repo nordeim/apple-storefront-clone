@@ -49,6 +49,15 @@ export function describeSelections(product: Product, selections: Record<string, 
   return labels;
 }
 
+/**
+ * The one-line summary grammar shared by the nav bag popover and the checkout
+ * aside: configuration labels joined with "·", then the quantity. Option-less
+ * products render "Qty n" alone — the separator only ever sits BETWEEN parts.
+ */
+export function bagLineSummary(product: Product, line: CartLine): string {
+  return [...describeSelections(product, line.selections), `Qty ${line.quantity}`].join(" · ");
+}
+
 const clampQuantity = (quantity: number) => Math.min(MAX_LINE_QUANTITY, Math.max(0, quantity));
 
 export function cartReducer(lines: readonly CartLine[], action: CartAction): readonly CartLine[] {

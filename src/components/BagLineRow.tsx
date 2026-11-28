@@ -1,4 +1,4 @@
-import { describeSelections, lineKey, unitPrice } from "@/lib/cart";
+import { bagLineSummary, lineKey, unitPrice } from "@/lib/cart";
 import { getProduct } from "@/lib/catalog";
 import { formatSgd } from "@/lib/money";
 import type { CartLine } from "@/lib/cart";
@@ -12,9 +12,7 @@ export function BagLineRow({ line }: { line: CartLine }) {
     <li className="flex justify-between gap-3 text-sm">
       <span>
         <span className="block font-semibold">{product.name}</span>
-        <span className="block text-xs text-[#6e6e73]">
-          {describeSelections(product, line.selections).join(" · ")} · Qty {line.quantity}
-        </span>
+        <span className="block text-xs text-[#6e6e73]">{bagLineSummary(product, line)}</span>
       </span>
       <span className="whitespace-nowrap">{formatSgd(unitPrice(product, line.selections) * line.quantity)}</span>
     </li>
