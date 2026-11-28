@@ -111,10 +111,10 @@ connect to it): `bash docs/setup_pg_z.sh` — see `docs/DEPLOYMENT.md` §4.
 | `npm run preview` | Serve `dist/` (bind `--host 127.0.0.1`) |
 | `npm run lint` | ESLint 10 flat config — must exit 0 |
 | `npm run typecheck` / `npm run typecheck:tests` | `tsc --noEmit` (app / tests+configs) |
-| `npm run test` | Vitest run (15 files / 163 tests) |
-| `npm run test:e2e` | Playwright (53 tests: 37 pins + 16 axe-core a11y scans; builds + serves the artifact) |
+| `npm run test` | Vitest run (16 files / 181 tests) |
+| `npm run test:e2e` | Playwright (60 tests: 42 pins + 18 axe-core a11y scans; builds + serves the artifact) |
 | `npm run test:smoke` | 45-assertion file:// battery over `dist/` |
-| `npm run sitemap` | Regenerate `public/sitemap.xml` + `public/robots.txt` (559 routes) |
+| `npm run sitemap` | Regenerate `public/sitemap.xml` + `public/robots.txt` (596 routes) |
 
 ## Testing Strategy
 
@@ -131,7 +131,7 @@ connect to it): `bash docs/setup_pg_z.sh` — see `docs/DEPLOYMENT.md` §4.
   horizontal overflow), `store-flow.spec.ts` (search → configurator → bag →
   checkout validation → confirmation → order lookup → hostile routes, plus the
   store index's seven measured editorial rails and quick-links strip), and
-  `a11y.spec.ts` (axe-core WCAG 2 A+AA scans — ten routes plus mobile resting
+  `a11y.spec.ts` (axe-core WCAG 2 A+AA scans — sixteen routes plus mobile resting
   and menu-open states; two measured-reference exclusions documented in the
   spec header).
 - **Smoke** — `tests/e2e/smoke.mjs`, the exhaustive file:// parity battery.

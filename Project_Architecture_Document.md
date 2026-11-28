@@ -1,4 +1,4 @@
-# apple-storefront-clone — Master Project Architecture Document (PAD) v2.1
+# apple-storefront-clone — Master Project Architecture Document (PAD) v2.2
 
 **Classification:** Internal Engineering Reference
 **Status:** DEFINITIVE, PRODUCTION-LOCKED BLUEPRINT
@@ -7,6 +7,54 @@
 **Audience:** Senior Engineers, Tech Leads, DevOps, and Onboarding Engineers
 **Rule:** Every architectural decision in this document traces to a specific rationale.
 Nothing is here "because it's popular."
+
+#### Revision Block — v2.2 (the session-13 nav-main marketing-pages cycle)
+
+- `[SR]` The session-13 cycle (2026-11-28, `docs/REMEDIATION_PLAN.md` session-13 section)
+  re-verified the pulled tree (`5ea2703`) — baseline gates exactly as documented (15/163 unit ·
+  53/53 e2e · 45/45 smoke · 559 routes · 447.68 kB byte-equal · rootless PG 17.12 initialized
+  clean on the first run) — plus a read-only audit (**0 CRITICAL/HIGH + 1 MEDIUM + 4 LOW +
+  6 INFO**; M-1: 11 stale current-claim counts across 4 of the 6 named docs — trap T7's own
+  contract broken; L-1: the "63 index-nav links" figure was wrong (121 links / 58 distinct);
+  L-2: site-content.test.ts never round-tripped hrefs through parseHash — the one seam
+  without the T8 guard; L-3: storeAccessories()'s parameter type permitted the illegal
+  `accessories` category; L-4: a duplicated chip interface + a mirrored findProduct matcher)
+  and a live-parity pass that re-verified the mobile navigation at 390×844 (bar byte-equal,
+  11 rows, navigate + close, zero console errors — no Tailwind v4 display-toggling defect),
+  extracted the reference's nav-main link map with hrefs and measured **the six nav-main
+  marketing pages in full** (358 items; both page generations — React MarcomSection and
+  legacy chapternav — captured by one dual-generation extractor, hand-verified).
+- `[FIX]` **The audit's fixes landed TDD-first** (S13-1..4): the doc count sweep restored
+  lockstep everywhere; site-content.test.ts gained the seam-wide parseHash round-trip guard
+  (proven RED by injecting a 153-char label — the S10-1 bug class); `DeviceCategoryId` was
+  exported from catalog.ts and storeAccessories() typed against it (building the dead
+  `#/store/accessories/accessories` href is now a type error); the chip interface and
+  findProductId matcher deduplicated into their owning seams.
+- `[FEAT]` **The six nav-main marketing pages landed** (D17): `#/mac`, `#/ipad`, `#/iphone`,
+  `#/watch`, `#/vision`, `#/home` — new pure seam `src/lib/marketing-pages.ts` (1,308 lines,
+  generated from the captures by `.scratch/s13/convert.mjs` with zero hand transcription)
+  + `MarketingSections.tsx` (the chapternav/lineup/valueprops/cards/accordion/directory/
+  statement family, the marketing-* CSS class family in @layer components) +
+  `MarketingPage.tsx` (PageTitle h1 + sections + the superset "Shop X" band). The nav main
+  links re-route to the marketing pages (the reference's behavior); the store pages stay
+  reachable via the flyouts' "Shop X" links, the marketing chapternav chips and the store
+  chip row. The D10/D12/D11 routing rules apply (see D17 in the dossier). The capture
+  script's four broken flyout-hover selectors (`aref*=` — never a valid selector; the
+  session-10..12 flyout shots had captured without the flyout open) were fixed and the
+  screenshot family re-captured.
+- `[VERIFY]` Full gate green after the change: lint 0 errors · typecheck clean ×2 · unit
+  **16 files / 181 tests** · build **505.05 kB / 132.22 kB gzip** (CSS 49,567 B / 721
+  rules) · e2e **60/60** (42 pins + 18 axe scans — `#/mac` and `#/vision` scan WCAG 2
+  A+AA clean after the axe tier caught the chip-badge contrast defect) · 45/45 smoke, zero
+  console errors · sitemap **596 routes / 558 info pages**. Live verification: all six
+  pages render their measured sections on the dev server; the tabs switch by click and
+  ArrowRight; the catalog-matched tiles derive (MacBook Pro "From S$2,299", Apple TV 4K
+  "From S$229", HomeView "From S$449"); the vision hero's Buy deep-links the configurator;
+  mobile 390×844 — no horizontal overflow.
+- `[CHORE]` README/AGENTS/CLAUDE/PAD/SKILL/DEPLOYMENT swept in lockstep (counts 15/163 →
+  16/181 unit, 53 → 60 e2e, 559 → 596 routes / 527 → 558 info pages, 447.68 → 505.05 kB,
+  CSS 45,842 → 49,567 B); 33 screenshots (the standing 26 re-captured with the flyout
+  selectors fixed + 27-33 the marketing family); worklog Task 125.
 
 #### Revision Block — v2.1 (the session-12 per-category accessories-grid cycle)
 
@@ -27,7 +75,8 @@ Nothing is here "because it's popular."
 - `[FEAT]` **The per-category accessories grids (D16)**: the store route gained the accessories
   view (`#/store/{cat}/accessories` for the seven device categories), a new pure seam
   `src/lib/accessories-category-pages.ts` (1,080 lines; 226 curated cards incl. 26 promos, 41
-  chips, 16 gallery cards, 25 value props, 63 index-nav links — generated from the live captures
+  chips, 16 gallery cards, 25 value props, 121 index-nav links (58 distinct
+  destinations) — generated from the live captures
   by the session-12 converter, hand-verified), the session-11 section components parameterized by
   an optional model prop (zero new CSS — one family, eight pages), the flyouts' "X Accessories"
   links and the all-page chapternav's device chips re-routed to the per-category grids, and the
@@ -638,9 +687,12 @@ apple-storefront-clone/
 │   │                             StoreRails (the editorial rails + quick-links strip +
 │   │                             the category shelf family), AirPodsSections (the
 │   │                             marketing-page family), AccessoriesSections (the
-│   │                             filtered-grid family, WAI-ARIA tabs)
+│   │                             filtered-grid family, WAI-ARIA tabs), MarketingSections
+│   │                             (the nav-main marketing family: chapternav/line-up/
+│   │                             value-props/cards/accordion/directory/statement)
 │   ├── pages/                  ← HomePage, StorePage, ProductPage, BagPage, CheckoutPage,
-│   │                             ConfirmationPage, SearchPage, StaticPages (info/support/404)
+│   │                             ConfirmationPage, SearchPage, StaticPages (info/support/404),
+│   │                             MarketingPage (the six nav-main marketing routes)
 │   ├── context/BagContext.tsx  ← the ONE store (in-memory bag + last order)
 │   ├── hooks/                  ← useRoute (useSyncExternalStore over hashchange), browser.ts
 │   │                             (useMediaQuery, usePrefersReducedMotion, useInView)
@@ -651,15 +703,17 @@ apple-storefront-clone/
 │   │                             device pages' measured shelves), airpods-page (the
 │   │                             marketing page's chapternav/heroes/compare/consider/
 │   │                             music), accessories-page (the grid's chapternav/gallery/
-│   │                             curated tabs/value props/index nav), slug (each with
-│   │                             *.test.ts except the 9-line slug module)
+│   │                             curated tabs/value props/index nav), marketing-pages (the
+│   │                             six nav-main marketing pages' measured models), slug
+│   │                             (each with *.test.ts except the 9-line slug module)
 ├── tests/
 │   └── e2e/                    ← home.spec.ts, mobile-navigation.spec.ts, store-flow.spec.ts,
-│                                 smoke.mjs (the 45-assertion file:// battery)
+│   │                             marketing.spec.ts, a11y.spec.ts (the axe-core scan tier),
+│   │                             smoke.mjs (the 45-assertion file:// battery)
 ├── scripts/
 │   └── build-sitemap.mjs       ← regenerates public/sitemap.xml + public/robots.txt from the seam
 ├── public/
-│   ├── sitemap.xml             ← 559 routes, generated (npm run sitemap)
+│   ├── sitemap.xml             ← 596 routes, generated (npm run sitemap)
 │   └── robots.txt              ← generated alongside the sitemap (same VITE_SITE_URL)
 ├── docs/                       ← reference-investigation.md (parity dossier), DEPLOYMENT.md,
 │                                 REMEDIATION_PLAN.md (this cycle's audits), screenshots/,
@@ -686,8 +740,8 @@ export function parseHash(hash: string): Route {
 }
 ```
 
-*Why:* the whole navigation contract (including hostile inputs) is 85 lines of pure
-TypeScript with 8 tests; components never parse locations themselves.
+*Why:* the whole navigation contract (including hostile inputs) is 147 lines of pure
+TypeScript with 21 tests; components never parse locations themselves.
 
 **Pattern 2 — conditional mounting for overlays (the Tailwind v4 display trap).**
 
@@ -771,6 +825,18 @@ There is no database. The domain model is typed constants + in-memory state:
   derive their prices from this clone's catalog, D10/D12), four value props and
   the three-group index-nav directory; `ACCESSORIES_INFO_LABELS` joins the
   derivation.
+- **Marketing pages** (`src/lib/marketing-pages.ts`, session-13): the reference's six
+  nav-main marketing models (`/sg/{mac,ipad,iphone,watch,vision,home}/`) — the
+  chapternav chips, the line-up product galleries (tabbed on Mac), the "Why Apple is
+  the best place to shop X." value props, the banner-card/accordion/essentials content
+  sections and the closing links directories; the vision page is hero-led (statement
+  sections). 358 measured items across both of the reference's page generations
+  (React MarcomSection and legacy chapternav — one dual-generation extractor); tiles
+  naming clone catalog products derive their prices (D10) and deep-link the
+  configurator (D12, incl. the vision hero's Buy); `MARKETING_INFO_LABELS` (95
+  labels, 31 net-new after slug dedup) joins the derivation. The nav main links route
+  here (the reference's behavior); the store pages stay one click away via the
+  flyouts' "Shop X" links and the marketing chapternav chips.
 
 Optional local PostgreSQL 17: installed for the repo family's standard environment
 (rootless via `docs/setup_pg_z.sh`, or `docker compose up -d`); connection
@@ -848,12 +914,13 @@ credentials.
 
 | Category | Files | Tests | Location | Framework |
 |---|---|---|---|---|
-| Unit (seam) | 14 | 159 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
+| Unit (seam) | 15 | 177 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
 | Unit (component) | 1 | 4 | `src/components/ErrorBoundary.test.tsx` | Vitest 4 + jsdom (React `act`) |
 | E2E — desktop | 1 | 8 | `tests/e2e/home.spec.ts` | Playwright (1440×900) |
 | E2E — mobile nav | 1 | 11 | `tests/e2e/mobile-navigation.spec.ts` | Playwright (iPhone 13 viewport, touch) |
 | E2E — store flow | 1 | 18 | `tests/e2e/store-flow.spec.ts` | Playwright (1440×900) |
-| E2E — a11y scans | 1 | 16 | `tests/e2e/a11y.spec.ts` | Playwright + @axe-core/playwright (WCAG 2 A+AA) |
+| E2E — marketing | 1 | 5 | `tests/e2e/marketing.spec.ts` | Playwright (1440×900) |
+| E2E — a11y scans | 1 | 18 | `tests/e2e/a11y.spec.ts` | Playwright + @axe-core/playwright (WCAG 2 A+AA) |
 | File:// smoke battery | 1 | 45 assertions | `tests/e2e/smoke.mjs` | Playwright library |
 
 ### 7.2 Test Patterns
@@ -871,9 +938,9 @@ credentials.
 
 - [ ] `npm run lint` exit 0
 - [ ] `npm run typecheck` && `npm run typecheck:tests` clean
-- [ ] `npm run test` — 15 files / 163 tests
+- [ ] `npm run test` — 16 files / 181 tests
 - [ ] `npm run build` — single-file `dist/index.html`
-- [ ] `npm run test:e2e` — 53 passed (37 pins + 16 axe scans)
+- [ ] `npm run test:e2e` — 60 passed (42 pins + 18 axe scans)
 - [ ] `npm run test:smoke` — 45 assertions, zero console errors
 - [ ] Docs touched in the same commit; counts in lockstep
 
@@ -884,8 +951,8 @@ credentials.
 ### 8.1 Production Build
 
 `npm run build` → `vite build` with `react()`, `@tailwindcss/vite`, and
-`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 447.68 kB /
-120.48 kB gzip this cycle; CSS 45,842 bytes / 676 rules). No server bundle, no image
+`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 505.05 kB /
+132.22 kB gzip this cycle; CSS 49,567 bytes / 721 rules). No server bundle, no image
 pipeline, no external requests.
 
 ### 8.2 Environment Variables
@@ -959,33 +1026,37 @@ The full remediation history of this cycle: `docs/REMEDIATION_PLAN.md`.
 
 | File | Lines | Purpose |
 |---|---|---|
-| `src/lib/router.ts` | 122 | The hash-route grammar; every href factory + `hasBuyParam` + the per-category accessories view (D16) |
-| `src/lib/route-title.ts` | 71 | The tab-title seam (full-form store labels, matching the h1; airpods/accessories + the seven accessories views carry their reference\u2019s own titles — D14/D15/D16) |
-| `src/lib/catalog.ts` | 356 | The typed catalog: 8 categories, 12 products, option matrices, search |
+| `src/lib/router.ts` | 147 | The hash-route grammar; every href factory + `hasBuyParam` + the per-category accessories view + the six marketing routes (D16/D17) |
+| `src/lib/route-title.ts` | 84 | The tab-title seam (full-form store labels, matching the h1; airpods/accessories + the seven accessories views + the six marketing pages carry their reference's own titles — D14/D15/D16/D17) |
+| `src/lib/catalog.ts` | 362 | The typed catalog: 8 categories, 12 products, option matrices, search, the exported `DeviceCategoryId` |
 | `src/lib/cart.ts` | 103 | The bag reducer + price/line-key seam (`bagLineSummary`) |
 | `src/lib/checkout.ts` | 49 | Singapore checkout validation + order numbers |
-| `src/lib/sitemap.ts` | 80 | Route-set enumeration + sitemap.xml/robots.txt rendering (559 URLs — 5 bare + 8 store + 7 accessories + 12 product + 527 info) |
-| `src/lib/site-content.ts` | 456 | Nav links, the per-category flyout content model, footer directory, info-page map |
-| `src/index.css` | 571 | Tailwind v4 tokens + all component CSS + source scoping |
+| `src/lib/sitemap.ts` | 84 | Route-set enumeration + sitemap.xml/robots.txt rendering (596 URLs — 4 bare + 16 store incl. the 7 accessories views + 6 marketing + 12 product + 558 info) |
+| `src/lib/site-content.ts` | 475 | Nav links (the device categories route to the marketing pages), the per-category flyout content model, footer directory, info-page map |
+| `src/index.css` | 619 | Tailwind v4 tokens + all component CSS (incl. the marketing-* family) + source scoping |
 | `src/components/GlobalNav.tsx` | 253 | Desktop flyouts, mobile accordion menu, bag popover, search trigger |
 | `src/components/ProductArt.tsx` | 449 | The original SVG art library |
 | `src/components/EntertainmentGallery.tsx` | 153 | The TV+ gallery state machine (dwell, pause, keys) |
 | `src/components/BagLineRow.tsx` | 31 | The shared bag-line summary row (popover + checkout aside) |
 | `src/components/ErrorBoundary.tsx` | 67 | Page-level render guard: graceful fallback, nav/bag state survive; `resetKey` re-arm |
 | `src/components/BagSummary.tsx` | 25 | The shared Subtotal/Delivery/GST/Total ledger (bag page + checkout) |
-| `src/lib/store-rails.ts` | 258 | The store index's seven measured editorial rails + quick-links strip (the rail content model, `railCardHref`, `productPriceLabel`, the exported `PRODUCT_ALIASES`) |
+| `src/lib/store-rails.ts` | 271 | The store index's seven measured editorial rails + quick-links strip (the rail content model, `railCardHref`, `productPriceLabel`, the exported `PRODUCT_ALIASES` + `findProductId`) |
 | `src/lib/category-rails.ts` | 371 | The six device category pages' measured shelf models (the D12 product cards, the content shelves, `CATEGORY_RAIL_INFO_LABELS`; airpods/accessories empty — their own seams below) |
 | `src/lib/airpods-page.ts` | 210 | The AirPods marketing page's measured model (chapternav, 3 heroes with the D10-derived Pro 3 price, compare, consider, music; `AIRPODS_INFO_LABELS` set-equality-pinned) |
 | `src/lib/accessories-page.ts` | 366 | The Accessories grid page's measured model (chapternav, 8-card gallery, 5-tab/53-item curated grid, value props, index nav; `ACCESSORIES_INFO_LABELS`) |
 | `src/lib/accessories-category-pages.ts` | 1,080 | The seven per-category accessories grids' measured models (D16 — 226 curated cards incl. 26 promos, chips, galleries, value props, index navs; `ACCESSORIES_CATEGORY_INFO_LABELS`; generated from the live captures by the session-12 converter) |
 | `src/components/AirPodsSections.tsx` | 161 | The marketing-page family rendering (the keyboard-focusable consider scroller) |
 | `src/components/AccessoriesSections.tsx` | 267 | The grid-page family rendering (the WAI-ARIA tabs over the curated grid; parameterized by an optional model prop — the all-page constants default, the per-category models render the same family, D16) |
+| `src/lib/marketing-pages.ts` | 1,308 | The six nav-main marketing pages' measured models (D17 — chapternavs, line-up galleries, value props, cards/accordion/directory sections, the vision statement family; `MARKETING_INFO_LABELS`; generated from the live captures by the session-13 converter) |
+| `src/components/MarketingSections.tsx` | 334 | The nav-main marketing family rendering (chapternav, the tabbed/plain line-up gallery, value props, banner cards, accordion, directory, statement sections) |
+| `src/pages/MarketingPage.tsx` | 33 | The marketing route page (PageTitle h1 + sections + the superset "Shop X" band to the store) |
 | `src/lib/slug.ts` | 9 | The one label→slug grammar (extracted session 9 to keep the module graph acyclic) |
 | `src/components/StoreRails.tsx` | 223 | The rail + quick-links rendering (measured card anatomy, theme-coloured editorial cards) + the category shelf family (CategoryShelves, the D12 product card with its Buy deep link) |
 | `src/pages/StorePage.tsx` | 169 | Store index (h1 → quick links → chips → rails → grid), the six device pages (h1 → chips → shelves → grid), the AirPods marketing page, the Accessories grid page and the seven per-category accessories grids (their measured sections → superset grid) |
-| `src/App.tsx` | 98 | Route switch, navigation side-effects, the page-level ErrorBoundary |
-| `tests/e2e/mobile-navigation.spec.ts` | 159 | The mobile-menu contract (bar layout, accordion, the v4 display trap) |
-| `tests/e2e/smoke.mjs` | 131 | The exhaustive file:// parity battery (45 assertions) |
+| `src/App.tsx` | 101 | Route switch, navigation side-effects, the page-level ErrorBoundary |
+| `tests/e2e/mobile-navigation.spec.ts` | 166 | The mobile-menu contract (bar layout, accordion, the v4 display trap) |
+| `tests/e2e/marketing.spec.ts` | 86 | The nav-main marketing pins (the Mac model + the D10 Apple TV 4K derivation + the vision statement family) |
+| `tests/e2e/smoke.mjs` | 133 | The exhaustive file:// parity battery (45 assertions) |
 | `scripts/flyout-diff.mjs` | 73 | The standing flyout drift harness (Vite ssrLoadModule vs a saved reference extraction) |
 | `vite.config.ts` | 30 | Build pipeline + dep-scan scoping (ADR-003) |
 | `playwright.config.ts` | 47 | The two-project e2e harness over `vite preview` |

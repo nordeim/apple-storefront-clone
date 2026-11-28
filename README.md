@@ -19,11 +19,11 @@ Apple's proprietary assets were deliberately not copied or hot-linked.
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest, jsdom — 15 files / 163 tests) |
+| Unit tests | `npm run test` (Vitest, jsdom — 16 files / 181 tests) |
 | Production build (single file → `dist/index.html`) | `npm run build` |
-| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 53 tests incl. 16 axe-core a11y scans) |
+| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 60 tests incl. 18 axe-core a11y scans) |
 | File-protocol smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
-| Regenerate `public/sitemap.xml` (559 routes) | `npm run sitemap` |
+| Regenerate `public/sitemap.xml` (596 routes) | `npm run sitemap` |
 | Clean gate order | `npm run lint && npm run typecheck && npm run typecheck:tests && npm run test && npm run build && npm run test:e2e && npm run test:smoke` |
 
 The Playwright E2E suite boots the production build (`npm run build` then `vite preview --host 127.0.0.1 --port 4173`),
@@ -43,9 +43,9 @@ npm run dev          # → http://localhost:5173
 
 ```bash
 npm run typecheck    # clean, no output
-npm run test         # 15 files / 163 tests passed
-npm run build        # dist/index.html (~382 kB single file)
-npm run test:e2e     # 53 passed (37 pins + 16 axe a11y scans)
+npm run test         # 16 files / 181 tests passed
+npm run build        # dist/index.html (~505.05 kB single file)
+npm run test:e2e     # 60 passed (42 pins + 18 axe a11y scans)
 ```
 
 Node.js ≥ 20 (verified on Node 24); npm is the package manager and `package-lock.json` is the lockfile.
@@ -91,6 +91,19 @@ cards + 26 promos total), value props and index-nav directory — the nine catal
 derive their prices from this clone's catalog where the reference's strings contradict it, the
 one video promo is modeled as a text promo with its caption — then the superset store below).
 
+The nav-main marketing pages are the reference's `/sg/{x}/` family (session-13: `#/mac`,
+`#/ipad`, `#/iphone`, `#/watch`, `#/vision`, `#/home` each render their measured chapternav
+chips, the visible 80px-family h1, the "Explore the line-up." product gallery (tabbed on
+Mac with the WAI-ARIA tabs pattern), the "Why Apple is the best place to shop X." value
+props, the measured content sections (banner cards, continuity accordions, essentials)
+and the closing links directory; the vision page is hero-led — statement sections with
+the M5-chip hero whose Buy deep-links the working configurator. The line-up tiles naming
+clone catalog products (the two MacBook Pro display-size variants via alias, iPhone Duo,
+iPhone 18 Pro, iPad, Apple Watch Series 12, Apple HomeView, Apple TV 4K) derive their
+prices from this clone's catalog where the reference's strings contradict it and their
+Buy CTAs deep-link the configurator; every page closes with the superset "Shop X" band
+routing to the working store category page).
+
 **Superset:** store with category filters and sorting, product pages with a configurator (options change
 price), an in-memory bag with a nav popover, GST-inclusive totals (9%), validated Singapore checkout
 (6-digit postal code, 8-digit +65 numbers), order confirmation, order-status lookup, live search
@@ -102,6 +115,9 @@ a render crash (and recovers on the next navigation), and an axe-core WCAG 2 A+A
 
 ```
 src/lib/        pure, tested logic: catalog, cart reducer, router (hash), money, checkout validation,
+                marketing-pages (the six nav-main marketing pages' measured content model —
+                the line-up galleries, value props, content sections and directories; feeds
+                the marketing page markup and the sitemap info routes),
                 content + the flyout content model (per-category structures measured off the live
                 reference; feeds nav flyouts, the mobile accordion menu and the sitemap route
                 enumeration), store-rails (the store index's seven measured editorial rails + the
@@ -114,6 +130,8 @@ src/lib/        pure, tested logic: catalog, cart reducer, router (hash), money,
 src/hooks/      useRoute (hashchange), media-query / in-view hooks
 src/context/    BagContext (in-memory only)
 src/components/ GlobalNav (desktop flyouts + mobile accordion menu), SearchPanel, Tile, EntertainmentGallery,
+                MarketingSections (the marketing pages' chapternav/line-up/value-props/
+                cards/accordion/directory/statement family),
                 Footer, ProductArt (original SVG art), ErrorBoundary (page-level render guard),
                 BagLineRow + BagSummary (shared bag-line/summary rows),
                 StoreRails + StoreQuickLinks (the store index's measured editorial rails),
@@ -145,7 +163,7 @@ The app reads **no** environment variables. One optional variable drives the sit
 
 ## SEO
 
-`public/sitemap.xml` (559 routes) is generated from the tested `src/lib/sitemap.ts` seam — never a
+`public/sitemap.xml` (596 routes) is generated from the tested `src/lib/sitemap.ts` seam — never a
 hand-maintained list. `public/robots.txt` and `index.html` (OG/Twitter meta, JSON-LD WebSite+Organization)
 are part of the same deliverable — one `VITE_SITE_URL` value stamps both the sitemap's base and the
 robots.txt `Sitemap:` directive. Honest limitation: hash routing means search engines collapse every
