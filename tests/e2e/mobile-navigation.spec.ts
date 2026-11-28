@@ -53,7 +53,10 @@ test.describe("mobile navigation (390×844, touch)", () => {
     await page.goto("/");
     await page.getByRole("button", { name: "Menu" }).click();
     await page.locator("#mobile-menu a", { hasText: "Mac" }).first().click();
-    await expect(page).toHaveURL(/#\/store\/mac$/);
+    // session-13 D17: the nav-main Mac destination is the marketing page
+    // (#/mac, the reference's /sg/mac/); the store page stays one flyout deeper.
+    await expect(page).toHaveURL(/#\/mac$/);
+    await expect(page).toHaveTitle("Mac - Apple (Singapore)");
     await expect(page.locator("#mobile-menu")).toHaveCount(0);
   });
 
@@ -138,6 +141,10 @@ test.describe("mobile navigation (390×844, touch)", () => {
       // session-12: the per-category accessories grids (the chips/tabs scroll)
       "#/store/mac/accessories",
       "#/store/iphone/accessories",
+      // session-13: the nav-main marketing pages (the chapternav chips scroll)
+      "#/mac",
+      "#/iphone",
+      "#/vision",
     ]) {
       await page.goto(r);
       await page.waitForTimeout(200);

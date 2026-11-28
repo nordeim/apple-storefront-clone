@@ -87,4 +87,13 @@ describe("routeTitle", () => {
     expect(routeTitle({ name: "info", slug: "compare-mac" })).toBe(`Compare Mac - ${SITE}`);
     expect(routeTitle({ name: "info", slug: "no-such-slug" })).toBe(`Page not found - ${SITE}`);
   });
+
+  it("titles the six marketing pages with the reference's measured document titles (S13-6, D17)", () => {
+    expect(routeTitle({ name: "marketing", category: "mac" })).toBe(`Mac - ${SITE}`);
+    expect(routeTitle({ name: "marketing", category: "ipad" })).toBe(`iPad - ${SITE}`);
+    expect(routeTitle({ name: "marketing", category: "iphone" })).toBe(`iPhone - ${SITE}`);
+    expect(routeTitle({ name: "marketing", category: "watch" })).toBe(`Apple Watch - ${SITE}`);
+    expect(routeTitle({ name: "marketing", category: "vision" })).toBe(`Apple Vision Pro - ${SITE}`);
+    expect(routeTitle({ name: "marketing", category: "home" })).toBe(`Home - ${SITE}`);
+  });
 });

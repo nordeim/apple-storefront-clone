@@ -565,6 +565,54 @@ body {
   .accessories-index-headline { font-size: 30px; }
 }
 
+
+/* ---------- Nav-main marketing pages (session-13; measured off /sg/{x}/) ---------- */
+.marketing-section { padding: 72px 0 0; }
+.marketing-section-header { font: 600 40px/1.08 var(--font-display); letter-spacing: -0.014em; margin: 0 0 28px; max-width: 720px; }
+.marketing-eyebrow { margin: 0 0 6px; font: 600 12px/1.2 var(--font-text); letter-spacing: 0.01em; color: #6e6e73; text-transform: none; }
+.marketing-chip-badge { margin-left: 6px; color: #424245; font-size: 12px; }
+.marketing-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 28px; padding: 3px; border-radius: 980px; background: #e8e8ed; width: fit-content; }
+.marketing-tab { border: 0; border-radius: 980px; padding: 8px 18px; background: transparent; color: var(--color-ink); font: 500 14px/1.2 var(--font-text); cursor: pointer; }
+.marketing-tab-active { background: #fff; }
+.marketing-lineup { margin: 0; }
+.marketing-tile { display: flex; flex-direction: column; gap: 6px; background: #fff; border-radius: 18px; padding: 28px 24px; }
+.marketing-tile-head { margin: 0; }
+.marketing-tile-name { margin: 0; font: 600 24px/1.15 var(--font-display); letter-spacing: -0.01em; }
+.marketing-tile-tagline { margin: 0; font: 400 15px/1.4 var(--font-text); color: #6e6e73; }
+.marketing-tile-price { margin: 4px 0 0; font: 600 15px/1.3 var(--font-text); }
+.marketing-tile-ctas { display: flex; align-items: center; gap: 18px; margin: 10px 0 0; }
+.marketing-buy-pill { display: inline-block; padding: 9px 20px; border-radius: 980px; background: var(--color-action); color: #fff; font: 400 15px/1.2 var(--font-text); text-decoration: none; }
+.marketing-buy-pill:hover { background: #0077ed; }
+.marketing-valueprops { background: #f5f5f7; }
+.marketing-valueprops { padding-top: 72px; padding-bottom: 24px; }
+.marketing-valueprop-title { margin: 0 0 8px; font: 600 19px/1.2 var(--font-display); letter-spacing: -0.008em; }
+.marketing-valueprop-copy { margin: 0 0 10px; font: 400 15px/1.45 var(--font-text); color: #6e6e73; }
+.marketing-card { display: flex; flex-direction: column; gap: 8px; background: #f5f5f7; border-radius: 18px; padding: 30px 26px; }
+.marketing-card-headline { margin: 0; font: 600 28px/1.12 var(--font-display); letter-spacing: -0.012em; }
+.marketing-card-copy { margin: 0; font: 400 15px/1.45 var(--font-text); color: #424245; }
+.marketing-accordion-item { border-bottom: 1px solid #d2d2d7; }
+.marketing-accordion-row { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; border: 0; background: transparent; padding: 18px 0; font: 600 19px/1.2 var(--font-display); letter-spacing: -0.008em; color: var(--color-ink); cursor: pointer; }
+.marketing-accordion-chevron { font-size: 22px; font-weight: 400; color: #6e6e73; }
+.marketing-accordion-panel { padding: 0 0 22px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.marketing-directory { background: #f5f5f7; margin-top: 72px; padding: 44px 0 56px; }
+.marketing-directory-header { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.marketing-directory-link { font: 400 14px/1.5 var(--font-text); color: #424245; text-decoration: none; }
+.marketing-directory-link:hover { text-decoration: underline; color: var(--color-ink); }
+.marketing-statement { text-align: center; }
+.marketing-statement-headline { font: 600 40px/1.08 var(--font-display); letter-spacing: -0.014em; margin: 0 0 18px; }
+.marketing-statement-copy { margin: 0 auto 14px; max-width: 640px; font: 400 17px/1.5 var(--font-text); color: #424245; }
+.marketing-statement-ctas { justify-content: center; }
+.marketing-shop-band { text-align: center; background: #f5f5f7; border-radius: 18px; padding: 44px 24px; }
+.marketing-shop-band-headline { margin: 0 0 8px; font: 600 32px/1.1 var(--font-display); letter-spacing: -0.012em; }
+.marketing-shop-band-copy { margin: 0 0 18px; font: 400 15px/1.4 var(--font-text); color: #6e6e73; }
+.marketing-shop-band-cta { display: inline-block; }
+@media (max-width: 734px) {
+  .marketing-section { padding-top: 48px; }
+  .marketing-section-header { font-size: 28px; }
+  .marketing-statement-headline { font-size: 28px; }
+  .marketing-card-headline { font-size: 24px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; transition-delay: 0ms !important; scroll-behavior: auto !important; }
 }

@@ -15,6 +15,7 @@ import { HomePage } from "@/pages/HomePage";
 import { ProductPage } from "@/pages/ProductPage";
 import { SearchPage } from "@/pages/SearchPage";
 import { EntertainmentPage, InfoPage, NotFoundPage, SupportPage } from "@/pages/StaticPages";
+import { MarketingPage } from "@/pages/MarketingPage";
 import { StorePage } from "@/pages/StorePage";
 
 function RouteView({ route }: { route: Route }) {
@@ -23,6 +24,8 @@ function RouteView({ route }: { route: Route }) {
       return <HomePage />;
     case "store":
       return <StorePage key={route.view === "accessories" ? `${route.category ?? "all"}-accessories` : route.category ?? "all"} category={route.category} view={route.view} />;
+    case "marketing":
+      return <MarketingPage key={route.category} category={route.category} />;
     case "product": {
       const product = getProduct(route.id);
       return product ? <ProductPage product={product} /> : <NotFoundPage />;

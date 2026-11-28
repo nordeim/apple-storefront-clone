@@ -377,6 +377,27 @@ describe("store chip row (the reference's measured model)", () => {
   });
 });
 
+describe("NAV_LINKS (the nav-main destinations, session-13 D17)", () => {
+  it("routes the six device categories to their marketing pages and airpods to its marketing family", () => {
+    expect(NAV_LINKS.map((l) => l.id)).toEqual([
+      "store", "mac", "ipad", "iphone", "watch", "vision", "airpods", "home", "entertainment", "accessories", "support",
+    ]);
+    expect(nav("mac").href).toBe("#/mac");
+    expect(nav("ipad").href).toBe("#/ipad");
+    expect(nav("iphone").href).toBe("#/iphone");
+    expect(nav("watch").href).toBe("#/watch");
+    expect(nav("vision").href).toBe("#/vision");
+    expect(nav("home").href).toBe("#/home");
+    // airpods keeps its session-11 D14 destination (the marketing family at
+    // #/store/airpods) — no separate marketing route exists for it.
+    expect(nav("airpods").href).toBe("#/store/airpods");
+    // the reference's nav order and short-form labels (the nav bar and the
+    // mobile menu both show "Watch"/"Vision", not the full store forms)
+    expect(nav("watch").label).toBe("Watch");
+    expect(nav("vision").label).toBe("Vision");
+  });
+});
+
 describe("router round-trip (the S10-1 dead-route guard, seam-wide)", () => {
   // Session-13 S13-2: this seam was the one content surface whose hrefs were
   // checked by SHAPE (ROUTE_RE) + INFO_TITLES membership but never actually

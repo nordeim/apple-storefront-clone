@@ -51,7 +51,7 @@ echo "captured 11-desktop-flyout-entertainment"
 agent-browser open "$BASE" >/dev/null 2>&1
 agent-browser set viewport 1440 900 >/dev/null 2>&1
 sleep 2
-agent-browser hover 'nav a[href*="store/iphone"]' >/dev/null 2>&1
+agent-browser hover 'nav a[href="#/iphone"]' >/dev/null 2>&1
 sleep 1
 agent-browser screenshot "$OUT/12-desktop-flyout-iphone.png" >/dev/null 2>&1
 echo "captured 12-desktop-flyout-iphone"
@@ -143,7 +143,7 @@ echo "captured 13-mobile-menu-entertainment"
 agent-browser open "$BASE" >/dev/null 2>&1
 agent-browser set viewport 1440 900 >/dev/null 2>&1
 sleep 2
-agent-browser hover 'nav a[href*="store/home"]' >/dev/null 2>&1
+agent-browser hover 'nav a[href="#/home"]' >/dev/null 2>&1
 sleep 1
 agent-browser screenshot "$OUT/14-desktop-flyout-home.png" >/dev/null 2>&1
 echo "captured 14-desktop-flyout-home"
@@ -152,7 +152,7 @@ echo "captured 14-desktop-flyout-home"
 agent-browser open "$BASE" >/dev/null 2>&1
 agent-browser set viewport 1440 900 >/dev/null 2>&1
 sleep 2
-agent-browser hover 'nav a[href*="store/mac"]' >/dev/null 2>&1
+agent-browser hover 'nav a[href="#/mac"]' >/dev/null 2>&1
 sleep 1
 agent-browser screenshot "$OUT/15-desktop-flyout-mac.png" >/dev/null 2>&1
 echo "captured 15-desktop-flyout-mac"
@@ -188,3 +188,13 @@ for f in files:
 print(f"{len(files)} PNGs validated" + (f"; BAD: {bad}" if bad else " — all signature+dimension valid"))
 sys.exit(1 if bad else 0)
 PY
+
+# ---------- session-13: the nav-main marketing pages (D17) ----------
+# Shots 27-32 pin the six #/{x} marketing pages; 33 the mobile chapternav.
+capture_desktop "27-desktop-marketing-mac" "/#/mac"
+capture_desktop "28-desktop-marketing-mac-lineup" "/#/mac"
+capture_desktop "29-desktop-marketing-iphone" "/#/iphone"
+capture_desktop "30-desktop-marketing-watch" "/#/watch"
+capture_desktop "31-desktop-marketing-vision" "/#/vision"
+capture_desktop "32-desktop-marketing-home" "/#/home"
+capture_mobile "33-mobile-marketing-mac" "/#/mac"

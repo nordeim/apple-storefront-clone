@@ -86,6 +86,30 @@ describe("parseHash", () => {
   it("returns not-found for unknown routes", () => {
     expect(parseHash("#/nope")).toEqual({ name: "not-found" });
   });
+
+  it("parses the six nav-main marketing pages as single-segment routes (S13-5, D17)", () => {
+    // The reference's /sg/{x}/ marketing destinations — top-level hash routes
+    // mirroring the reference's URL shape.
+    expect(parseHash("#/mac")).toEqual({ name: "marketing", category: "mac" });
+    expect(parseHash("#/ipad")).toEqual({ name: "marketing", category: "ipad" });
+    expect(parseHash("#/iphone")).toEqual({ name: "marketing", category: "iphone" });
+    expect(parseHash("#/watch")).toEqual({ name: "marketing", category: "watch" });
+    expect(parseHash("#/vision")).toEqual({ name: "marketing", category: "vision" });
+    expect(parseHash("#/home")).toEqual({ name: "marketing", category: "home" });
+    // The marketing routes tolerate the ?buy-style query part like every head.
+    expect(parseHash("#/mac?x=1")).toEqual({ name: "marketing", category: "mac" });
+  });
+
+  it("rejects trailing segments on the marketing heads and keeps airpods/store distinct (S13-5)", () => {
+    expect(parseHash("#/mac/x")).toEqual({ name: "not-found" });
+    expect(parseHash("#/iphone/accessories")).toEqual({ name: "not-found" });
+    // airpods has NO separate marketing route — its marketing family lives at
+    // #/store/airpods (session-11 D14) and the accessories grid at the view route.
+    expect(parseHash("#/airpods")).toEqual({ name: "not-found" });
+    // the store family is unchanged.
+    expect(parseHash("#/store/mac")).toEqual({ name: "store", category: "mac" });
+    expect(parseHash("#/store/mac/accessories")).toEqual({ name: "store", category: "mac", view: "accessories" });
+  });
 });
 
 describe("routeHref factories", () => {
@@ -102,6 +126,14 @@ describe("routeHref factories", () => {
   it("builds and round-trips the per-category accessories view (S12-4)", () => {
     expect(routeHref.storeAccessories("mac")).toBe("#/store/mac/accessories");
     expect(parseHash(routeHref.storeAccessories("watch"))).toEqual({ name: "store", category: "watch", view: "accessories" });
+  });
+
+  it("builds and round-trips the six marketing pages (S13-5)", () => {
+    expect(routeHref.marketing("mac")).toBe("#/mac");
+    expect(routeHref.marketing("vision")).toBe("#/vision");
+    for (const c of ["mac", "ipad", "iphone", "watch", "vision", "home"] as const) {
+      expect(parseHash(routeHref.marketing(c))).toEqual({ name: "marketing", category: c });
+    }
   });
 
   it("round-trips the buy deep link through parseHash to the product page", () => {

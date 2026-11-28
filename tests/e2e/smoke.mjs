@@ -114,7 +114,9 @@ ok('desktop links hidden on mobile', !(await p.locator('a.globalnav-link', {hasT
 await p.getByRole('button',{name:'Menu'}).click();
 ok('mobile menu opens', await p.locator('#mobile-menu').isVisible());
 await p.locator('#mobile-menu a', {hasText:'Mac'}).click(); await p.waitForTimeout(300);
-ok('mobile nav navigates + closes', p.url().endsWith('#/store/mac') && (await p.locator('#mobile-menu').count())===0);
+// session-13 D17: the nav-main Mac destination is the marketing page (#/mac,
+// the reference's /sg/mac/); the store page stays one flyout deeper.
+ok('mobile nav navigates + closes', p.url().endsWith('#/mac') && (await p.locator('#mobile-menu').count())===0);
 ok('mobile tile headline 32px', await (async()=>{await p.goto(url);await p.reload();return (await p.evaluate(()=>{ const el=document.querySelector('.section-hero h2'); return el ? getComputedStyle(el).fontSize : ''; }))==='32px'})());
 ok('mobile promo single column', (await p.evaluate(()=>{ const el=document.querySelector('.section-promo'); return el ? getComputedStyle(el).gridTemplateColumns.split(' ').length : 0; }))===1);
 await p.locator('.footer').scrollIntoViewIfNeeded();

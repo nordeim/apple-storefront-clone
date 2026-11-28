@@ -1,4 +1,5 @@
 import { CATEGORIES, PRODUCTS } from "./catalog";
+import { MARKETING_ROUTE_CATEGORIES } from "./router";
 import { INFO_TITLES } from "./site-content";
 
 export interface SiteRoute {
@@ -26,6 +27,9 @@ export function siteRoutes(): SiteRoute[] {
     { path: "/support", priority: 0.6, changefreq: "monthly" },
   ];
   for (const c of CATEGORIES) routes.push({ path: `/store/${c.id}`, priority: 0.8, changefreq: "weekly" });
+  // the six nav-main marketing pages (session-13 D17) — /sg/{x}/ on the
+  // reference, the clone's #/{x} hash routes
+  for (const c of MARKETING_ROUTE_CATEGORIES) routes.push({ path: `/${c}`, priority: 0.9, changefreq: "weekly" });
   // the per-category accessories grids (session-12 D16) — every device category
   for (const c of CATEGORIES) {
     if (c.id === "accessories") continue;

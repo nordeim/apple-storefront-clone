@@ -1,5 +1,5 @@
 import { getProduct, type CategoryId } from "./catalog";
-import type { Route } from "./router";
+import type { MarketingCategoryId, Route } from "./router";
 import { INFO_TITLES } from "./site-content";
 
 const SITE = "Apple (Singapore)";
@@ -40,6 +40,17 @@ const ACCESSORIES_VIEW_TITLES: Readonly<Record<CategoryId, string>> = {
   accessories: "Accessories",
 };
 
+/** The nav-main marketing pages' measured document titles (session-13 D17 —
+ * the reference's `/sg/{x}/` pages, each "… - Apple (SG)" there). */
+const MARKETING_PAGE_TITLES: Readonly<Record<MarketingCategoryId, string>> = {
+  mac: "Mac",
+  ipad: "iPad",
+  iphone: "iPhone",
+  watch: "Apple Watch",
+  vision: "Apple Vision Pro",
+  home: "Home",
+};
+
 export function routeTitle(route: Route): string {
   switch (route.name) {
     case "home":
@@ -49,6 +60,8 @@ export function routeTitle(route: Route): string {
         return `${ACCESSORIES_VIEW_TITLES[route.category]} - ${SITE}`;
       }
       return `${route.category ? STORE_PAGE_TITLES[route.category] : "Store"} - ${SITE}`;
+    case "marketing":
+      return `${MARKETING_PAGE_TITLES[route.category]} - ${SITE}`;
     case "product":
       return `${getProduct(route.id)?.name ?? "Product"} - ${SITE}`;
     case "bag":

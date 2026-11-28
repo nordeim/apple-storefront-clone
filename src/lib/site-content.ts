@@ -1,9 +1,10 @@
 import { CATEGORIES, PRODUCTS, type CategoryId } from "./catalog";
-import { routeHref } from "./router";
+import { routeHref, MARKETING_ROUTE_CATEGORIES } from "./router";
 import { ACCESSORIES_INFO_LABELS } from "./accessories-page";
 import { ACCESSORIES_CATEGORY_INFO_LABELS } from "./accessories-category-pages";
 import { AIRPODS_INFO_LABELS } from "./airpods-page";
 import { CATEGORY_RAIL_INFO_LABELS } from "./category-rails";
+import { MARKETING_INFO_LABELS } from "./marketing-pages";
 import { RAIL_INFO_LABELS } from "./store-rails";
 import { slugify } from "./slug";
 
@@ -16,19 +17,6 @@ export interface NavLinkSpec {
   /** Present for items that open a flyout on desktop. */
   category?: CategoryId;
 }
-
-export const NAV_LINKS: readonly NavLinkSpec[] = [
-  { id: "store", label: "Store", href: routeHref.store() },
-  ...CATEGORIES.filter((c) => c.id !== "accessories").map((c) => ({
-    id: c.id,
-    label: c.label,
-    href: routeHref.store(c.id),
-    category: c.id,
-  })),
-  { id: "entertainment", label: "Entertainment", href: routeHref.entertainment },
-  { id: "accessories", label: "Accessories", href: routeHref.store("accessories"), category: "accessories" as const },
-  { id: "support", label: "Support", href: routeHref.support },
-];
 
 export interface FlyoutLink {
   label: string;
@@ -106,6 +94,32 @@ export const STORE_CATEGORY_LABELS: Readonly<Record<CategoryId, string>> = {
   home: "Home",
   accessories: "Accessories",
 };
+
+export const NAV_LINKS: readonly NavLinkSpec[] = [
+  { id: "store", label: "Store", href: routeHref.store() },
+  // The six device categories' nav-main destinations are the marketing pages
+  // (session-13 D17 — the reference routes Mac/iPad/iPhone/Watch/Vision/Home to
+  // /sg/{x}/). AirPods rides in the same nav position but routes to its own
+  // marketing family at #/store/airpods (session-11 D14 — the reference's
+  // /sg/airpods/); the store pages stay reachable via the flyouts' "Shop X"
+  // links, the marketing chapternav chips and the store chip row. Labels stay
+  // the CATEGORIES short forms ("Watch", "Vision") — the reference's nav bar
+  // and mobile menu both use them.
+  ...MARKETING_ROUTE_CATEGORIES.map((id) => ({
+    id,
+    label: CATEGORIES.find((c) => c.id === id)?.label ?? id,
+    href: routeHref.marketing(id),
+    category: id as CategoryId,
+  })).flatMap((link) =>
+    link.id === "vision"
+      ? [link, { id: "airpods", label: "AirPods", href: routeHref.store("airpods"), category: "airpods" as const }]
+      : [link],
+  ),
+  { id: "entertainment", label: "Entertainment", href: routeHref.entertainment },
+  { id: "accessories", label: "Accessories", href: routeHref.store("accessories"), category: "accessories" as const },
+  { id: "support", label: "Support", href: routeHref.support },
+];
+
 
 /**
  * The flyout content model, measured off the live reference's eleven flyouts
@@ -238,6 +252,10 @@ export function flyoutSections(link: NavLinkSpec): FlyoutSection[] {
   }
   if (!link.category) return [];
   const c = link.category;
+  // Unreachable in practice (the id-switch above already returned the
+  // accessories flyout) but it keeps the device-category correlation honest
+  // for the type checker — every category below this line is a DeviceCategoryId.
+  if (c === "accessories") return [];
   const label = STORE_CATEGORY_LABELS[c];
 
   const exploreExtras: FlyoutLink[] =
@@ -446,6 +464,7 @@ export const INFO_TITLES: ReadonlyMap<string, string> = new Map([
     ...AIRPODS_INFO_LABELS,
     ...ACCESSORIES_INFO_LABELS,
     ...ACCESSORIES_CATEGORY_INFO_LABELS,
+    ...MARKETING_INFO_LABELS,
   ]
     .filter(isInfoRouted)
     .map((l) => [slugify(l.label), l.label] as const),

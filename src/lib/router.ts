@@ -1,8 +1,9 @@
-import { isCategoryId, getProduct, type CategoryId } from "./catalog";
+import { isCategoryId, getProduct, type CategoryId, type DeviceCategoryId } from "./catalog";
 
 export type Route =
   | { name: "home" }
   | { name: "store"; category?: CategoryId; view?: "accessories" }
+  | { name: "marketing"; category: MarketingCategoryId }
   | { name: "product"; id: string }
   | { name: "bag" }
   | { name: "checkout" }
@@ -12,6 +13,12 @@ export type Route =
   | { name: "support" }
   | { name: "info"; slug: string }
   | { name: "not-found" };
+
+/** The categories whose nav-main destination is a marketing page
+ * (`/sg/{x}/` on the reference — session-13 D17). AirPods is absent on
+ * purpose: its marketing family lives at `#/store/airpods` (session-11 D14). */
+export const MARKETING_ROUTE_CATEGORIES = ["mac", "ipad", "iphone", "watch", "vision", "home"] as const;
+export type MarketingCategoryId = (typeof MARKETING_ROUTE_CATEGORIES)[number];
 
 /** The categories whose reference destination is a per-category accessories
  * grid (/sg/shop/{cat}/accessories) — every category except accessories
@@ -82,6 +89,16 @@ export function parseHash(hash: string): Route {
     case "store":
       if (arg === undefined) return { name: "store" };
       return isCategoryId(arg) ? { name: "store", category: arg } : NOT_FOUND;
+    case "mac":
+    case "ipad":
+    case "iphone":
+    case "watch":
+    case "vision":
+    case "home":
+      // the six nav-main marketing pages (S13-5, D17) — single-segment routes
+      // mirroring the reference's /sg/{x}/ shape. The case labels ARE the
+      // marketing categories; the set check is defense-in-depth.
+      return arg === undefined && MARKETING_ROUTE_SET.has(head) ? { name: "marketing", category: head } : NOT_FOUND;
     case "product":
       return arg !== undefined && getProduct(arg) ? { name: "product", id: arg } : NOT_FOUND;
     case "bag":
@@ -103,12 +120,20 @@ export function parseHash(hash: string): Route {
   }
 }
 
+const MARKETING_ROUTE_SET: ReadonlySet<string> = new Set(MARKETING_ROUTE_CATEGORIES);
+
 export const routeHref = {
   home: "#/",
   store: (category?: CategoryId) => (category ? `#/store/${category}` : "#/store"),
   /** The per-category accessories grid (`#/store/mac/accessories`) — the
-   * reference's /sg/shop/{cat}/accessories destination (session-12 D16). */
-  storeAccessories: (category: CategoryId) => `#/store/${category}/accessories`,
+   * reference's /sg/shop/{cat}/accessories destination (session-12 D16). The
+   * parameter is DeviceCategoryId: the accessories category itself has no
+   * accessories page (`#/store/accessories/accessories` 404s by design) and
+   * the type now makes building that dead href impossible (session-13 S13-3). */
+  storeAccessories: (category: DeviceCategoryId) => `#/store/${category}/accessories`,
+  /** The nav-main marketing page (`#/mac` … `#/home`) — the reference's
+   * /sg/{x}/ destination (session-13 D17). */
+  marketing: (category: MarketingCategoryId) => `#/${category}`,
   product: (id: string) => `#/product/${id}`,
   /** Product deep link that scrolls straight to the configurator (App/ProductPage consume the `?buy` hint). */
   productBuy: (id: string) => `#/product/${id}?buy`,

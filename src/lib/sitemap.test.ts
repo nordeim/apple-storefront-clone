@@ -17,6 +17,18 @@ describe("siteRoutes", () => {
     for (const slug of INFO_TITLES.keys()) expect(paths).toContain(`/info/${slug}`);
   });
 
+  it("enumerates the six nav-main marketing pages (session-13 D17)", () => {
+    const routes = siteRoutes();
+    const paths = routes.map((r) => r.path);
+    for (const c of ["mac", "ipad", "iphone", "watch", "vision", "home"]) {
+      expect(paths).toContain(`/${c}`);
+    }
+    // airpods has no separate marketing route (its family lives at /store/airpods)
+    expect(paths).not.toContain("/airpods");
+    // the marketing pages carry near-top priority (below home, beside the store)
+    expect(routes.find((r) => r.path === "/mac")?.priority).toBe(0.9);
+  });
+
   it("enumerates the seven per-category accessories grids (session-12 D16)", () => {
     const paths = siteRoutes().map((r) => r.path);
     for (const c of CATEGORIES) {

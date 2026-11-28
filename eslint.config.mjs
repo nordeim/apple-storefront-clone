@@ -15,6 +15,9 @@ export default tseslint.config(
     "playwright-report/**",
     "test-results/**",
     "public/**",
+    // session scratch areas (live-capture JSON + converters — gitignored,
+    // never shipped; excluded from checking like skills/ and docs/)
+    ".scratch/**",
   ] },
   { files: ["**/*.{ts,tsx}"] },
   {

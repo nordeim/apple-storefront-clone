@@ -28,6 +28,8 @@ const ROUTES: Array<{ hash: string; label: string }> = [
   { hash: "#/store/airpods", label: "store airpods (the session-11 marketing page)" },
   { hash: "#/store/accessories", label: "store accessories (the session-11 filtered grid)" },
   { hash: "#/store/mac/accessories", label: "store mac accessories (the session-12 per-category grid)" },
+  { hash: "#/mac", label: "marketing mac (the session-13 nav-main marketing page)" },
+  { hash: "#/vision", label: "marketing vision (the session-13 hero-led marketing page)" },
   { hash: "#/product/iphone-18-pro", label: "product" },
   { hash: "#/bag", label: "bag" },
   { hash: "#/checkout", label: "checkout" },
