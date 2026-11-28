@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { productsByCategory } from "./catalog";
+import { PRODUCTS, productsByCategory } from "./catalog";
 import { parseHash } from "./router";
-import { CATEGORY_RAIL_INFO_LABELS, CATEGORY_RAILS, type CategoryRail, type CategoryRailCard } from "./category-rails";
+import { railCardHref } from "./store-rails";
+import { CATEGORY_RAIL_INFO_LABELS, CATEGORY_RAILS, PRODUCT_EYEBROWS, type CategoryRail, type CategoryRailCard } from "./category-rails";
 
 /** Every card href must survive the router — the session-10 drift guard. */
 const routeable = (href: string): boolean => parseHash(href).name !== "not-found";
@@ -48,7 +49,10 @@ describe("CATEGORY_RAILS (the reference's measured category-page shelves)", () =
     expect(CATEGORY_RAILS.iphone[4]?.subhead).toBe("Our Specialists are here to help.");
   });
 
-  it("leaves airpods and accessories empty this cycle (D13: their reference pages are different families)", () => {
+  it("leaves airpods and accessories empty (D13→session-11: each renders its own measured page-family seam)", () => {
+    // The airpods page is the reference's marketing family (airpods-page.ts)
+    // and the accessories page is its filtered grid (accessories-page.ts);
+    // neither is a shelf sequence, so the shelf seam stays empty for both.
     expect(CATEGORY_RAILS.airpods).toEqual([]);
     expect(CATEGORY_RAILS.accessories).toEqual([]);
   });
@@ -160,10 +164,48 @@ describe("CATEGORY_RAILS (the reference's measured category-page shelves)", () =
     expect(variants).toContain("editorial-wide");
     expect(variants).toContain("editorial-short");
     expect(variants).toContain("editorial-short-wide");
-    // product cards are the only ones with buy deep links
+    // product cards are the only ones with buy deep links. Since S11-2 a
+    // content card may carry productId WITHOUT a Buy pill (a product-linked
+    // editorial card whose price derives from the catalog — D10), so the
+    // precise D12 invariant is: a Buy pill only ever appears on a card that
+    // IS a catalog product, and every first-shelf product card carries one.
     for (const card of allCards) {
-      if (card.productId) expect(card.buyHref).toBeDefined();
-      else expect(card.buyHref).toBeUndefined();
+      if (card.buyHref) expect(card.productId, `"${card.label}" carries a Buy pill without being a catalog product`).toBeDefined();
+    }
+    for (const category of ["mac", "ipad", "iphone", "watch", "vision", "home"] as const) {
+      const shelf = CATEGORY_RAILS[category][0];
+      if (!shelf) throw new Error(`${category} has no first shelf`);
+      for (const card of shelf.cards.filter((c) => c.variant === "product" || c.variant === "product-wide")) {
+        expect(card.buyHref, `${category} ${card.label}`).toBeDefined();
+      }
+    }
+  });
+
+  it("keys every measured product eyebrow by a real catalog id (the S11-1 dead-key guard)", () => {
+    // A lookup key that is not a catalog product id is a silent dead key: the
+    // card never receives its measured tag and no gate sees it (the session-11
+    // audit's M-1 — the map carried the Watch card's ArtId, not its catalog id).
+    const catalogIds = new Set(PRODUCTS.map((p) => p.id));
+    for (const key of Object.keys(PRODUCT_EYEBROWS)) {
+      expect(catalogIds.has(key), `PRODUCT_EYEBROWS key "${key}" is not a catalog product id`).toBe(true);
+    }
+    // the measured tags land on the first-shelf product cards
+    const watchCard = CATEGORY_RAILS.watch[0]?.cards.find((c) => c.productId === "apple-watch-series-12");
+    expect(watchCard?.eyebrow).toBe("NEW");
+  });
+
+  it("never quotes a measured price on a card whose label names a catalog product (the S11-2 D10 guard)", () => {
+    // D10/D12: a card that routes to a product page must derive its price from
+    // the catalog at render (productId set, desc absent) — a measured price
+    // string beside a contradicting configurator is a functional lie (the
+    // session-11 audit's L-1: "Apple HomeView" quoted S$399 vs From S$449).
+    for (const card of allCards) {
+      if (card.productId) continue; // product cards derive by construction
+      const routesToProduct = railCardHref(card.label).startsWith("#/product/");
+      if (routesToProduct) {
+        expect(card.productId, `"${card.label}" names a catalog product but is not a productId card`).toBeDefined();
+        expect(card.desc, `"${card.label}" carries a measured price beside a catalog-matched route`).toBeUndefined();
+      }
     }
   });
 });

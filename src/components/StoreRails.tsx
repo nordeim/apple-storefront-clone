@@ -148,11 +148,15 @@ const CategoryProductCard = memo(function CategoryProductCard({ card }: { card: 
 });
 
 /** The content cards: the store-rails anatomy (themed editorial, accessory
- * recomm, measured geometry) — one link, one chevron. */
+ * recomm, measured geometry) — one link, one chevron. A card that names a
+ * catalog product (productId set, no Buy pill — the S11-2 D10 rule) derives
+ * its price from the catalog at render, exactly like the store-rails cards. */
 const CategoryContentCard = memo(function CategoryContentCard({ card }: { card: CategoryRailCard }) {
   const accessory = card.variant === "accessory";
   const theme = card.theme ?? { bg: "#ffffff", fg: "#1d1d1f" };
   const themed = card.theme !== undefined;
+  const product = card.productId ? getProduct(card.productId) : undefined;
+  const price = product ? productPriceLabel(product) : card.desc;
   return (
     <li className={`m-0 list-none ${CATEGORY_CARD_CLASS[card.variant]}`}>
       <a
@@ -164,7 +168,7 @@ const CategoryContentCard = memo(function CategoryContentCard({ card }: { card: 
         <div className={`rail-card-info ${!themed ? "rail-card-info-on-art" : ""}`}>
           {card.eyebrow && <p className="rail-card-eyebrow m-0">{card.eyebrow}</p>}
           <p className={`rail-card-name m-0 ${accessory ? "rail-card-name-accessory" : ""}`}>{card.label}</p>
-          {card.desc && <p className="rail-card-desc m-0">{card.desc}</p>}
+          {price && <p className="rail-card-desc m-0">{price}</p>}
         </div>
         <span className="rail-card-chevron" aria-hidden="true">
           <ChevronRightIcon />

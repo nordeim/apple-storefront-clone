@@ -23,10 +23,10 @@ import { railCardHref, type StoreRailTheme } from "./store-rails";
  *   a label naming a clone product routes to its product page, everything
  *   else to a generated info page.
  *
- * The airpods and accessories categories carry no shelves this cycle (D13):
- * their reference pages are different families (a marketing page and a
- * filtered grid — measured as such in the session-10 dossier); their clone
- * pages keep the pinned h1 + chips + grid structure.
+ * The airpods and accessories categories carry no shelves — their reference
+ * pages are different families, each modeled by its own session-11 seam
+ * (src/lib/airpods-page.ts — the marketing page; src/lib/accessories-page.ts
+ * — the filtered grid) and rendered by StorePage above the superset grid.
  */
 
 export type CategoryRailCardVariant =
@@ -61,13 +61,16 @@ export interface CategoryRail {
 }
 
 /** The reference's measured per-product tags on the first shelves, for the
- * clone's catalog-matched products (live capture; see the session-10 plan). */
-const PRODUCT_EYEBROWS: Readonly<Record<string, string>> = {
+ * clone's catalog-matched products (live capture; see the session-10 plan).
+ * Exported for the spec's dead-key guard: every key must be a catalog product
+ * id (the session-11 audit's M-1 caught a key carrying the Watch card's ArtId
+ * instead — its measured tag silently never rendered). */
+export const PRODUCT_EYEBROWS: Readonly<Record<string, string>> = {
   "macbook-pro-m6": "NEW 14\u201d WITH M6",
   "macbook-pro-proled": "NEW",
   "iphone-duo": "NEW",
   "iphone-18-pro": "NEW",
-  watch: "NEW",
+  "apple-watch-series-12": "NEW",
   "apple-homeview": "NEW",
   "apple-tv-4k": "NEW",
 };
@@ -328,7 +331,15 @@ export const CATEGORY_RAILS: Readonly<Record<CategoryId, readonly CategoryRail[]
     {
       header: "Shopping guides.",
       subhead: "Can’t decide? Start here.",
-      cards: [editorialCard("NEW", "Apple HomeView", "S$399.00"), editorialWideCard("APPLE HOME SPECIALIST", "Shop one on one with a Specialist. Online or in a store.", undefined), editorialWideCard("APPLE TV", "Watch new Apple Originals every month.", undefined, INK_51)],
+      cards: [
+        // S11-2/L-1: the label names a catalog product, so the card is a
+        // productId card — the price derives from the catalog at render (D10:
+        // internal consistency beats the reference's measured S$399 string,
+        // which contradicted this clone's From S$449 configurator).
+        { eyebrow: "NEW", label: "Apple HomeView", href: railCardHref("Apple HomeView"), productId: "apple-homeview", variant: "editorial" },
+        editorialWideCard("APPLE HOME SPECIALIST", "Shop one on one with a Specialist. Online or in a store.", undefined),
+        editorialWideCard("APPLE TV", "Watch new Apple Originals every month.", undefined, INK_51),
+      ],
     },
     {
       header: "The Apple Home experience.",
