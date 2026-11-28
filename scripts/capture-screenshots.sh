@@ -198,3 +198,15 @@ capture_desktop "30-desktop-marketing-watch" "/#/watch"
 capture_desktop "31-desktop-marketing-vision" "/#/vision"
 capture_desktop "32-desktop-marketing-home" "/#/home"
 capture_mobile "33-mobile-marketing-mac" "/#/mac"
+
+# ---------- session-14: the seam text-fidelity cycle ----------
+# Shot 34 pins the S14-8 vision rebuild: the five experiences subsections
+# (Entertainment first) over the corrected measured copy.
+agent-browser open "$BASE/#/vision" >/dev/null 2>&1
+agent-browser set viewport 1440 900 >/dev/null 2>&1
+sleep 2
+agent-browser eval "document.querySelector('section.marketing-statement h2').scrollIntoView({ block: 'start' }); 'ok'" >/dev/null 2>&1
+agent-browser eval "window.scrollBy(0, 500); 'scrolled'" >/dev/null 2>&1
+sleep 1
+agent-browser screenshot "$OUT/34-desktop-vision-experiences.png" >/dev/null 2>&1
+echo "captured 34-desktop-vision-experiences"

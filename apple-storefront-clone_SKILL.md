@@ -8,12 +8,12 @@ description: >
   to it. Covers the architecture, design tokens, the Tailwind v4 trap log, the
   three-tier test suite, the build/SEO posture, and the hard lessons of the 2026-11
   remediation cycle.
-version: 2.2.0
-last_updated: 2026-11-28
+version: 2.3.0
+last_updated: 2026-11-29
 tags: [react, vite, tailwindcss-v4, typescript, spa, e-commerce-clone, e2e-testing, accessibility]
 ---
 
-# apple-storefront-clone — Engineering Skill (v2.2.0)
+# apple-storefront-clone — Engineering Skill (v2.3.0)
 
 > **What this is:** the distilled, codebase-verified engineering reference for
 > the remediated `apple-storefront-clone`. Every number below was measured in
@@ -48,7 +48,7 @@ entertainment/support pages. Philosophy:
 | TypeScript | 5.9.3 | `strict`, `noUnusedLocals/Parameters`, bundler resolution, `@/*` → `src/*` |
 | Vite | 7.3.7 | `react()` + `@tailwindcss/vite` + `viteSingleFile()`; dep scan pinned to `index.html` |
 | Tailwind CSS | 4.1.17 | CSS-first: `@theme` tokens in `src/index.css`; NO JS config; NO PostCSS config |
-| Vitest | 4.1.12 (jsdom 29.1.1) | 16 files / 181 tests (15 seam — incl. the store-rails, category-rails, airpods-page, accessories-page, accessories-category-pages and marketing-pages specs — + 1 render-level component spec, 4 cases) |
+| Vitest | 4.1.12 (jsdom 29.1.1) | 16 files / 187 tests (15 seam — incl. the store-rails, category-rails, airpods-page, accessories-page, accessories-category-pages and marketing-pages specs with their session-14 text-fidelity guards — + 1 render-level component spec, 4 cases) |
 | Playwright | 1.65.1 | 60 e2e over the production build (42 pins + 18 axe-core a11y scans); Chromium only (WebKit unavailable in the sandbox) |
 | axe-core | @axe-core/playwright ^4.14.1 (devDep) | WCAG 2 A+AA scan tier (`tests/e2e/a11y.spec.ts`); nothing ships in the single-file artifact |
 | ESLint | 10.15.0 (typescript-eslint 8.74.0) | Flat config; `skills/**` and `docs/**` ignored |
@@ -157,9 +157,11 @@ deviation D10; every other card carries the reference's measured text routed
 to info pages). The marketing-pages seam (`src/lib/marketing-pages.ts`, session-13)
 models the reference's six nav-main marketing pages (D17 — chapternavs, line-up
 galleries, value props, cards/accordion/directory sections, the vision statement
-family; 358 measured items over both of the reference's page generations;
+family rebuilt to the measured structure in session 14; 358 measured items over
+both of the reference's page generations, the session-13 caps' 20 mid-word cuts
+corrected against the live reference in session 14;
 `MARKETING_INFO_LABELS` joins the derivation). The sitemap seam (`src/lib/sitemap.ts`)
-enumerates 596 routes from exactly these sources — the route set can never
+enumerates 590 routes from exactly these sources — the route set can never
 drift from the catalog.
 
 ## §8 Accessibility Implementation
@@ -222,12 +224,12 @@ real screen readers (documented Unknown).
 
 ```bash
 npm run lint && npm run typecheck && npm run typecheck:tests   # 0 / clean / clean
-npm run test                       # 16 files / 181 tests
-npm run build                      # dist/index.html ~505.05 kB (CSS 49.6 kB)
+npm run test                       # 16 files / 187 tests
+npm run build                      # dist/index.html ~512.55 kB (CSS 49.6 kB)
 npm run test:e2e                   # 60/60 (42 pins + 18 axe scans)
 npm run test:smoke                 # 45 assertions, 0 console errors
 npm run sitemap                    # if routes changed: regenerate + re-check the
-                                   #   count (596) and idempotency
+                                   #   count (590) and idempotency
 ```
 
 Plus: counts swept in README/PAD/SKILL; no `TODO`/placeholder text; docs and
@@ -379,6 +381,15 @@ code in the same commit; `git status` clean before the SSH-wrapper push.
   wasn't. A capture's pin is what it must show (the flyout open), and a
   reference figure is verified by reproducing the measurement method, not by
   trusting the previous sweep's number.
+21. **A textContent capture is not running text (session-14):** the reference's
+  own `textContent` joins its `<br>`-split words and sentences ("the
+  best<br>place" reads "bestplace"), and a converter's length caps cut strings
+  mid-word silently — both classes shipped through four fully-green gates
+  because every pin asserted the corrupted bytes too (the e2e literally pinned
+  "bestplace"). The fixes: normalize br-joins to running text at capture time,
+  never cap a measured string, and give every content seam a no-artifact guard
+  (the S14-3/S14-9 tiers: fixed-cap mid-word endings, sentence/colon joins,
+  separator joins — RED-proven against the shipped artifacts before the fix).
 
 
 ## §13 Pitfalls to Avoid
@@ -506,9 +517,9 @@ lockfiles, running app) → IMPLEMENT (small typed test-backed increments) →
 VERIFY (the full gate, browser-verified UI) → DELIVER (atomic conventional
 commits to `main`, docs lockstep, evidence labels, deferred-debt honesty).
 
-## Appendix B — project_state (measured 2026-11-28, session 13)
+## Appendix B — project_state (measured 2026-11-29, session 14)
 
-- Unit: **16 files / 181 tests** (15 seam files — cart (+ `bagLineSummary`),
+- Unit: **16 files / 187 tests** (15 seam files — cart (+ `bagLineSummary`),
   catalog, checkout, the per-category flyout content model, home tiles,
   money, router (+ `hasBuyParam` + the per-category accessories view + the six
   marketing routes), route-title (+ the seven D16 view titles + the six D17
@@ -533,8 +544,8 @@ commits to `main`, docs lockstep, evidence labels, deferred-debt honesty).
   the D10/D11/D12 routing rule, the value props, the index nav, the info-labels
   set-equality), sitemap + robots — plus the render-level component spec
   `ErrorBoundary.test.tsx` with 4 cases incl. the resetKey re-arm/re-latch pair)
-- E2e: **60 tests** (home 8, mobile-navigation 11, store-flow 18, marketing 5
-  — the session-13 nav-main marketing pins — incl. the session-9
+- E2e: **64 tests** (home 8, mobile-navigation 11, store-flow 18, marketing 9
+  — the session-13 nav-main marketing pins + the session-14 fidelity pins (the vision structure, the unique-id invariant, the accordion interaction, the routing families, the real directory pin) — incl. the session-9
   editorial-rails/quick-links pins, the session-10 category-shelf + long-slug
   pins and the session-11 airpods-marketing/accessories-grid/tab-switching
   pins — a11y 18: sixteen routes incl. `#/store/mac`, `#/store/airpods`,
@@ -544,15 +555,16 @@ commits to `main`, docs lockstep, evidence labels, deferred-debt honesty).
   exclusions documented in the spec header)
 - Smoke: **45 assertions**, `file://dist/index.html`, 0 console errors — the
   battery is now JSDoc-typed and covered by `typecheck:tests`
-- Sitemap: **596 routes / 558 info pages** generated from the seam (session 9:
+- Sitemap: **590 routes / 552 info pages** generated from the seam (session 9:
   the store rails' 48 info-routed labels; session 10: the category shelves'
   133; session 11: the airpods marketing page's 7 + the accessories grid's
-  45; session 13: the marketing pages' 95 labels — 31 net-new after slug
-  dedup — joined the `INFO_TITLES` derivation);
+  45; session 13: the marketing pages' labels joined the `INFO_TITLES` derivation;
+  session 14: the S14-7 re-routes moved nine labels out of the info set and the
+  canonical re-slugs consolidated the rest — 552 info pages);
   robots.txt rendered by the same seam + generator (one `VITE_SITE_URL` stamps
   both; the value resolves from the shell or a `.env` file via Vite `loadEnv`)
-- Build: `dist/index.html` **505.05 kB / 132.22 kB gzip**; CSS **49,567 bytes /
-  721 rules**; build time ~1.3 s
+- Build: `dist/index.html` **512.55 kB / 135.12 kB gzip**; CSS **49,567 bytes /
+  721 rules** (unchanged in session 14 — a data-only cycle); build time ~1.6 s
 - Gate: `npm run gate` — lint 0 errors · typecheck clean · tests green · build · e2e · smoke
 - A11y posture (session 8): the home page ships the sr-only `<h1>` the
   reference itself ships (`Apple (Singapore)` vs the reference's `Apple`);

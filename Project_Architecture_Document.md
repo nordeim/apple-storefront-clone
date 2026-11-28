@@ -1,12 +1,55 @@
-# apple-storefront-clone — Master Project Architecture Document (PAD) v2.2
+# apple-storefront-clone — Master Project Architecture Document (PAD) v2.3
 
 **Classification:** Internal Engineering Reference
 **Status:** DEFINITIVE, PRODUCTION-LOCKED BLUEPRINT
 **Companion Document:** `README.md` (quick start), `AGENTS.md` (agent traps), `CLAUDE.md` (conventions), `docs/reference-investigation.md` (parity dossier)
-**Last Updated:** 2026-11-28
+**Last Updated:** 2026-11-29
 **Audience:** Senior Engineers, Tech Leads, DevOps, and Onboarding Engineers
 **Rule:** Every architectural decision in this document traces to a specific rationale.
 Nothing is here "because it's popular."
+
+#### Revision Block — v2.3 (the session-14 seam text-fidelity cycle)
+
+- `[SR]` The session-14 cycle (2026-11-29, `docs/REMEDIATION_PLAN.md` session-14 section)
+  re-verified the pulled tree (`0291133`) — baseline gates exactly as documented (16/181
+  unit · 60/60 e2e · 45/45 smoke · 596 routes · 505.05 kB byte-equal · rootless PG 17
+  re-initialized per the documented recovery) — plus a read-only audit (**0 CRITICAL +
+  1 HIGH + 4 MEDIUM + 5 LOW + 5 INFO**; F1: the session-13 converter's 34/240/260-char
+  caps had cut 20 strings mid-word — 3 CTA labels and 17 copy strings, some seeded into
+  INFO_TITLES and the sitemap as junk page titles; F2: three constant heading ids
+  collided across same-kind sections (11 sections mislabelled by `aria-labelledby`);
+  F3: 11 br-join artifacts in measured text ("bestplace", "towatch" — the reference's
+  own `textContent` joins its `<br>`-split words, verified live: `<span>Why Apple is the
+  best<br>place to shop Mac.</span>`); F4: five routing deviations ("Shop Apple Watch" →
+  info while the reference routes to the store, verified live at `/sg/shop/goto/buy_watch`);
+  F5: the vision page's `section-routers` flattened into three overlapping sections, the
+  `section-foundation` missing, `section-experiences` modeled as a 2-card fragment of
+  its five subsections; F13: the same join class in the session-12 accessories seam —
+  15 chip labels) and a live-parity pass that re-verified the mobile navigation at
+  390×844 (bar byte-equal, 11 rows, navigate + close, zero console errors — no Tailwind
+  v4 display-toggling defect) and re-measured every patched string against the live
+  reference DOM.
+- `[FIX]` **The S14-3/S14-9 text-fidelity guards** (new spec tiers, RED-proven against the
+  shipped artifacts) make the class unshippable: no string ends mid-word at a converter
+  cap length, no sentence/colon br-join, no separator join — plus the seam data fixed
+  (20 full-text re-measurements; 11 marketing + 15 accessories label corrections; the
+  Displays badges; 8 canonical slug re-maps) and the routing re-aligned (Shop Apple
+  Watch/Home → the store, the five "X Accessories" directory links → the session-12
+  grids, the AirTag Buy → the configurator per D12, the footer Home → `#/home`).
+- `[FEAT]` **The vision page rebuilt to the measured reference structure (S14-8)**: hero →
+  foundation (the three intro statements) → design → the five experiences subsections
+  (Entertainment / Productivity / Photos and Videos / Connection / Apps) → visionOS →
+  technology → values → the two routers (accessories + developer) — 13 statement
+  sections with full-text copy, the sub-heads and CTA labels out of `paragraphs`, and
+  the section ids derived per index (S14-1). New e2e pins: the vision structure, the
+  unique-id invariant, the MarketingAccordion interaction, the routing families, and
+  the real Mac directory pin (26 links).
+- `[FIG]` Gates this cycle: lint 0 errors (3 accepted warnings) · typecheck ×2 clean ·
+  unit **16 files / 187 tests** (+6: the two guard tiers + the tabs pin) · build
+  **512.55 kB / 135.12 kB gzip** (CSS 49,567 B / 721 rules — unchanged: a data-only
+  cycle) · e2e **64/64** (46 pins + 18 axe scans) · 45/45 smoke, zero console errors ·
+  sitemap **596 → 590 routes / 558 → 552 info pages** (the re-routed labels left the
+  info set; idempotent). 34 screenshots (shot 34: the vision experiences close-up).
 
 #### Revision Block — v2.2 (the session-13 nav-main marketing-pages cycle)
 
@@ -713,7 +756,7 @@ apple-storefront-clone/
 ├── scripts/
 │   └── build-sitemap.mjs       ← regenerates public/sitemap.xml + public/robots.txt from the seam
 ├── public/
-│   ├── sitemap.xml             ← 596 routes, generated (npm run sitemap)
+│   ├── sitemap.xml             ← 590 routes, generated (npm run sitemap)
 │   └── robots.txt              ← generated alongside the sitemap (same VITE_SITE_URL)
 ├── docs/                       ← reference-investigation.md (parity dossier), DEPLOYMENT.md,
 │                                 REMEDIATION_PLAN.md (this cycle's audits), screenshots/,
@@ -919,7 +962,7 @@ credentials.
 | E2E — desktop | 1 | 8 | `tests/e2e/home.spec.ts` | Playwright (1440×900) |
 | E2E — mobile nav | 1 | 11 | `tests/e2e/mobile-navigation.spec.ts` | Playwright (iPhone 13 viewport, touch) |
 | E2E — store flow | 1 | 18 | `tests/e2e/store-flow.spec.ts` | Playwright (1440×900) |
-| E2E — marketing | 1 | 5 | `tests/e2e/marketing.spec.ts` | Playwright (1440×900) |
+| E2E — marketing | 1 | 9 | `tests/e2e/marketing.spec.ts` | Playwright (1440×900) |
 | E2E — a11y scans | 1 | 18 | `tests/e2e/a11y.spec.ts` | Playwright + @axe-core/playwright (WCAG 2 A+AA) |
 | File:// smoke battery | 1 | 45 assertions | `tests/e2e/smoke.mjs` | Playwright library |
 
@@ -938,9 +981,9 @@ credentials.
 
 - [ ] `npm run lint` exit 0
 - [ ] `npm run typecheck` && `npm run typecheck:tests` clean
-- [ ] `npm run test` — 16 files / 181 tests
+- [ ] `npm run test` — 16 files / 187 tests
 - [ ] `npm run build` — single-file `dist/index.html`
-- [ ] `npm run test:e2e` — 60 passed (42 pins + 18 axe scans)
+- [ ] `npm run test:e2e` — 64 passed (46 pins + 18 axe scans)
 - [ ] `npm run test:smoke` — 45 assertions, zero console errors
 - [ ] Docs touched in the same commit; counts in lockstep
 
@@ -951,8 +994,8 @@ credentials.
 ### 8.1 Production Build
 
 `npm run build` → `vite build` with `react()`, `@tailwindcss/vite`, and
-`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 505.05 kB /
-132.22 kB gzip this cycle; CSS 49,567 bytes / 721 rules). No server bundle, no image
+`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 512.55 kB /
+135.12 kB gzip this cycle; CSS 49,567 bytes / 721 rules). No server bundle, no image
 pipeline, no external requests.
 
 ### 8.2 Environment Variables
@@ -1031,7 +1074,7 @@ The full remediation history of this cycle: `docs/REMEDIATION_PLAN.md`.
 | `src/lib/catalog.ts` | 362 | The typed catalog: 8 categories, 12 products, option matrices, search, the exported `DeviceCategoryId` |
 | `src/lib/cart.ts` | 103 | The bag reducer + price/line-key seam (`bagLineSummary`) |
 | `src/lib/checkout.ts` | 49 | Singapore checkout validation + order numbers |
-| `src/lib/sitemap.ts` | 84 | Route-set enumeration + sitemap.xml/robots.txt rendering (596 URLs — 4 bare + 16 store incl. the 7 accessories views + 6 marketing + 12 product + 558 info) |
+| `src/lib/sitemap.ts` | 84 | Route-set enumeration + sitemap.xml/robots.txt rendering (590 URLs — 4 bare + 16 store incl. the 7 accessories views + 6 marketing + 12 product + 552 info) |
 | `src/lib/site-content.ts` | 475 | Nav links (the device categories route to the marketing pages), the per-category flyout content model, footer directory, info-page map |
 | `src/index.css` | 619 | Tailwind v4 tokens + all component CSS (incl. the marketing-* family) + source scoping |
 | `src/components/GlobalNav.tsx` | 253 | Desktop flyouts, mobile accordion menu, bag popover, search trigger |
@@ -1047,8 +1090,8 @@ The full remediation history of this cycle: `docs/REMEDIATION_PLAN.md`.
 | `src/lib/accessories-category-pages.ts` | 1,080 | The seven per-category accessories grids' measured models (D16 — 226 curated cards incl. 26 promos, chips, galleries, value props, index navs; `ACCESSORIES_CATEGORY_INFO_LABELS`; generated from the live captures by the session-12 converter) |
 | `src/components/AirPodsSections.tsx` | 161 | The marketing-page family rendering (the keyboard-focusable consider scroller) |
 | `src/components/AccessoriesSections.tsx` | 267 | The grid-page family rendering (the WAI-ARIA tabs over the curated grid; parameterized by an optional model prop — the all-page constants default, the per-category models render the same family, D16) |
-| `src/lib/marketing-pages.ts` | 1,308 | The six nav-main marketing pages' measured models (D17 — chapternavs, line-up galleries, value props, cards/accordion/directory sections, the vision statement family; `MARKETING_INFO_LABELS`; generated from the live captures by the session-13 converter) |
-| `src/components/MarketingSections.tsx` | 334 | The nav-main marketing family rendering (chapternav, the tabbed/plain line-up gallery, value props, banner cards, accordion, directory, statement sections) |
+| `src/lib/marketing-pages.ts` | 1,356 | The six nav-main marketing pages' measured models (D17 — chapternavs, line-up galleries, value props, cards/accordion/directory sections, the vision statement family rebuilt to the measured structure in session 14; `MARKETING_INFO_LABELS`; hand-maintained measured data — the scratch converter expired, every patch re-measured against the live reference) |
+| `src/components/MarketingSections.tsx` | 358 | The nav-main marketing family rendering (chapternav, the tabbed/plain line-up gallery, value props, banner cards, accordion, directory, statement sections; per-section-index heading ids since session 14) |
 | `src/pages/MarketingPage.tsx` | 33 | The marketing route page (PageTitle h1 + sections + the superset "Shop X" band to the store) |
 | `src/lib/slug.ts` | 9 | The one label→slug grammar (extracted session 9 to keep the module graph acyclic) |
 | `src/components/StoreRails.tsx` | 223 | The rail + quick-links rendering (measured card anatomy, theme-coloured editorial cards) + the category shelf family (CategoryShelves, the D12 product card with its Buy deep link) |

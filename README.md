@@ -19,11 +19,11 @@ Apple's proprietary assets were deliberately not copied or hot-linked.
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest, jsdom — 16 files / 181 tests) |
+| Unit tests | `npm run test` (Vitest, jsdom — 16 files / 187 tests) |
 | Production build (single file → `dist/index.html`) | `npm run build` |
-| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 60 tests incl. 18 axe-core a11y scans) |
+| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 64 tests incl. 18 axe-core a11y scans) |
 | File-protocol smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
-| Regenerate `public/sitemap.xml` (596 routes) | `npm run sitemap` |
+| Regenerate `public/sitemap.xml` (590 routes) | `npm run sitemap` |
 | Clean gate order | `npm run lint && npm run typecheck && npm run typecheck:tests && npm run test && npm run build && npm run test:e2e && npm run test:smoke` |
 
 The Playwright E2E suite boots the production build (`npm run build` then `vite preview --host 127.0.0.1 --port 4173`),
@@ -43,9 +43,9 @@ npm run dev          # → http://localhost:5173
 
 ```bash
 npm run typecheck    # clean, no output
-npm run test         # 16 files / 181 tests passed
-npm run build        # dist/index.html (~505.05 kB single file)
-npm run test:e2e     # 60 passed (42 pins + 18 axe a11y scans)
+npm run test         # 16 files / 187 tests passed
+npm run build        # dist/index.html (~512.55 kB single file)
+npm run test:e2e     # 64 passed (46 pins + 18 axe a11y scans)
 ```
 
 Node.js ≥ 20 (verified on Node 24); npm is the package manager and `package-lock.json` is the lockfile.
@@ -163,7 +163,7 @@ The app reads **no** environment variables. One optional variable drives the sit
 
 ## SEO
 
-`public/sitemap.xml` (596 routes) is generated from the tested `src/lib/sitemap.ts` seam — never a
+`public/sitemap.xml` (590 routes) is generated from the tested `src/lib/sitemap.ts` seam — never a
 hand-maintained list. `public/robots.txt` and `index.html` (OG/Twitter meta, JSON-LD WebSite+Organization)
 are part of the same deliverable — one `VITE_SITE_URL` value stamps both the sitemap's base and the
 robots.txt `Sitemap:` directive. Honest limitation: hash routing means search engines collapse every
