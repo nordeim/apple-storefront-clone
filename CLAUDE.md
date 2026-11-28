@@ -109,14 +109,15 @@ connect to it): `bash docs/setup_pg_z.sh` — see `docs/DEPLOYMENT.md` §4.
 | `npm run preview` | Serve `dist/` (bind `--host 127.0.0.1`) |
 | `npm run lint` | ESLint 10 flat config — must exit 0 |
 | `npm run typecheck` / `npm run typecheck:tests` | `tsc --noEmit` (app / tests+configs) |
-| `npm run test` | Vitest run (9 files / 102 tests) |
-| `npm run test:e2e` | Playwright (27 tests; builds + serves the artifact) |
+| `npm run test` | Vitest run (10 files / 105 tests) |
+| `npm run test:e2e` | Playwright (28 tests; builds + serves the artifact) |
 | `npm run test:smoke` | 45-assertion file:// battery over `dist/` |
 | `npm run sitemap` | Regenerate `public/sitemap.xml` + `public/robots.txt` (156 routes) |
 
 ## Testing Strategy
 
-- **Unit (Vitest, jsdom)** — the pure seam `src/lib/*`: catalog, cart
+- **Unit (Vitest, jsdom)** — the pure seam `src/lib/*` (plus the one component-level
+  spec, `ErrorBoundary.test.tsx`): catalog, cart
   reducer, router parsing (incl. malformed inputs), money/GST, checkout
   validation, flyout content model, sitemap route enumeration.
 - **E2E (Playwright, production build)** — `home.spec.ts` (tokens, the

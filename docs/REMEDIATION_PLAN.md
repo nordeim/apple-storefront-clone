@@ -585,3 +585,62 @@ Inputs: the operator's standing review prompt on a fresh pull (HEAD `6a3f2be` = 
 - `ORDER_NO` at `router.ts:17` is module-private today; exporting it adds a consumer in `StaticPages.tsx:40` (deleting the duplicate) — no new tests needed (the regex is pinned in `router.test.ts`; the support-page lookup flow is pinned in store-flow e2e).
 - INFO-2 (SITE name duplication with the static `index.html` boot title) is **accepted as-is**: the shell title is deliberately static pre-hydration (no generator exists to stamp it; adding an export with zero TS consumers would be dead code — the repo forbids it). INFO-3 (sort reset on chip switch) is the documented remount-key decision — no change. INFO-4 (random holiday initializer) is likewise accepted (see S6-4: React's documented CSR idiom; removing the randomness would break the 4-colourway parity behavior).
 - Counts will move: unit 99 → 102 (+3 bagLineSummary tests, S6-2), e2e 26 → 27 (+1 in-app focus pin, S6-1) — the lockstep sweep (S6-7) covers README/AGENTS/CLAUDE/PAD/SKILL in the same commit.
+
+# Session 7 (2026-11-28 — the robustness + lockstep-integrity cycle)
+
+Inputs: the operator's standing review prompt on a fresh pull (HEAD `9ffb287` = the session-6 docs sweep + the session_6.md log paste; `git pull` brought in the log only). Baseline re-observed exactly as documented (lint 0 errors + 3 accepted warnings · typecheck ×2 clean · 9 files/102 unit · build 309.27 kB / 93.24 kB gzip · e2e 27/27 · smoke 45/45, zero console errors · sitemap 156 routes · PostgreSQL 17.12 accepting connections at `postgresql://postgres:postgres@127.0.0.1:5432/app_db` — data dir and server survived the sandbox recycle this cycle). A read-only subagent audit (web-application methodology, `skills/` excluded) ran over the session-5+6 diffs plus a full-tree hygiene sweep; the live-parity pass re-measured the clone's mobile navigation, re-extracted **all eleven reference flyout models from the live DOM and re-diffed them programmatically against `flyoutSections()`** (the session-6 Vite ssrLoadModule harness, re-run), and spot-checked the reference's hero/promo surfaces.
+
+## Session-7 findings (counts by severity)
+
+| Severity | Count | Key items |
+|---|---|---|
+| CRITICAL | 0 | — |
+| HIGH | 0 | — |
+| MEDIUM | 0 | — |
+| LOW | 2 | `README.md:48` Quick-start block still says `26 passed` for the e2e suite (the one count-lockstep drift — session-6's sweep missed it); `Tile.tsx:91` carries `aria-pressed={!playing}` on a label-flipping play/pause button (APG anti-pattern: pressed-state + changing label are contradictory channels; the gallery's play/pause is the correct label-flip-only pattern) |
+| INFO | 5 | no ErrorBoundary anywhere (a render throw blanks the whole SPA — deferred debt from sessions 5+6, landed this cycle); `BagSummary` still exported from `pages/BagPage.tsx` and imported page→page by `CheckoutPage.tsx` (the session-5/6 refactor pattern missed this straggler); BagPopover non-modal focus announcement (accepted as-is); `flyoutSections()` recomputed per render (accepted — microseconds); audit-scope notes (documentation only) |
+
+### Verified evidence (this cycle)
+
+- **Baseline:** every documented gate re-run and green at HEAD (counts above) — the docs' claims hold, except the single README:48 drift.
+- **Audit:** 0 C/H/M · 2 LOW + 5 INFO; 8 project traps all PASS; count lockstep verified everywhere except README:48. The session-6 seams re-audited clean: the `?buy` focus gate's edge routes probed at runtime (ghost product → 404 gets the standard `<main>` focus reset — correct; `?buy` on non-product routes inert; discrete query-key grammar holds), `bagLineSummary`/`ORDER_NO` single-sourcing intact, XSS surface clean (no `innerHTML`/`dangerouslySetInnerHTML`/`eval` anywhere in `src/`).
+- **Live parity (agent-browser, both sites):** clone mobile navigation working at 390×844 (bar byte-equal to the pins: logo x=0 w=48, Search x=246, Bag x=294, Menu x=342; menu opens top=48/h=796, rgba(22,22,23,.98); 11 rows; Mac expansion renders the 3-section / 26-link content; "Compare Mac" navigates + closes; zero console errors) — **no Tailwind v4 display-toggling defect**. All eleven reference flyout models re-extracted fresh from the live DOM and diffed against the seam: **ALL ELEVEN MATCH**. Reference hero ("Gifts they'll love." → iPhone Duo → iPhone 18 Pro), 6-promo sequence (HomeView · iPad · Watch S12 · MacBook Pro ×2 · AirPods Pro 3) and bar pins re-measured — **no reference drift this cycle**. Environment-limited: the reference's TV+ gallery rail did not lazy-load into this session's headless render; gallery parity rests on the session-4/5/6 live extractions (9/9 titles) + the clone's own e2e gallery pins (9 cards / 9 dots verified in the DOM this cycle).
+- **Test/SEO surface:** `vitest.config.ts` + `playwright.config.ts` present and passing (the standing config-file instruction); sitemap 156 routes regenerated from the seam; robots.txt/meta surface verified unchanged.
+
+## Remediation ToDo list (session 7 — S7-*)
+
+### Phase 1 — TDD fixes and pins
+
+- **S7-1 (LOW-1, docs lockstep).** `README.md:48`: `26 passed` → `27 passed` (the e2e count in the Quick-start verify block). Pure docs fix.
+- **S7-2 (LOW-2, RED first).** Drop `aria-pressed={!playing}` from the holiday play/pause button (`Tile.tsx:91`); the flipping `aria-label` ("Pause/Play Holiday 2026 animation") is the state channel, matching the gallery's play/pause pattern. TDD: extend `home.spec.ts`'s holiday test with a RED assertion — the button must NOT carry `aria-pressed` (it fails today: the attribute is present).
+- **S7-3 (coverage pin, unit).** `cart.test.ts` bagLineSummary block gains "drops unknown choice ids without leaking separators" — `bagLineSummary(phone, { selections: { color: "bogus", storage: "256" } })` → `"256GB · Qty 1"` (already-correct behavior pinned; `describeSelections` skips unknown ids).
+- **S7-4 (coverage pin, e2e +1).** `store-flow.spec.ts` gains "?buy on a ghost product still resets focus to main (404 path)": `#/product/ghost?buy` → not-found copy visible + `document.activeElement.id === "main"` — pins the App.tsx gate's false branch, previously only reasoned.
+- **S7-5 (coverage pin, same test).** The existing "in-app Buy CTA keeps the configurator heading focused" test gains back/forward assertions: `goBack()` → home, `goForward()` → `#/product/iphone-duo?buy` + URL + `#configure-heading` still focused — the popstate path, previously unpinned (no count change).
+- **S7-6 (INFO-2 → landed, RED first).** `src/components/ErrorBoundary.tsx` — a class boundary (`static getDerivedStateFromError`) rendering a graceful fallback ("Something went wrong." + a "Return to the homepage" link + a reload link) styled as a PageShell-compatible section; `App.tsx` wraps `<RouteView route={route} />` so the nav/footer shell survives a render throw (page-level boundary, the right granularity for a route-switched SPA). TDD: `src/components/ErrorBoundary.test.tsx` — the repo's first component-level unit test (React 19 `act` + `createRoot` in jsdom, zero new deps): renders children when no error; renders the fallback + home link when a child throws (console noise mocked inside the test). Test posture documented as a new row in PAD §7.1.
+- **S7-7 (INFO-5 → landed, mechanical).** `BagSummary` moves from `src/pages/BagPage.tsx` to `src/components/BagSummary.tsx` (both components, both pages import it from `components/`) — the page→page import is gone; behavior unchanged (typecheck + full gate verify).
+
+### Phase 2 — verification
+
+- **S7-8.** Full gate on the remediated tree; live dev-server verification of the touched surfaces (holiday play/pause label flip with no aria-pressed; bag page + checkout still render the summary rows; the ghost-?buy 404 path live).
+
+### Phase 3 — evidence, docs, delivery
+
+- **S7-9.** Re-capture the 17-shot screenshot family via `scripts/capture-screenshots.sh` on the remediated dev server.
+- **S7-10.** Docs lockstep sweep: counts (unit 102 → 105 (+3: unknown-choice pin + 2 boundary tests), e2e 27 → 28 (+1 ghost pin), plus the component-test posture row) across README/AGENTS/CLAUDE/PAD §7.1/SKILL project_state; PAD → v1.6 revision block; SKILL → v1.6.0; `docs/reference-investigation.md` session-7 re-verification row; worklog Task 119; `.env.example` re-verified unchanged.
+- **S7-11.** Atomic Conventional Commits on `main` → SSH-wrapper push (`docs/ssh_git_wrapper_v3.py --remote git@github.com:nordeim/apple-storefront-clone.git`).
+
+## Plan validation notes (session 7, against the codebase)
+
+- `Tile.tsx:91` read in full: the button's `aria-label` already flips with state; no spec pins `aria-pressed` on the holiday button (grep over `tests/e2e/**` — only `data-playing` is pinned by home.spec.ts:117 + smoke.mjs:100), so removing the attribute is pin-safe; the RED assertion makes the removal itself test-driven.
+- `README.md:48` verified stale by direct read + `git show 06a737b` (the sweep commit updated line 24 but missed the Quick-start block).
+- `bagLineSummary` unknown-choice behavior read in `cart.ts:43-59` — `describeSelections`'s `find` skips unmatched ids, so the pin lands GREEN (labeled a coverage pin, not a bug fix).
+- The `#/product/ghost?buy` route was probed at runtime this cycle (audit's probe + parseHash): `parseHash` yields `not-found`, the App.tsx:62 gate is false → the standard scroll+focus reset runs — the S7-4 e2e pins verified behavior. The ghost-path e2e needs `page.reload()` after `goto` (hash-navigation effect timing, matching the hostile-routes test's pattern at store-flow.spec.ts:84-86).
+- `ErrorBoundary` placement read in `App.tsx` (full file): wrapping `RouteView` inside `<main>` keeps `GlobalNav`/`Footer`/skip-link alive and the `<main>` focus contract untouched; the boundary must never wrap the `GlobalNav` (the bag popover's state must survive a route crash). The test file lands under `src/components/` so the main `tsconfig.json` (`include: ["src", ...]`, `jsx: react-jsx`) and `vitest.config.ts` (`src/**/*.test.{ts,tsx}`) both cover it without config changes; `React.act` + `IS_REACT_ACT_ENVIRONMENT` is the React-19-documented harness; react-dom/client is an existing dependency (`react-dom` 19.2.6 — no new packages).
+- `BagSummary` move: `BagPage.tsx` (full read) + `CheckoutPage.tsx`'s import line verified; both exports are components so no react-refresh warning change (the 3 accepted warnings live in ProductArt/ProductCard/BagContext — checked, unaffected).
+- Count moves: unit 102 → 105 (+3), e2e 27 → 28 (+1) — the lockstep sweep (S7-10) covers README/AGENTS/CLAUDE/PAD/SKILL in the same commits.
+
+### Execution addendum (session 7, as-run corrections)
+
+- S7-4 as executed: the ghost-path pin first drove a fresh-load `goto` + `reload` and failed RED for the right reason — the shell's effect only runs its scroll/focus reset on **in-app navigation** (`isNavigation` guard; fresh loads never move focus by design). The landed test drives an in-app hash navigation (`window.location.hash = "#/product/ghost?buy"` from home) and pins not-found + `<main>` focus — the pin now matches the documented behavior instead of an assumed one. The plan's original "needs page.reload() after goto()" note was wrong; this addendum records the correction.
+- S7-5 as executed: the first `goBack()` assertion (`#/` URL) failed RED because the browser collapses the hash to the bare entry URL on history navigation — the landed tail asserts the home content is visible (robust to URL shape), then `goForward()` back onto the `?buy` route with `#configure-heading` focused.
+- Counts as landed: unit 102 → **105** (+1 unknown-choice pin, +2 `ErrorBoundary` spec), e2e 27 → **28** (+1 ghost pin); build 310.4 kB / 93.7 kB gzip; CSS 33,654 bytes / 518 rules.

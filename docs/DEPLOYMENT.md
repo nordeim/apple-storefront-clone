@@ -132,9 +132,9 @@ this automatically).
 
 ```bash
 npm run lint && npm run typecheck && npm run typecheck:tests
-npm run test                 # 9 files / 102 tests
-npm run build                # single file, ~309 kB
-npm run test:e2e             # 27 Playwright tests against the artifact
+npm run test                 # 10 files / 105 tests
+npm run build                # single file, ~310 kB
+npm run test:e2e             # 28 Playwright tests against the artifact
 npm run test:smoke           # 45 assertions, zero console errors
 ```
 

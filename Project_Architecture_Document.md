@@ -1,4 +1,4 @@
-# apple-storefront-clone — Master Project Architecture Document (PAD) v1.5
+# apple-storefront-clone — Master Project Architecture Document (PAD) v1.6
 
 **Classification:** Internal Engineering Reference
 **Status:** DEFINITIVE, PRODUCTION-LOCKED BLUEPRINT
@@ -7,6 +7,39 @@
 **Audience:** Senior Engineers, Tech Leads, DevOps, and Onboarding Engineers
 **Rule:** Every architectural decision in this document traces to a specific rationale.
 Nothing is here "because it's popular."
+
+#### Revision Block — v1.6 (the session-7 robustness + lockstep-integrity cycle)
+
+- `[SR]` The session-7 cycle (2026-11-28, `docs/REMEDIATION_PLAN.md` session-7 section)
+  re-verified the pulled tree (9ffb287) — baseline gates exactly as documented (9/102 ·
+  27/27 e2e · 45/45 smoke · 156 routes) — plus a read-only audit (0 CRITICAL/HIGH/MEDIUM;
+  2 LOW + 5 INFO) and a fresh agent-browser parity sweep: the clone's mobile navigation
+  re-measured working at 390×844 and **all eleven reference flyout models re-extracted from
+  the live DOM and programmatically re-diffed against `flyoutSections()` — all match**;
+  hero and promo sequences also match (the reference's TV+ gallery rail did not lazy-load
+  into this session's headless render — parity rests on the session-4/5/6 extractions
+  plus the clone's own e2e gallery pins).
+- `[FIX]` Audit fixes: the `README.md` Quick-start e2e count drift (26 → the live count);
+  the holiday play/pause button no longer carries `aria-pressed` (the flipping label is
+  the single state channel — the gallery's pattern, pinned by the extended home e2e);
+  `BagSummary` moved from `pages/BagPage.tsx` to `components/BagSummary.tsx` (the
+  page→page import is gone — the session-5/6 sharing pattern applied to the last
+  straggler).
+- `[FEAT]` `ErrorBoundary` (`src/components/ErrorBoundary.tsx`) wraps `RouteView` so a
+  render throw degrades to a graceful in-shell fallback (home + reload affordances)
+  instead of a blank root — the deferred debt from sessions 5+6, now landed with the
+  repo's first render-level component spec (`ErrorBoundary.test.tsx`, React 19 `act` in
+  jsdom — the test posture gains the component tier in §7.1). Coverage pins added: the
+  ghost-product `?buy` 404 focus path (e2e), the back/forward popstate focus path
+  (appended to the in-app Buy CTA e2e), and the unknown-choice-id bag-line case (unit).
+- `[VERIFY]` Full gate green after the change: lint 0 errors · typecheck clean ×2 · unit
+  10 files / 105 tests · build 310.4 kB / 93.7 kB gzip (CSS 33,654 bytes / 518 rules) ·
+  e2e 28/28 · smoke 45/45, zero console errors. Live on the dev server: the holiday
+  button flips labels with no `aria-pressed`; the bag + checkout ledgers render; the
+  ghost `?buy` route shows not-found with focus on `<main>`.
+- `[CHORE]` README/AGENTS/CLAUDE/PAD/SKILL/DEPLOYMENT swept in lockstep (counts 9/102 →
+  10/105 unit, 27 → 28 e2e, 309.3 → 310.4 kB, CSS 33,212 → 33,654 bytes); the 17
+  screenshots re-captured; worklog Task 119.
 
 #### Revision Block — v1.5 (the session-6 re-verification + grammar-hygiene cycle)
 
@@ -289,7 +322,8 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 - **Decision:** All logic in `src/lib/*` (catalog, cart reducer, router, money, checkout
   validation, content, sitemap); the single shared store is
   `src/context/BagContext.tsx` (React context + reducer, in-memory only).
-- **Rationale:** The seam is unit-testable without rendering (102 tests); "no backend,
+- **Rationale:** The seam is unit-testable without rendering (105 tests, incl. the
+  one render-level component spec); "no backend,
   nothing transmitted" is an explicit documented deviation, not an accident.
 - **Consequences:** Bag/order state resets on reload (documented limitation).
 - **Alternatives rejected:** localStorage persistence (silently changes the privacy
@@ -306,8 +340,9 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 
 **ADR-006: Three-tier test suite against the production artifact.**
 - **Context:** The dev server is not the build; parity claims must be executable.
-- **Decision:** Vitest for the seam (102 tests); Playwright against
-  `npm run build && vite preview --host 127.0.0.1` (27 tests: tokens,
+- **Decision:** Vitest for the seam + the one render-level component spec (105 tests);
+  Playwright against
+  `npm run build && vite preview --host 127.0.0.1` (28 tests: tokens,
   mobile-navigation state machine, store flow incl. hostile routes); the exhaustive
   45-assertion `file://` smoke battery as the parity net.
 - **Rationale:** The token assertions ARE the parity evidence; the mobile spec pins
@@ -589,10 +624,11 @@ credentials.
 
 | Category | Files | Tests | Location | Framework |
 |---|---|---|---|---|
-| Unit (seam) | 9 | 99 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
+| Unit (seam) | 9 | 103 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
+| Unit (component) | 1 | 2 | `src/components/ErrorBoundary.test.tsx` | Vitest 4 + jsdom (React `act`) |
 | E2E — desktop | 1 | 8 | `tests/e2e/home.spec.ts` | Playwright (1440×900) |
 | E2E — mobile nav | 1 | 11 | `tests/e2e/mobile-navigation.spec.ts` | Playwright (iPhone 13 viewport, touch) |
-| E2E — store flow | 1 | 7 | `tests/e2e/store-flow.spec.ts` | Playwright (1440×900) |
+| E2E — store flow | 1 | 9 | `tests/e2e/store-flow.spec.ts` | Playwright (1440×900) |
 | File:// smoke battery | 1 | 45 assertions | `tests/e2e/smoke.mjs` | Playwright library |
 
 ### 7.2 Test Patterns
@@ -610,9 +646,9 @@ credentials.
 
 - [ ] `npm run lint` exit 0
 - [ ] `npm run typecheck` && `npm run typecheck:tests` clean
-- [ ] `npm run test` — 9 files / 102 tests
+- [ ] `npm run test` — 10 files / 105 tests
 - [ ] `npm run build` — single-file `dist/index.html`
-- [ ] `npm run test:e2e` — 27 passed
+- [ ] `npm run test:e2e` — 28 passed
 - [ ] `npm run test:smoke` — 45 assertions, zero console errors
 - [ ] Docs touched in the same commit; counts in lockstep
 
@@ -623,8 +659,8 @@ credentials.
 ### 8.1 Production Build
 
 `npm run build` → `vite build` with `react()`, `@tailwindcss/vite`, and
-`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 309.3 kB /
-93.2 kB gzip this cycle; CSS 33.2 kB / 501 rules). No server bundle, no image
+`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 310.4 kB /
+93.7 kB gzip this cycle; CSS 33.7 kB / 518 rules). No server bundle, no image
 pipeline, no external requests.
 
 ### 8.2 Environment Variables
@@ -710,7 +746,9 @@ The full remediation history of this cycle: `docs/REMEDIATION_PLAN.md`.
 | `src/components/ProductArt.tsx` | 449 | The original SVG art library |
 | `src/components/EntertainmentGallery.tsx` | 153 | The TV+ gallery state machine (dwell, pause, keys) |
 | `src/components/BagLineRow.tsx` | 33 | The shared bag-line summary row (popover + checkout aside) |
-| `src/App.tsx` | 91 | Route switch, navigation side-effects (title via the route-title seam) |
+| `src/components/ErrorBoundary.tsx` | 51 | Page-level render guard: graceful fallback, nav/bag state survive |
+| `src/components/BagSummary.tsx` | 25 | The shared Subtotal/Delivery/GST/Total ledger (bag page + checkout) |
+| `src/App.tsx` | 98 | Route switch, navigation side-effects, the page-level ErrorBoundary |
 | `tests/e2e/mobile-navigation.spec.ts` | 148 | The mobile-menu contract (bar layout, accordion, the v4 display trap) |
 | `tests/e2e/smoke.mjs` | 131 | The exhaustive file:// parity battery (45 assertions) |
 | `vite.config.ts` | 30 | Build pipeline + dep-scan scoping (ADR-003) |

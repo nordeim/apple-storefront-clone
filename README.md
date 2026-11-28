@@ -19,9 +19,9 @@ Apple's proprietary assets were deliberately not copied or hot-linked.
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest, jsdom — 9 files / 102 tests) |
+| Unit tests | `npm run test` (Vitest, jsdom — 10 files / 105 tests) |
 | Production build (single file → `dist/index.html`) | `npm run build` |
-| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 27 tests) |
+| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 28 tests) |
 | File-protocol smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
 | Regenerate `public/sitemap.xml` | `npm run sitemap` |
 | Clean gate order | `npm run lint && npm run typecheck && npm run typecheck:tests && npm run test && npm run build && npm run test:e2e && npm run test:smoke` |
@@ -43,9 +43,9 @@ npm run dev          # → http://localhost:5173
 
 ```bash
 npm run typecheck    # clean, no output
-npm run test         # 9 files / 102 tests passed
-npm run build        # dist/index.html (~309 kB single file)
-npm run test:e2e     # 26 passed
+npm run test         # 10 files / 105 tests passed
+npm run build        # dist/index.html (~310 kB single file)
+npm run test:e2e     # 28 passed
 ```
 
 Node.js ≥ 20 (verified on Node 24); npm is the package manager and `package-lock.json` is the lockfile.
@@ -84,7 +84,8 @@ src/lib/        pure, tested logic: catalog, cart reducer, router (hash), money,
 src/hooks/      useRoute (hashchange), media-query / in-view hooks
 src/context/    BagContext (in-memory only)
 src/components/ GlobalNav (desktop flyouts + mobile accordion menu), SearchPanel, Tile, EntertainmentGallery,
-                Footer, ProductArt (original SVG art)
+                Footer, ProductArt (original SVG art), ErrorBoundary (page-level render guard),
+                BagLineRow + BagSummary (shared bag-line/summary rows)
 src/pages/      one file per route
 tests/e2e/      Playwright suite (home, mobile-navigation, store-flow) + the file:// smoke battery
 scripts/        build-sitemap.mjs (generates public/sitemap.xml from the tested seam)
