@@ -104,4 +104,16 @@ test.describe("store flow (desktop)", () => {
     await page.goto("/#/store");
     await expect(page).toHaveTitle("Store - Apple (Singapore)");
   });
+
+  test("in-app Buy CTA keeps the configurator heading focused", async ({ page }) => {
+    // In-app navigation into ?buy (not a fresh load): the Configurator's
+    // heading must own focus — the shell's <main> focus reset must not
+    // steal it back on this path.
+    await page.goto("/");
+    await page.getByRole("link", { name: "Buy, iPhone Duo" }).first().scrollIntoViewIfNeeded();
+    await page.getByRole("link", { name: "Buy, iPhone Duo" }).first().click();
+    await expect(page).toHaveURL(/#\/product\/iphone-duo\?buy$/);
+    await expect(page.locator("#configure-heading")).toBeVisible();
+    expect(await page.evaluate(() => document.activeElement?.id)).toBe("configure-heading");
+  });
 });

@@ -57,8 +57,12 @@ function Shell() {
     previousPath.current = path;
     if (!isNavigation) return;
     // Hash routing never reloads the page, so reset scroll and focus the way a real navigation would.
-    if (!hasBuyParam(hash)) window.scrollTo(0, 0);
-    mainRef.current?.focus({ preventScroll: true });
+    // A product deep link (?buy) hands focus to the Configurator's heading — its
+    // child effect runs first, so the shell's focus reset would steal it back.
+    if (!(route.name === "product" && hasBuyParam(hash))) {
+      window.scrollTo(0, 0);
+      mainRef.current?.focus({ preventScroll: true });
+    }
   }, [route, hash, path]);
 
   return (
