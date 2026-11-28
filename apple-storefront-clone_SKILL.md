@@ -8,12 +8,12 @@ description: >
   to it. Covers the architecture, design tokens, the Tailwind v4 trap log, the
   three-tier test suite, the build/SEO posture, and the hard lessons of the 2026-11
   remediation cycle.
-version: 1.9.0
+version: 2.0.0
 last_updated: 2026-11-28
 tags: [react, vite, tailwindcss-v4, typescript, spa, e-commerce-clone, e2e-testing, accessibility]
 ---
 
-# apple-storefront-clone — Engineering Skill (v1.9.0)
+# apple-storefront-clone — Engineering Skill (v2.0.0)
 
 > **What this is:** the distilled, codebase-verified engineering reference for
 > the remediated `apple-storefront-clone`. Every number below was measured in
@@ -48,8 +48,8 @@ entertainment/support pages. Philosophy:
 | TypeScript | 5.9.3 | `strict`, `noUnusedLocals/Parameters`, bundler resolution, `@/*` → `src/*` |
 | Vite | 7.3.7 | `react()` + `@tailwindcss/vite` + `viteSingleFile()`; dep scan pinned to `index.html` |
 | Tailwind CSS | 4.1.17 | CSS-first: `@theme` tokens in `src/index.css`; NO JS config; NO PostCSS config |
-| Vitest | 4.1.12 (jsdom 29.1.1) | 11 files / 119 tests (10 seam — incl. the store-rails spec — + 1 render-level component spec, 4 cases) |
-| Playwright | 1.65.1 | 42 e2e over the production build (30 pins + 12 axe-core a11y scans); Chromium only (WebKit unavailable in the sandbox) |
+| Vitest | 4.1.12 (jsdom 29.1.1) | 14 files / 147 tests (13 seam — incl. the store-rails, category-rails, airpods-page and accessories-page specs — + 1 render-level component spec, 4 cases) |
+| Playwright | 1.65.1 | 50 e2e over the production build (35 pins + 15 axe-core a11y scans); Chromium only (WebKit unavailable in the sandbox) |
 | axe-core | @axe-core/playwright ^4.14.1 (devDep) | WCAG 2 A+AA scan tier (`tests/e2e/a11y.spec.ts`); nothing ships in the single-file artifact |
 | ESLint | 10.15.0 (typescript-eslint 8.74.0) | Flat config; `skills/**` and `docs/**` ignored |
 | (removed) | — | `clsx`/`tailwind-merge` and the dead `cn()` helper were dropped in session 3 (zero importers) |
@@ -152,7 +152,7 @@ measured store editorial rails + the quick-links strip (68 cards; catalog
 matches route to product pages with prices derived from THIS clone's catalog —
 deviation D10; every other card carries the reference's measured text routed
 to info pages). The sitemap seam (`src/lib/sitemap.ts`)
-enumerates 204 routes from exactly these sources — the route set can never
+enumerates 389 routes from exactly these sources — the route set can never
 drift from the catalog.
 
 ## §8 Accessibility Implementation
@@ -215,11 +215,11 @@ real screen readers (documented Unknown).
 
 ```bash
 npm run lint && npm run typecheck && npm run typecheck:tests   # 0 / clean / clean
-npm run test                       # 11 files / 119 tests
-npm run build                      # dist/index.html ~322 kB (CSS 35.8 kB)
-npm run test:e2e                   # 42/42 (30 pins + 12 axe scans)
+npm run test                       # 14 files / 147 tests
+npm run build                      # dist/index.html ~382 kB (CSS 45.8 kB)
+npm run test:e2e                   # 50/50 (35 pins + 15 axe scans)
 npm run test:smoke                 # 45 assertions, 0 console errors
-npm run sitemap                    # if routes changed: regenerate + re-check 204→N
+npm run sitemap                    # if routes changed: regenerate + re-check 389→N
 ```
 
 Plus: counts swept in README/PAD/SKILL; no `TODO`/placeholder text; docs and
@@ -243,7 +243,7 @@ code in the same commit; `git status` clean before the SSH-wrapper push.
    battery was ported into `@playwright/test` specs so the parity evidence
    lives in the gate, not in an optional script.
 6. **Generate what you can derive.** The sitemap seam derives the full route
-   set (204 URLs at the 2026-11-28 session-9 measurement — the store rails' info labels joined the derivation) from the catalog + content
+   set (389 URLs at the 2026-11-28 session-11 measurement — the store-rails, category-rails, airpods-page and accessories-page info labels all joined the derivation) from the catalog + content
    seam; hand-maintained artifacts drift by construction. The flyout content
    model and the robots.txt renderer are derived by the same rule.
 7. **Extract a tab-title seam the moment two surfaces disagree about a label**
@@ -333,6 +333,22 @@ code in the same commit; `git status` clean before the SSH-wrapper push.
    reference ships real duplications (the CONTINUITY card twice on its
    iPhone page) — measured content is kept verbatim and the component keys
    carry the index, because label keys collide on faithful data.
+18. **A nav destination's page FAMILY is the parity unit, and lookup maps
+   key by what they claim to key by** (session 11): (a) the nav's AirPods
+   link opens a marketing page and the Accessories link a filtered grid —
+   neither is a "Shop X" shelf sequence, so parity meant modeling each
+   family on its own terms (D14/D15: the sr-only h1 pattern, the chapternav,
+   the tabs) rather than stretching the shelf model to fit; (b) the audit's
+   dead-key finding — `PRODUCT_EYEBROWS` keyed one entry by the product's
+   ArtId while every other key was a catalog id, so the measured tag silently
+   never rendered and no gate saw it: a map's keys must be pinned to their
+   key-domain (every key a real catalog id — the S11-1 guard); (c) the axe
+   tier caught a text-only horizontal scroller (`scrollable-region-focusable`)
+   — a scroller whose cards carry no links has no keyboard path at all, so
+   it takes `tabIndex={0}` itself; (d) a reference price quoted beside a
+   contradicting catalog is a functional lie even when the label matches
+   (the L-1 HomeView card: measured S$399 vs the clone's From S$449 on the
+   same page) — catalog-named cards derive, always (the S11-2 guard).
 
 ## §13 Pitfalls to Avoid
 
@@ -459,35 +475,42 @@ lockfiles, running app) → IMPLEMENT (small typed test-backed increments) →
 VERIFY (the full gate, browser-verified UI) → DELIVER (atomic conventional
 commits to `main`, docs lockstep, evidence labels, deferred-debt honesty).
 
-## Appendix B — project_state (measured 2026-11-28, session 10)
+## Appendix B — project_state (measured 2026-11-28, session 11)
 
-- Unit: **12 files / 130 tests** (11 seam files — cart (+ `bagLineSummary`),
+- Unit: **14 files / 147 tests** (13 seam files — cart (+ `bagLineSummary`),
   catalog, checkout, the per-category flyout content model, home tiles,
   money, router (+ `hasBuyParam` + trailing-segment 404s), route-title,
   store-rails (11 tests: the seven measured rails' headers/subheads/cards,
   `railCardHref`, `productPriceLabel`, the quick-links strip — plus the
-  parseHash round-trip guard), category-rails (9 tests: the six device pages'
+  parseHash round-trip guard), category-rails (13 tests: the six device pages'
   measured shelf counts/subheads, the D12 catalog-derived product cards with
   Buy deep links, the trailing editorial cards, the content shelves' card
-  sets, the round-trip + info-labels derivation), sitemap
-  + robots — plus the render-level component spec `ErrorBoundary.test.tsx`
-  with 4 cases incl. the resetKey re-arm/re-latch pair)
-- E2e: **45 tests** (home 8, mobile-navigation 11, store-flow 13 — incl. the
-  session-9 editorial-rails/quick-links pins and the session-10 category-shelf
-  + long-slug pins — a11y 13: eleven routes incl. `#/store/mac` + mobile
-  resting/menu-open states) over
-  `vite preview --host 127.0.0.1:4173`; the a11y tier = `tests/e2e/a11y.spec.ts`
-  (axe-core WCAG 2 A+AA: eleven routes + mobile resting/menu-open states, two
-  measured-reference exclusions documented in the spec header)
+  sets, the round-trip + info-labels derivation, the session-11 dead-key +
+  D10 price-derivation guards), airpods-page (6 tests: the chapternav, the
+  three heroes, the compare module, the consider rail, the music promo, the
+  round-trip + info-labels derivation), accessories-page (8 tests: the chapter
+  nav, the gallery, the five-tab curated grid with the measured card counts,
+  the D10/D11/D12 routing rule, the value props, the index nav, the info-labels
+  set-equality), sitemap + robots — plus the render-level component spec
+  `ErrorBoundary.test.tsx` with 4 cases incl. the resetKey re-arm/re-latch pair)
+- E2e: **50 tests** (home 8, mobile-navigation 11, store-flow 16 — incl. the
+  session-9 editorial-rails/quick-links pins, the session-10 category-shelf
+  + long-slug pins and the session-11 airpods-marketing/accessories-grid/
+  tab-switching pins — a11y 15: thirteen routes incl. `#/store/mac`,
+  `#/store/airpods`, `#/store/accessories` + mobile resting/menu-open states)
+  over `vite preview --host 127.0.0.1:4173`; the a11y tier =
+  `tests/e2e/a11y.spec.ts` (axe-core WCAG 2 A+AA, two measured-reference
+  exclusions documented in the spec header)
 - Smoke: **45 assertions**, `file://dist/index.html`, 0 console errors — the
   battery is now JSDoc-typed and covered by `typecheck:tests`
-- Sitemap: **337 routes / 312 info pages** generated from the seam (session 9:
+- Sitemap: **389 routes / 364 info pages** generated from the seam (session 9:
   the store rails' 48 info-routed labels; session 10: the category shelves'
-  133 info-routed labels joined the `INFO_TITLES` derivation);
+  133; session 11: the airpods marketing page's 7 + the accessories grid's
+  45 joined the `INFO_TITLES` derivation);
   robots.txt rendered by the same seam + generator (one `VITE_SITE_URL` stamps
   both; the value resolves from the shell or a `.env` file via Vite `loadEnv`)
-- Build: `dist/index.html` **349.26 kB / 102.71 kB gzip**; CSS **37,986 bytes /
-  579 rules**; build time ~1.2 s
+- Build: `dist/index.html` **382.22 kB / 109.12 kB gzip**; CSS **45,806 bytes /
+  675 rules**; build time ~1.3 s
 - Gate: `npm run gate` — lint 0 errors · typecheck clean · tests green · build · e2e · smoke
 - A11y posture (session 8): the home page ships the sr-only `<h1>` the
   reference itself ships (`Apple (Singapore)` vs the reference's `Apple`);
@@ -515,11 +538,25 @@ commits to `main`, docs lockstep, evidence labels, deferred-debt honesty).
   clone's catalog (D12: 9 product cards with clone-honest prices and Buy
   pills deep-linking `?buy`), the content shelves carry the reference's
   measured text routed by the established rule, and the superset grid
-  follows below; airpods/accessories keep the pinned structure (D13); catalog-matched rail
-  cards route to product pages with clone-derived prices (deviation D10),
-  every other card carries the reference's measured text routed to info pages
-  (deviation D11); the eyebrow colour inherits the card theme on editorial
-  cards (the axe-tier fix)
+  follows below; catalog-matched rail cards route to product pages with
+  clone-derived prices (deviation D10), every other card carries the
+  reference's measured text routed to info pages (deviation D11); the eyebrow
+  colour inherits the card theme on editorial cards (the axe-tier fix)
+- AirPods marketing page (session-11, D14): `#/store/airpods` renders the
+  reference's `/sg/airpods/` family — the six-link chapternav, the sr-only
+  h1 (the reference's 1px pagetitle pattern), three product heroes (the
+  AirPods Pro 3 hero's Buy deep-links the working configurator), the
+  four-column compare module, the keyboard-focusable consider rail (the axe
+  tier's `scrollable-region-focusable` catch: a text-only scroller needs
+  focus) and the Apple Music promo, with the superset store below
+- Accessories grid page (session-11, D15): `#/store/accessories` renders the
+  reference's `/sg/shop/accessories/all` family — the nine-chip chapter nav,
+  the eight-card media gallery, the five-tab curated grid over 53 measured
+  cards (the WAI-ARIA tabs pattern: roving tabindex + arrow keys), four value
+  props and the three-group index-nav directory, with the superset below; the
+  three catalog-matched cards derive their prices from this clone's catalog
+  (the reference's S$149/S$59 strings contradict it — D10); the colour-swatch
+  strips drop (D1: each swatch is product photography)
 - Local PG 17 (optional): `postgresql://postgres:postgres@127.0.0.1:5432/app_db` — installed rootless, unused by the SPA
 - Mobile nav parity (sessions 5–8 re-measure at 390×844): bar geometry byte-equal
   (logo x=0 w=48, Search x=246, Bag x=294, Menu x=342); all 11 accordion rows

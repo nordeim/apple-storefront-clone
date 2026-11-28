@@ -78,6 +78,32 @@ sleep 1
 agent-browser screenshot "$OUT/20-desktop-category-mac-all-models.png" >/dev/null 2>&1
 echo "captured 20-desktop-category-mac-all-models"
 
+# 21 — the session-11 AirPods marketing page (chapternav + the dark first hero)
+agent-browser open "$BASE/#/store/airpods" >/dev/null 2>&1
+agent-browser set viewport 1440 900 >/dev/null 2>&1
+sleep 2
+agent-browser screenshot "$OUT/21-desktop-airpods-marketing.png" >/dev/null 2>&1
+echo "captured 21-desktop-airpods-marketing"
+
+# 22 — the session-11 AirPods compare module close-up
+agent-browser eval "document.querySelector('.airpods-compare').scrollIntoView({ block: 'start' }); 'scrolled'" >/dev/null 2>&1
+sleep 1
+agent-browser screenshot "$OUT/22-desktop-airpods-compare.png" >/dev/null 2>&1
+echo "captured 22-desktop-airpods-compare"
+
+# 23 — the session-11 Accessories grid page (h1 + chapternav + gallery)
+agent-browser open "$BASE/#/store/accessories" >/dev/null 2>&1
+agent-browser set viewport 1440 900 >/dev/null 2>&1
+sleep 2
+agent-browser screenshot "$OUT/23-desktop-accessories-grid.png" >/dev/null 2>&1
+echo "captured 23-desktop-accessories-grid"
+
+# 24 — the session-11 Accessories curated tab grid close-up
+agent-browser eval "document.querySelector('.accessories-curated').scrollIntoView({ block: 'start' }); 'scrolled'" >/dev/null 2>&1
+sleep 1
+agent-browser screenshot "$OUT/24-desktop-accessories-curated.png" >/dev/null 2>&1
+echo "captured 24-desktop-accessories-curated"
+
 capture_mobile 07-mobile-home ""
 capture_mobile 09-mobile-store "#/store"
 capture_mobile 10-mobile-product "#/product/iphone-18-pro"

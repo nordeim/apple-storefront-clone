@@ -19,11 +19,11 @@ Apple's proprietary assets were deliberately not copied or hot-linked.
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest, jsdom — 12 files / 130 tests) |
+| Unit tests | `npm run test` (Vitest, jsdom — 14 files / 147 tests) |
 | Production build (single file → `dist/index.html`) | `npm run build` |
-| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 45 tests incl. 13 axe-core a11y scans) |
+| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 50 tests incl. 15 axe-core a11y scans) |
 | File-protocol smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
-| Regenerate `public/sitemap.xml` (337 routes) | `npm run sitemap` |
+| Regenerate `public/sitemap.xml` (389 routes) | `npm run sitemap` |
 | Clean gate order | `npm run lint && npm run typecheck && npm run typecheck:tests && npm run test && npm run build && npm run test:e2e && npm run test:smoke` |
 
 The Playwright E2E suite boots the production build (`npm run build` then `vite preview --host 127.0.0.1 --port 4173`),
@@ -43,9 +43,9 @@ npm run dev          # → http://localhost:5173
 
 ```bash
 npm run typecheck    # clean, no output
-npm run test         # 12 files / 130 tests passed
-npm run build        # dist/index.html (~349 kB single file)
-npm run test:e2e     # 45 passed (32 pins + 13 axe a11y scans)
+npm run test         # 14 files / 147 tests passed
+npm run build        # dist/index.html (~382 kB single file)
+npm run test:e2e     # 50 passed (35 pins + 15 axe a11y scans)
 ```
 
 Node.js ≥ 20 (verified on Node 24); npm is the package manager and `package-lock.json` is the lockfile.
@@ -76,7 +76,14 @@ pages carry the reference's full-form h1 ("Shop Apple Watch") and their measured
 (session-10: mac 7 shelves · ipad 7 · iphone 6 · watch 8 · vision 7 · home 5 — the "All models."
 shelf renders the clone's catalog products in the reference's card anatomy with working Buy deep
 links into the configurator, and the content shelves carry the reference's measured editorial,
-accessory and service cards; the superset product grid follows below).
+accessory and service cards; the superset product grid follows below). The AirPods destination is
+the reference's marketing page family (session-11: the six-link chapternav, the sr-only h1, three
+product heroes with the AirPods Pro 3 Buy deep-linking the working configurator, the four-column
+compare module, the five-card consider rail and the Apple Music promo — then the superset store
+below), and the Accessories destination is the reference's filtered-grid family (session-11: the
+nine-chip chapter nav, the eight-card media gallery, the five-tab curated grid over 53 measured
+cards where the three catalog-matched cards derive their prices from this clone's catalog, the
+four value props and the three-group index-nav directory — then the superset store below).
 
 **Superset:** store with category filters and sorting, product pages with a configurator (options change
 price), an in-memory bag with a nav popover, GST-inclusive totals (9%), validated Singapore checkout
@@ -132,7 +139,7 @@ The app reads **no** environment variables. One optional variable drives the sit
 
 ## SEO
 
-`public/sitemap.xml` (337 routes) is generated from the tested `src/lib/sitemap.ts` seam — never a
+`public/sitemap.xml` (389 routes) is generated from the tested `src/lib/sitemap.ts` seam — never a
 hand-maintained list. `public/robots.txt` and `index.html` (OG/Twitter meta, JSON-LD WebSite+Organization)
 are part of the same deliverable — one `VITE_SITE_URL` value stamps both the sitemap's base and the
 robots.txt `Sitemap:` directive. Honest limitation: hash routing means search engines collapse every
