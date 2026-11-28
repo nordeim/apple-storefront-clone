@@ -13,11 +13,11 @@ in-memory bag, Singapore checkout). The evidence dossier (measured tokens, devia
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest/jsdom — **11 files / 119 tests**; update this count in README + PAD when it changes) |
-| Production build | `npm run build` (single file → `dist/index.html`, ~322 kB) |
-| E2E | `npm run test:e2e` (Playwright — **42 tests**: 30 pins + 12 axe-core a11y scans; builds and serves `dist/` itself) |
+| Unit tests | `npm run test` (Vitest/jsdom — **12 files / 130 tests**; update this count in README + PAD when it changes) |
+| Production build | `npm run build` (single file → `dist/index.html`, ~349 kB) |
+| E2E | `npm run test:e2e` (Playwright — **45 tests**: 32 pins + 13 axe-core a11y scans; builds and serves `dist/` itself) |
 | File:// smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
-| Regenerate sitemap | `npm run sitemap` (writes `public/sitemap.xml` + `public/robots.txt` from the tested `src/lib/sitemap.ts` seam — **204 routes**) |
+| Regenerate sitemap | `npm run sitemap` (writes `public/sitemap.xml` + `public/robots.txt` from the tested `src/lib/sitemap.ts` seam — **337 routes**) |
 | Clean gate order | lint → typecheck → typecheck:tests → test → build → test:e2e → test:smoke |
 
 Use `npm`; the lockfile is `package-lock.json`. Commit to `main` only (no feature branches);
@@ -55,6 +55,10 @@ remediation.
    `history.pushState` without updating `parseHash` tests and the smoke battery first.
 7. **Count lockstep:** when test/route/screenshot counts change, sweep README.md, PAD §8.1 and the
    SKILL project_state in the same commit (`rg "<old number>"`).
+8. **Generated hrefs must round-trip `parseHash`.** A href that matches the shape regex can still
+   404 (the session-9 rails shipped nine 61–70-char slugs against the router's 60-char cap; every
+   gate was green). Every content seam's spec round-trips its hrefs through the router, and the
+   cap is 130 (the longest measured label slugifies to 126).
 
 ## Environment
 

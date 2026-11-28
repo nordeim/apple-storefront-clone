@@ -19,11 +19,11 @@ Apple's proprietary assets were deliberately not copied or hot-linked.
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest, jsdom — 11 files / 119 tests) |
+| Unit tests | `npm run test` (Vitest, jsdom — 12 files / 130 tests) |
 | Production build (single file → `dist/index.html`) | `npm run build` |
-| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 42 tests incl. 12 axe-core a11y scans) |
+| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 45 tests incl. 13 axe-core a11y scans) |
 | File-protocol smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
-| Regenerate `public/sitemap.xml` | `npm run sitemap` |
+| Regenerate `public/sitemap.xml` (337 routes) | `npm run sitemap` |
 | Clean gate order | `npm run lint && npm run typecheck && npm run typecheck:tests && npm run test && npm run build && npm run test:e2e && npm run test:smoke` |
 
 The Playwright E2E suite boots the production build (`npm run build` then `vite preview --host 127.0.0.1 --port 4173`),
@@ -43,9 +43,9 @@ npm run dev          # → http://localhost:5173
 
 ```bash
 npm run typecheck    # clean, no output
-npm run test         # 11 files / 119 tests passed
-npm run build        # dist/index.html (~322 kB single file)
-npm run test:e2e     # 42 passed (30 pins + 12 axe a11y scans)
+npm run test         # 12 files / 130 tests passed
+npm run build        # dist/index.html (~349 kB single file)
+npm run test:e2e     # 45 passed (32 pins + 13 axe a11y scans)
 ```
 
 Node.js ≥ 20 (verified on Node 24); npm is the package manager and `package-lock.json` is the lockfile.
@@ -72,7 +72,11 @@ chip) and the reference's seven measured editorial rails — "The latest." / "Pe
 offers." — as a horizontal-scroller card family (measured headers, subheads, eyebrows, labels,
 prices and card themes; catalog-matched cards route to the clone's product pages, everything else to
 generated info pages) with the clone's superset product grid below ("All products."). The category
-pages carry the reference's full-form h1 ("Shop Apple Watch").
+pages carry the reference's full-form h1 ("Shop Apple Watch") and their measured shelf models
+(session-10: mac 7 shelves · ipad 7 · iphone 6 · watch 8 · vision 7 · home 5 — the "All models."
+shelf renders the clone's catalog products in the reference's card anatomy with working Buy deep
+links into the configurator, and the content shelves carry the reference's measured editorial,
+accessory and service cards; the superset product grid follows below).
 
 **Superset:** store with category filters and sorting, product pages with a configurator (options change
 price), an in-memory bag with a nav popover, GST-inclusive totals (9%), validated Singapore checkout
@@ -89,13 +93,18 @@ src/lib/        pure, tested logic: catalog, cart reducer, router (hash), money,
                 reference; feeds nav flyouts, the mobile accordion menu and the sitemap route
                 enumeration), store-rails (the store index's seven measured editorial rails + the
                 quick-links strip; feeds the rail markup and the sitemap info routes),
+                category-rails (the six device category pages' measured shelf models — the
+                "All models." product cards derive from this catalog with working Buy deep
+                links, the content shelves carry the reference's measured text; feeds the
+                category shelf markup and the sitemap info routes),
                 sitemap route enumeration (feeds public/sitemap.xml)
 src/hooks/      useRoute (hashchange), media-query / in-view hooks
 src/context/    BagContext (in-memory only)
 src/components/ GlobalNav (desktop flyouts + mobile accordion menu), SearchPanel, Tile, EntertainmentGallery,
                 Footer, ProductArt (original SVG art), ErrorBoundary (page-level render guard),
                 BagLineRow + BagSummary (shared bag-line/summary rows),
-                StoreRails + StoreQuickLinks (the store index's measured editorial rails)
+                StoreRails + StoreQuickLinks (the store index's measured editorial rails),
+                CategoryShelves (the category pages' measured shelf family, in StoreRails.tsx)
 src/pages/      one file per route
 tests/e2e/      Playwright suite (home, mobile-navigation, store-flow) + the file:// smoke battery
 scripts/        build-sitemap.mjs (generates public/sitemap.xml from the tested seam)
@@ -123,7 +132,7 @@ The app reads **no** environment variables. One optional variable drives the sit
 
 ## SEO
 
-`public/sitemap.xml` (204 routes) is generated from the tested `src/lib/sitemap.ts` seam — never a
+`public/sitemap.xml` (337 routes) is generated from the tested `src/lib/sitemap.ts` seam — never a
 hand-maintained list. `public/robots.txt` and `index.html` (OG/Twitter meta, JSON-LD WebSite+Organization)
 are part of the same deliverable — one `VITE_SITE_URL` value stamps both the sitemap's base and the
 robots.txt `Sitemap:` directive. Honest limitation: hash routing means search engines collapse every

@@ -1,4 +1,4 @@
-# apple-storefront-clone — Master Project Architecture Document (PAD) v1.8
+# apple-storefront-clone — Master Project Architecture Document (PAD) v1.9
 
 **Classification:** Internal Engineering Reference
 **Status:** DEFINITIVE, PRODUCTION-LOCKED BLUEPRINT
@@ -7,6 +7,50 @@
 **Audience:** Senior Engineers, Tech Leads, DevOps, and Onboarding Engineers
 **Rule:** Every architectural decision in this document traces to a specific rationale.
 Nothing is here "because it's popular."
+
+#### Revision Block — v1.9 (the session-10 category-shelves + router-cap cycle)
+
+- `[SR]` The session-10 cycle (2026-11-28, `docs/REMEDIATION_PLAN.md` session-10 section)
+  re-verified the pulled tree (e5bbdc2) — baseline gates exactly as documented (11/119 unit ·
+  42/42 e2e · 45/45 smoke · 204 routes · 322.34 kB) — plus a read-only audit (**1 HIGH + 1
+  MEDIUM + 3 LOW + 8 INFO**; the HIGH: nine session-9 rail cards linked to info slugs the
+  router's 60-char cap 404'd — silent dead links every gate was green against) and a
+  live-parity sweep: the clone's mobile navigation re-measured working at 390×844, all eleven
+  reference flyout models re-extracted and re-diffed via a committed Vite ssrLoadModule
+  harness (`scripts/flyout-diff.mjs`) — all match.
+- `[FIX]` **The router's info-slug cap rose 60 → 130** (S10-1, RED first): the longest measured
+  label slugifies to 126; the boundary is pinned in `router.test.ts` (126 routeable, 131
+  404s) and every content seam's spec now round-trips its generated hrefs through
+  `parseHash` (the M-1 drift guard — content, sitemap and router can never drift silently
+  again). The editorial chevron inherits the card theme on dark cards (the session-9
+  eyebrow fix, completed for the chevron).
+- `[FEAT]` **The six device category pages' measured shelf models landed** (the session-9
+  log's named next surface): a new pure seam `src/lib/category-rails.ts` (360 lines) —
+  mac 7 shelves · ipad 7 · iphone 6 · watch 8 · vision 7 · home 5 (233 measured cards; the
+  reference's 30 model cards replaced by the clone's 9 catalog products per **D12**, the
+  honesty rule: a card with a price and a Buy pill must be a product the clone can
+  configure and sell — measured per-product tags like "NEW 14” WITH M6" carry over) + the
+  `CategoryShelves` rendering in `StoreRails.tsx` (the measured "All models." product-card
+  anatomy: 400×500, name/tag at top, art mid, price bottom-left, the 56×36 #0071e3
+  Buy pill bottom-right **deep-linking the working configurator** (`?buy`) — the superset
+  play; the vision hero renders at the measured 646×500) + editorial-wide (480×500),
+  editorial-short (313×240) and editorial-short-wide (480×240) card variants. The
+  airpods/accessories pages keep their pinned structure (**D13**: their reference pages
+  are different families — a marketing page and a filtered grid). `CATEGORY_RAIL_INFO_LABELS`
+  joins the `INFO_TITLES` derivation — the sitemap grew 204 → 337 routes, all from the seam.
+- `[VERIFY]` Full gate green after the change: lint 0 errors · typecheck clean ×2 · unit
+  **12 files / 130 tests** · build **349.26 kB / 102.71 kB gzip** (CSS 37,986 bytes /
+  579 rules) · e2e **45/45** (32 pins + 13 axe scans, incl. the new `#/store/mac` scan) ·
+  smoke 45/45, zero console errors. Live verification: all six category pages render their
+  shelves; the Buy pill opens the configurator focused; the reference's duplicated
+  CONTINUITY card (measured, shipped twice on the reference's iPhone page) renders without
+  key collisions.
+- `[CHORE]` README/AGENTS/CLAUDE/PAD/SKILL/DEPLOYMENT swept in lockstep (counts 11/119 →
+  12/130 unit, 42 → 45 e2e, 204 → 337 routes / 179 → 312 info pages, 322.34 → 349.26 kB,
+  CSS 35,782 → 37,986 bytes); the audit's stale-doc LOWs fixed (PAD §11 line counts, the
+  SKILL Appendix B session title); the 20-shot screenshot family re-captured
+  (+19/+20 the category shelves); `scripts/flyout-diff.mjs` committed as the standing
+  drift harness; worklog Task 122.
 
 #### Revision Block — v1.8 (the session-9 store editorial-rails cycle)
 
@@ -715,12 +759,12 @@ credentials.
 
 | Category | Files | Tests | Location | Framework |
 |---|---|---|---|---|
-| Unit (seam) | 10 | 115 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
+| Unit (seam) | 11 | 126 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
 | Unit (component) | 1 | 4 | `src/components/ErrorBoundary.test.tsx` | Vitest 4 + jsdom (React `act`) |
 | E2E — desktop | 1 | 8 | `tests/e2e/home.spec.ts` | Playwright (1440×900) |
 | E2E — mobile nav | 1 | 11 | `tests/e2e/mobile-navigation.spec.ts` | Playwright (iPhone 13 viewport, touch) |
-| E2E — store flow | 1 | 11 | `tests/e2e/store-flow.spec.ts` | Playwright (1440×900) |
-| E2E — a11y scans | 1 | 12 | `tests/e2e/a11y.spec.ts` | Playwright + @axe-core/playwright (WCAG 2 A+AA) |
+| E2E — store flow | 1 | 13 | `tests/e2e/store-flow.spec.ts` | Playwright (1440×900) |
+| E2E — a11y scans | 1 | 13 | `tests/e2e/a11y.spec.ts` | Playwright + @axe-core/playwright (WCAG 2 A+AA) |
 | File:// smoke battery | 1 | 45 assertions | `tests/e2e/smoke.mjs` | Playwright library |
 
 ### 7.2 Test Patterns
@@ -738,9 +782,9 @@ credentials.
 
 - [ ] `npm run lint` exit 0
 - [ ] `npm run typecheck` && `npm run typecheck:tests` clean
-- [ ] `npm run test` — 11 files / 119 tests
+- [ ] `npm run test` — 12 files / 130 tests
 - [ ] `npm run build` — single-file `dist/index.html`
-- [ ] `npm run test:e2e` — 42 passed (30 pins + 12 axe scans)
+- [ ] `npm run test:e2e` — 45 passed (32 pins + 13 axe scans)
 - [ ] `npm run test:smoke` — 45 assertions, zero console errors
 - [ ] Docs touched in the same commit; counts in lockstep
 
@@ -751,8 +795,8 @@ credentials.
 ### 8.1 Production Build
 
 `npm run build` → `vite build` with `react()`, `@tailwindcss/vite`, and
-`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 322.34 kB /
-97.42 kB gzip this cycle; CSS 35,782 bytes / 553 rules). No server bundle, no image
+`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 349.26 kB /
+102.71 kB gzip this cycle; CSS 37,986 bytes / 579 rules). No server bundle, no image
 pipeline, no external requests.
 
 ### 8.2 Environment Variables
@@ -826,14 +870,14 @@ The full remediation history of this cycle: `docs/REMEDIATION_PLAN.md`.
 
 | File | Lines | Purpose |
 |---|---|---|
-| `src/lib/router.ts` | 94 | The hash-route grammar; every href factory + `hasBuyParam` |
+| `src/lib/router.ts` | 98 | The hash-route grammar; every href factory + `hasBuyParam` |
 | `src/lib/route-title.ts` | 39 | The tab-title seam (full-form store labels, matching the h1) |
 | `src/lib/catalog.ts` | 356 | The typed catalog: 8 categories, 12 products, option matrices, search |
 | `src/lib/cart.ts` | 103 | The bag reducer + price/line-key seam (`bagLineSummary`) |
 | `src/lib/checkout.ts` | 49 | Singapore checkout validation + order numbers |
 | `src/lib/sitemap.ts` | 75 | Route-set enumeration + sitemap.xml/robots.txt rendering (204 URLs) |
-| `src/lib/site-content.ts` | 441 | Nav links, the per-category flyout content model, footer directory, info-page map |
-| `src/index.css` | 387 | Tailwind v4 tokens + all component CSS + source scoping |
+| `src/lib/site-content.ts` | 445 | Nav links, the per-category flyout content model, footer directory, info-page map |
+| `src/index.css` | 457 | Tailwind v4 tokens + all component CSS + source scoping |
 | `src/components/GlobalNav.tsx` | 253 | Desktop flyouts, mobile accordion menu, bag popover, search trigger |
 | `src/components/ProductArt.tsx` | 449 | The original SVG art library |
 | `src/components/EntertainmentGallery.tsx` | 153 | The TV+ gallery state machine (dwell, pause, keys) |
@@ -841,12 +885,14 @@ The full remediation history of this cycle: `docs/REMEDIATION_PLAN.md`.
 | `src/components/ErrorBoundary.tsx` | 67 | Page-level render guard: graceful fallback, nav/bag state survive; `resetKey` re-arm |
 | `src/components/BagSummary.tsx` | 25 | The shared Subtotal/Delivery/GST/Total ledger (bag page + checkout) |
 | `src/lib/store-rails.ts` | 253 | The store index's seven measured editorial rails + quick-links strip (the rail content model, `railCardHref`, `productPriceLabel`) |
+| `src/lib/category-rails.ts` | 360 | The six device category pages' measured shelf models (the D12 product cards, the content shelves, `CATEGORY_RAIL_INFO_LABELS`) |
 | `src/lib/slug.ts` | 9 | The one label→slug grammar (extracted session 9 to keep the module graph acyclic) |
-| `src/components/StoreRails.tsx` | 98 | The rail + quick-links rendering (measured card anatomy, theme-coloured editorial cards) |
-| `src/pages/StorePage.tsx` | 111 | Store index (h1 → quick links → chips → rails → "All products." grid) and category pages |
+| `src/components/StoreRails.tsx` | 217 | The rail + quick-links rendering (measured card anatomy, theme-coloured editorial cards) + the category shelf family (CategoryShelves, the D12 product card with its Buy deep link) |
+| `src/pages/StorePage.tsx` | 123 | Store index (h1 → quick links → chips → rails → "All products." grid) and category pages (h1 → chips → measured shelves → "All products." grid) |
 | `src/App.tsx` | 98 | Route switch, navigation side-effects, the page-level ErrorBoundary |
 | `tests/e2e/mobile-navigation.spec.ts` | 148 | The mobile-menu contract (bar layout, accordion, the v4 display trap) |
 | `tests/e2e/smoke.mjs` | 131 | The exhaustive file:// parity battery (45 assertions) |
+| `scripts/flyout-diff.mjs` | 73 | The standing flyout drift harness (Vite ssrLoadModule vs a saved reference extraction) |
 | `vite.config.ts` | 30 | Build pipeline + dep-scan scoping (ADR-003) |
 | `playwright.config.ts` | 47 | The two-project e2e harness over `vite preview` |
 

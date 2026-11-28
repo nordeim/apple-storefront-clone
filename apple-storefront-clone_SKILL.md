@@ -8,12 +8,12 @@ description: >
   to it. Covers the architecture, design tokens, the Tailwind v4 trap log, the
   three-tier test suite, the build/SEO posture, and the hard lessons of the 2026-11
   remediation cycle.
-version: 1.8.0
+version: 1.9.0
 last_updated: 2026-11-28
 tags: [react, vite, tailwindcss-v4, typescript, spa, e-commerce-clone, e2e-testing, accessibility]
 ---
 
-# apple-storefront-clone — Engineering Skill (v1.8.0)
+# apple-storefront-clone — Engineering Skill (v1.9.0)
 
 > **What this is:** the distilled, codebase-verified engineering reference for
 > the remediated `apple-storefront-clone`. Every number below was measured in
@@ -317,6 +317,22 @@ code in the same commit; `git status` clean before the SSH-wrapper push.
    reference's WHITE product cards) fails on another surface (the dark
    editorial cards) — the axe tier caught it; themes must inherit, not
    carry one hardcoded colour.
+17. **Generated hrefs must round-trip the router, and a product-looking card
+   must BE a product** (session 10): (a) the session-9 rails shipped nine
+   dead links through a fully green gate — every href matched the shape
+   regex, but the router's 60-char slug cap 404'd the 61–70-char slugs.
+   The fix was two-layered: raise the cap to cover the longest measured
+   label (126 → cap 130, boundary-pinned) AND make every content seam's
+   spec round-trip its hrefs through `parseHash` — a shape assertion
+   proves nothing about routeability; (b) the category pages' "All models."
+   shelf renders ONLY the clone's catalog products (deviation D12): a card
+   with a price and a Buy pill must be a product the clone can configure
+   and sell — the D10 lesson generalized from prices to the whole card
+   anatomy, with the Buy pill deep-linking the working configurator (the
+   superset play: the reference's Buy is a marketing link); (c) the
+   reference ships real duplications (the CONTINUITY card twice on its
+   iPhone page) — measured content is kept verbatim and the component keys
+   carry the index, because label keys collide on faithful data.
 
 ## §13 Pitfalls to Avoid
 
@@ -443,28 +459,35 @@ lockfiles, running app) → IMPLEMENT (small typed test-backed increments) →
 VERIFY (the full gate, browser-verified UI) → DELIVER (atomic conventional
 commits to `main`, docs lockstep, evidence labels, deferred-debt honesty).
 
-## Appendix B — project_state (measured 2026-11-28, session 8)
+## Appendix B — project_state (measured 2026-11-28, session 10)
 
-- Unit: **11 files / 119 tests** (10 seam files — cart (+ `bagLineSummary`),
+- Unit: **12 files / 130 tests** (11 seam files — cart (+ `bagLineSummary`),
   catalog, checkout, the per-category flyout content model, home tiles,
   money, router (+ `hasBuyParam` + trailing-segment 404s), route-title,
   store-rails (11 tests: the seven measured rails' headers/subheads/cards,
-  `railCardHref`, `productPriceLabel`, the quick-links strip), sitemap
+  `railCardHref`, `productPriceLabel`, the quick-links strip — plus the
+  parseHash round-trip guard), category-rails (9 tests: the six device pages'
+  measured shelf counts/subheads, the D12 catalog-derived product cards with
+  Buy deep links, the trailing editorial cards, the content shelves' card
+  sets, the round-trip + info-labels derivation), sitemap
   + robots — plus the render-level component spec `ErrorBoundary.test.tsx`
   with 4 cases incl. the resetKey re-arm/re-latch pair)
-- E2e: **42 tests** (home 8, mobile-navigation 11, store-flow 11 — incl. the
-  session-9 editorial-rails and quick-links pins — a11y 12) over
+- E2e: **45 tests** (home 8, mobile-navigation 11, store-flow 13 — incl. the
+  session-9 editorial-rails/quick-links pins and the session-10 category-shelf
+  + long-slug pins — a11y 13: eleven routes incl. `#/store/mac` + mobile
+  resting/menu-open states) over
   `vite preview --host 127.0.0.1:4173`; the a11y tier = `tests/e2e/a11y.spec.ts`
-  (axe-core WCAG 2 A+AA: ten routes + mobile resting/menu-open states, two
+  (axe-core WCAG 2 A+AA: eleven routes + mobile resting/menu-open states, two
   measured-reference exclusions documented in the spec header)
 - Smoke: **45 assertions**, `file://dist/index.html`, 0 console errors — the
   battery is now JSDoc-typed and covered by `typecheck:tests`
-- Sitemap: **204 routes / 179 info pages** generated from the seam (session 9:
-  the store rails' 48 info-routed labels joined the `INFO_TITLES` derivation);
+- Sitemap: **337 routes / 312 info pages** generated from the seam (session 9:
+  the store rails' 48 info-routed labels; session 10: the category shelves'
+  133 info-routed labels joined the `INFO_TITLES` derivation);
   robots.txt rendered by the same seam + generator (one `VITE_SITE_URL` stamps
   both; the value resolves from the shell or a `.env` file via Vite `loadEnv`)
-- Build: `dist/index.html` **322.34 kB / 97.42 kB gzip**; CSS **35,782 bytes /
-  553 rules**; build time ~1.2 s
+- Build: `dist/index.html` **349.26 kB / 102.71 kB gzip**; CSS **37,986 bytes /
+  579 rules**; build time ~1.2 s
 - Gate: `npm run gate` — lint 0 errors · typecheck clean · tests green · build · e2e · smoke
 - A11y posture (session 8): the home page ships the sr-only `<h1>` the
   reference itself ships (`Apple (Singapore)` vs the reference's `Apple`);
@@ -485,7 +508,14 @@ commits to `main`, docs lockstep, evidence labels, deferred-debt honesty).
   the tab title matches via the `route-title` seam (session-5)
 - Store index editorial rails (session-9): the reference's seven measured
   rails render in the reference's order (h1 → quick-links strip → chip row →
-  rails) with the superset "All products." grid below; catalog-matched rail
+  rails) with the superset "All products." grid below;
+- Category shelves (session-10): the six device category pages carry their
+  measured shelf models (mac 7 · ipad 7 · iphone 6 · watch 8 · vision 7 ·
+  home 5; 233 measured cards) — the "All models." shelf derives from the
+  clone's catalog (D12: 9 product cards with clone-honest prices and Buy
+  pills deep-linking `?buy`), the content shelves carry the reference's
+  measured text routed by the established rule, and the superset grid
+  follows below; airpods/accessories keep the pinned structure (D13); catalog-matched rail
   cards route to product pages with clone-derived prices (deviation D10),
   every other card carries the reference's measured text routed to info pages
   (deviation D11); the eyebrow colour inherits the card theme on editorial

@@ -111,18 +111,19 @@ connect to it): `bash docs/setup_pg_z.sh` — see `docs/DEPLOYMENT.md` §4.
 | `npm run preview` | Serve `dist/` (bind `--host 127.0.0.1`) |
 | `npm run lint` | ESLint 10 flat config — must exit 0 |
 | `npm run typecheck` / `npm run typecheck:tests` | `tsc --noEmit` (app / tests+configs) |
-| `npm run test` | Vitest run (11 files / 119 tests) |
-| `npm run test:e2e` | Playwright (42 tests: 30 pins + 12 axe-core a11y scans; builds + serves the artifact) |
+| `npm run test` | Vitest run (12 files / 130 tests) |
+| `npm run test:e2e` | Playwright (45 tests: 32 pins + 13 axe-core a11y scans; builds + serves the artifact) |
 | `npm run test:smoke` | 45-assertion file:// battery over `dist/` |
-| `npm run sitemap` | Regenerate `public/sitemap.xml` + `public/robots.txt` (204 routes) |
+| `npm run sitemap` | Regenerate `public/sitemap.xml` + `public/robots.txt` (337 routes) |
 
 ## Testing Strategy
 
 - **Unit (Vitest, jsdom)** — the pure seam `src/lib/*` (plus the one component-level
   spec, `ErrorBoundary.test.tsx`): catalog, cart
-  reducer, router parsing (incl. malformed inputs), money/GST, checkout
-  validation, flyout content model, the store editorial-rail content model,
-  sitemap route enumeration.
+  reducer, router parsing (incl. malformed inputs and the 130-char slug boundary),
+  money/GST, checkout validation, flyout content model, the store editorial-rail
+  content model, the category shelf content model (incl. the parseHash
+  round-trip drift guard), sitemap route enumeration.
 - **E2E (Playwright, production build)** — `home.spec.ts` (tokens, the
   per-category flyout content model, gallery state machine, zero console errors),
   `mobile-navigation.spec.ts` (390×844 touch: the reference's bar layout,
