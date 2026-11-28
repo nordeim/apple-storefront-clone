@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Footer } from "@/components/Footer";
 import { GlobalNav } from "@/components/GlobalNav";
 import { BagProvider } from "@/context/BagContext";
@@ -79,7 +80,9 @@ function Shell() {
       </a>
       <GlobalNav />
       <main id="main" ref={mainRef} tabIndex={-1} className="focus:outline-none">
-        <RouteView route={route} />
+        <ErrorBoundary>
+          <RouteView route={route} />
+        </ErrorBoundary>
       </main>
       <Footer notes={route.name === "home" ? HOME_FOOTNOTES : []} />
     </>
