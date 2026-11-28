@@ -74,10 +74,23 @@ describe("MARKETING_PAGES (the reference's measured /sg/{x}/ marketing pages)", 
     expect(MARKETING_PAGES.watch.sections.map((s) => s.kind)).toEqual([
       "lineup", "valueprops", "cards", "cards", "directory",
     ]);
-    // the vision page is hero-led: no line-up, statement sections carry it
-    // (the Entertainment section is its one cards family)
+    // the vision page is hero-led: no line-up. S14-8 rebuilt it to the
+    // measured reference structure: hero, foundation (3 intro statements),
+    // design, the five experiences subsections (Entertainment / Productivity /
+    // Photos and Videos / Connection / Apps), visionOS, technology, values,
+    // and the two routers (accessories + developer) — 13 statements.
     expect(MARKETING_PAGES.vision.sections.map((s) => s.kind)).toEqual([
-      "statement", "statement", "cards", "statement", "statement", "statement", "statement", "statement", "statement",
+      "statement", "statement", "statement", "statement", "statement", "statement",
+      "statement", "statement", "statement", "statement", "statement", "statement", "statement",
+    ]);
+    expect(MARKETING_PAGES.vision.sections.map((s) => s.heading)).toEqual([
+      "New powerful M5 chip and comfortable Dual Knit Band.",
+      null,
+      "Take a closer look.",
+      "Entertainment", "Productivity", "Photos and Videos", "Connection", "Apps",
+      "visionOS", "Technology", "Values",
+      "Explore Apple Vision Pro accessories.",
+      "An exciting new platform. A world of new opportunities for developers.",
     ]);
     expect(MARKETING_PAGES.home.sections.map((s) => s.kind)).toEqual([
       "lineup", "valueprops", "statement", "cards", "directory",
@@ -188,5 +201,50 @@ describe("MARKETING_PAGES (the reference's measured /sg/{x}/ marketing pages)", 
         expect(routeable(href), `${page.id}: dead href ${href}`).toBe(true);
       }
     }
+  });
+});
+
+describe("MARKETING_PAGES text fidelity (the S14-3 guard)", () => {
+  /** The session-13 converter capped CTA labels at 34 chars and accordion copy
+   *  at 240/260 — 20 strings shipped cut mid-word, and its textContent capture
+   *  joined the reference's <br>-split words and sentences ("bestplace",
+   *  "see.In"). A seam string is display text: this guard makes that artifact
+   *  class unshippable. */
+  const collectText = (value: unknown, out: string[] = []): string[] => {
+    if (typeof value === "string") {
+      if (!value.startsWith("#/")) out.push(value);
+    } else if (Array.isArray(value)) {
+      for (const v of value) collectText(v, out);
+    } else if (value && typeof value === "object") {
+      for (const v of Object.values(value)) collectText(v, out);
+    }
+    return out;
+  };
+
+  const texts = collectText([MARKETING_PAGES, MARKETING_INFO_LABELS]);
+
+  it("S14-2: every line-up section carries at least one tab (the LineupGallery single-tab branch reads tabs[0])", () => {
+    for (const page of PAGES) {
+      for (const section of sectionsOf(page, "lineup")) {
+        expect(section.tabs.length, `${page.id}: empty tabs`).toBeGreaterThanOrEqual(1);
+      }
+    }
+  });
+
+  it("no string ends mid-word at a converter cap length (34/240/260 — the F1 class)", () => {
+    const offenders = texts.filter(
+      (t) => [34, 240, 260].includes(t.trimEnd().length) && /[a-z]$/.test(t.trimEnd()),
+    );
+    expect(offenders).toEqual([]);
+  });
+
+  it("no string joins two sentences without a space (the br-capture class, e.g. 'see.In')", () => {
+    const offenders = texts.filter((t) => /[a-z]\.[A-Z]/.test(t));
+    expect(offenders).toEqual([]);
+  });
+
+  it("no string carries the known word joins ('bestplace', 'towatch', 'sportsand', 'soundin', 'loveto')", () => {
+    const offenders = texts.filter((t) => /bestplace|towatch|sportsand|soundin|loveto/.test(t));
+    expect(offenders).toEqual([]);
   });
 });

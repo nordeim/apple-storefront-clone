@@ -51,9 +51,11 @@ describe("ACCESSORIES_CATEGORY_PAGES (the reference's measured /sg/shop/{cat}/ac
         expect(routeable(chip.href), chip.ariaLabel).toBe(true);
       }
     }
-    // the reference's own quirky chip spacing is kept verbatim (measured)
-    expect(ACCESSORIES_CATEGORY_PAGES.mac.chapternav[0]?.ariaLabel).toBe("Cases &Protection - Mac Accessories");
-    expect(ACCESSORIES_CATEGORY_PAGES.watch.chapternav[0]?.ariaLabel).toBe("Apple WatchStraps - Apple Watch Accessories");
+    // the chip spacing is running text: the session-12 textContent capture
+    // had joined the reference's <br>-split words ("Apple WatchStraps") —
+    // corrected in S14-9 (the S14-9 guard pins the class)
+    expect(ACCESSORIES_CATEGORY_PAGES.mac.chapternav[0]?.ariaLabel).toBe("Cases & Protection - Mac Accessories");
+    expect(ACCESSORIES_CATEGORY_PAGES.watch.chapternav[0]?.ariaLabel).toBe("Apple Watch Straps - Apple Watch Accessories");
   });
 
   it("models the measured media galleries (headlines, themes, CTAs)", () => {
@@ -227,5 +229,38 @@ describe("ACCESSORIES_CATEGORY_PAGES (the reference's measured /sg/shop/{cat}/ac
         expect(route.name !== "not-found", `${page.id}: ${href}`).toBe(true);
       }
     }
+  });
+});
+
+describe("ACCESSORIES_CATEGORY_PAGES text fidelity (the S14-9 guard)", () => {
+  /** The session-12 converter's textContent capture dropped the spaces around
+   *  the chip labels' separators and word boundaries ("Cases &Protection",
+   *  "OfficeAccessories", "Controllers,Keyboards &Trackpads"). The chip labels
+   *  are display text: these three patterns make the class unshippable. */
+  const collectText = (value: unknown, out: string[] = []): string[] => {
+    if (typeof value === "string") {
+      if (!value.startsWith("#/")) out.push(value);
+    } else if (Array.isArray(value)) {
+      for (const v of value) collectText(v, out);
+    } else if (value && typeof value === "object") {
+      for (const v of Object.values(value)) collectText(v, out);
+    }
+    return out;
+  };
+
+  const texts = collectText(ACCESSORIES_CATEGORY_PAGES);
+
+  it("no label joins '&' or ',' to the next word without a space ('Cases &Protection', 'Controllers,Keyboards')", () => {
+    const offenders = texts.filter((t) => /&[A-Z]/.test(t) || /,[A-Z]/.test(t));
+    expect(offenders).toEqual([]);
+  });
+
+  it("no label carries a dropped word boundary ('OfficeAccessories', 'WatchStraps', 'ProEssentials', 'Mountsand'…)", () => {
+    const joins = [
+      "OfficeAccessories", "WatchStraps", "ProEssentials", "TVEssentials",
+      "SmartHomeAccessories", "ContentCreation", "Mountsand", "AirPodsEssentials",
+    ];
+    const offenders = texts.filter((t) => joins.some((j) => t.includes(j)));
+    expect(offenders).toEqual([]);
   });
 });

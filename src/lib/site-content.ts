@@ -1,5 +1,5 @@
 import { CATEGORIES, PRODUCTS, type CategoryId } from "./catalog";
-import { routeHref, MARKETING_ROUTE_CATEGORIES } from "./router";
+import { routeHref, MARKETING_ROUTE_CATEGORIES, type MarketingCategoryId } from "./router";
 import { ACCESSORIES_INFO_LABELS } from "./accessories-page";
 import { ACCESSORIES_CATEGORY_INFO_LABELS } from "./accessories-category-pages";
 import { AIRPODS_INFO_LABELS } from "./airpods-page";
@@ -380,6 +380,10 @@ export interface FooterSection {
 
 const info = (label: string): FooterLink => ({ label, href: routeHref.info(slugify(label)) });
 const store = (label: string, category: CategoryId): FooterLink => ({ label, href: routeHref.store(category) });
+const marketing = (label: string, category: MarketingCategoryId): FooterLink => ({
+  label,
+  href: routeHref.marketing(category),
+});
 
 export const FOOTER_GROUPS: readonly (readonly FooterSection[])[] = [
   [
@@ -393,7 +397,9 @@ export const FOOTER_GROUPS: readonly (readonly FooterSection[])[] = [
         store("Watch", "watch"),
         store("Vision", "vision"),
         store("AirPods", "airpods"),
-        store("Home", "home"),
+        // the reference's footer Home routes to the marketing page (/sg/home/)
+        // — swept with the D17 re-route (S14-10)
+        marketing("Home", "home"),
         info("AirTag"),
         store("Accessories", "accessories"),
       ],

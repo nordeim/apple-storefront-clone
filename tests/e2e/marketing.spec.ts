@@ -5,7 +5,10 @@ import { expect, test } from "@playwright/test";
 // page's measured model (chapternav, tabbed line-up, value props, closing
 // directory), the D10 price derivation on the Home page's line-up (the
 // reference quotes S$399 for Apple TV 4K; this clone's catalog says From
-// S$229) and the hero-led Vision page.
+// S$229) and the hero-led Vision page. Session 14 (S14-11) added the
+// text-fidelity fallout pins (the "best place" heading), the real directory
+// pin, the unique-heading-id pin (S14-1), the vision hero's D12 deep-link and
+// the MarketingAccordion interaction pin.
 
 test("the Mac marketing page renders its measured model", async ({ page }) => {
   await page.goto("/#/mac");
@@ -29,9 +32,15 @@ test("the Mac marketing page renders its measured model", async ({ page }) => {
   await expect(m6Tile).toContainText("From S$2,299");
   await expect(m6Tile.getByRole("link", { name: "Buy" })).toHaveAttribute("href", "#/product/macbook-pro-m6?buy");
 
-  // the value props section (7 rows) and the closing directory
-  await expect(page.getByRole("heading", { name: "Why Apple is the bestplace to shop Mac." })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Mac" }).locator("..").getByRole("listitem").first()).toBeVisible();
+  // the value props section (7 rows) and the closing directory — the heading
+  // is the corrected running text (S14-4: the reference's own <br>-join
+  // "bestplace" was a capture artifact, not the reference's typography)
+  await expect(page.getByRole("heading", { name: "Why Apple is the best place to shop Mac." })).toBeVisible();
+  // the closing directory: the measured link count and the S14-7 routing —
+  // "Mac Accessories" routes to the per-category grid like the flyout does
+  const directory = page.locator("section.marketing-directory");
+  await expect(directory.getByRole("link", { name: "Mac Accessories" })).toHaveAttribute("href", "#/store/mac/accessories");
+  await expect(directory.getByRole("listitem")).toHaveCount(26);
 
   // the superset band routes to the store
   await expect(page.getByRole("link", { name: "Shop Mac" }).last()).toHaveAttribute("href", "#/store/mac");
@@ -72,6 +81,61 @@ test("the Vision page renders its hero-led statement family", async ({ page }) =
   // the hero statement + its CTAs
   await expect(page.getByRole("heading", { name: "New powerful M5 chip and comfortable Dual Knit Band." })).toBeVisible();
   await expect(page.getByRole("link", { name: "Buy" }).first()).toBeVisible();
+  // S14-11 (the audit's F6): the hero's Buy deep-links the configurator (D12)
+  await expect(page.getByRole("link", { name: "Buy" }).first()).toHaveAttribute("href", "#/product/apple-vision-pro?buy");
+});
+
+test("the Vision page carries the rebuilt measured structure (S14-8)", async ({ page }) => {
+  await page.goto("/#/vision");
+  // the foundation statements (the reference's section-foundation)
+  await expect(page.getByText("The era of spatial computing is here.")).toBeVisible();
+  // the five experiences subsections (the reference's section-experiences)
+  for (const h2 of ["Entertainment", "Productivity", "Photos and Videos", "Connection", "Apps"]) {
+    await expect(
+      page.locator("section.marketing-statement").filter({ hasText: h2 }).getByRole("heading", { name: h2, exact: true }),
+    ).toBeVisible();
+  }
+  // the two routers (the F5 fix: exactly one accessories + one developer)
+  await expect(page.getByRole("heading", { name: "Explore Apple Vision Pro accessories." })).toHaveCount(1);
+  await expect(
+    page.getByRole("heading", { name: "An exciting new platform. A world of new opportunities for developers." }),
+  ).toHaveCount(1);
+  // the experiences' corrected running text (S14-4's class)
+  await expect(page.getByText("The ultimate theatre. Wherever you are.")).toBeVisible();
+});
+
+test("same-kind sections carry unique heading ids (S14-1)", async ({ page }) => {
+  for (const route of ["/#/mac", "/#/iphone", "/#/vision", "/#/home"]) {
+    await page.goto(route);
+    const ids = await page.evaluate(() => [...document.querySelectorAll("[id^='marketing-']")].map((e) => e.id));
+    expect(new Set(ids).size, `${route}: duplicate marketing-* ids`).toBe(ids.length);
+  }
+});
+
+test("the MarketingAccordion interaction (expand reveals the panel)", async ({ page }) => {
+  await page.goto("/#/iphone");
+  // the first item ("iPhone and Mac") is open by default (useState(0)) — pin
+  // the second item's collapsed -> expanded -> collapsed cycle
+  const watch = page.getByRole("button", { name: "iPhone and Apple Watch" });
+  await expect(watch).toHaveAttribute("aria-expanded", "false");
+  await watch.click();
+  await expect(watch).toHaveAttribute("aria-expanded", "true");
+  // the expanded panel reveals the measured continuity copy (the S14-5 full
+  // text — 260+ chars, no mid-word cut)
+  await expect(page.getByText("just tap your iPhone to continue the conversation there.")).toBeVisible();
+  await watch.click();
+  await expect(watch).toHaveAttribute("aria-expanded", "false");
+});
+
+test("the routing fixes land on their modeled surfaces (S14-7)", async ({ page }) => {
+  await page.goto("/#/watch");
+  // "Shop Apple Watch" routes to the store (the reference: goto/buy_watch)
+  await expect(page.getByRole("link", { name: "Shop Apple Watch" }).first()).toHaveAttribute("href", "#/store/watch");
+  await page.goto("/#/iphone");
+  // the AirTag card's Buy deep-links the configurator (AirTag IS a catalog
+  // product — the D12 rule)
+  const airTag = page.locator("li", { has: page.getByRole("heading", { name: "AirTag" }) });
+  await expect(airTag.getByRole("link", { name: "Buy" })).toHaveAttribute("href", "#/product/airtag-4-pack?buy");
 });
 
 test("the nav main links route to the marketing pages", async ({ page }) => {

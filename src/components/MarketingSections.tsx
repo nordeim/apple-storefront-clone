@@ -125,7 +125,7 @@ export const LineupGallery = memo(function LineupGallery({ section }: { section:
           </div>
         ) : (
           <ul role="list" className="m-0 grid list-none gap-5 p-0">
-            {section.tabs[0].tiles.map((tile) => (
+            {(section.tabs[0]?.tiles ?? []).map((tile) => (
               <LineupTile key={tile.name} tile={tile} />
             ))}
           </ul>
@@ -135,12 +135,20 @@ export const LineupGallery = memo(function LineupGallery({ section }: { section:
   );
 });
 
-/** The "Why Apple is the best place to shop X." icon-row family. */
-export const ValueProps = memo(function ValueProps({ section }: { section: Extract<MarketingSection, { kind: "valueprops" }> }) {
+/** The "Why Apple is the best place to shop X." icon-row family. The heading
+ * id derives from the page-level section index — a page can carry two
+ * valueprops sections (iphone) and a constant id would collide (S14-1). */
+export const ValueProps = memo(function ValueProps({
+  section,
+  id,
+}: {
+  section: Extract<MarketingSection, { kind: "valueprops" }>;
+  id: number;
+}) {
   return (
-    <section aria-labelledby="marketing-valueprops-heading" className="marketing-section marketing-valueprops">
+    <section aria-labelledby={`marketing-valueprops-heading-${id}`} className="marketing-section marketing-valueprops">
       <div className="mx-auto max-w-[1024px] px-[22px]">
-        <h2 id="marketing-valueprops-heading" className="marketing-section-header">
+        <h2 id={`marketing-valueprops-heading-${id}`} className="marketing-section-header">
           {section.heading}
           {section.headCta ? (
             <>
@@ -170,13 +178,21 @@ export const ValueProps = memo(function ValueProps({ section }: { section: Extra
 });
 
 /** The banner-card / hero-card families (Switch to Mac, essentials, the
- * iPhone Duo hero, the vision Entertainment cards). */
-export const MarketingCards = memo(function MarketingCards({ section }: { section: Extract<MarketingSection, { kind: "cards" }> }) {
+ * iPhone Duo hero, the vision Entertainment cards). The heading id derives
+ * from the page-level section index — mac alone carries three cards
+ * sections and a constant id would collide (S14-1). */
+export const MarketingCards = memo(function MarketingCards({
+  section,
+  id,
+}: {
+  section: Extract<MarketingSection, { kind: "cards" }>;
+  id: number;
+}) {
   return (
-    <section aria-labelledby="marketing-cards-heading" className="marketing-section">
+    <section aria-labelledby={`marketing-cards-heading-${id}`} className="marketing-section">
       <div className="mx-auto max-w-[1024px] px-[22px]">
         {section.heading ? (
-          <h2 id="marketing-cards-heading" className="marketing-section-header">
+          <h2 id={`marketing-cards-heading-${id}`} className="marketing-section-header">
             {section.heading}
           </h2>
         ) : null}
@@ -280,13 +296,21 @@ export const MarketingDirectory = memo(function MarketingDirectory({ section }: 
 });
 
 /** The vision page's hero-led statement sections: measured headline + copy
- * + CTAs (the reference's imagery drops, D1). */
-export const StatementSection = memo(function StatementSection({ section }: { section: Extract<MarketingSection, { kind: "statement" }> }) {
+ * + CTAs (the reference's imagery drops, D1). The heading id derives from
+ * the page-level section index — vision carries eight statements and a
+ * constant id would collide (S14-1). */
+export const StatementSection = memo(function StatementSection({
+  section,
+  id,
+}: {
+  section: Extract<MarketingSection, { kind: "statement" }>;
+  id: number;
+}) {
   return (
-    <section aria-labelledby="marketing-statement-heading" className="marketing-section marketing-statement">
+    <section aria-labelledby={`marketing-statement-heading-${id}`} className="marketing-section marketing-statement">
       <div className="mx-auto max-w-[820px] px-[22px] text-center">
         {section.heading ? (
-          <h2 id="marketing-statement-heading" className="marketing-statement-headline">
+          <h2 id={`marketing-statement-heading-${id}`} className="marketing-statement-headline">
             {section.heading}
           </h2>
         ) : null}
@@ -318,15 +342,15 @@ export function MarketingPageSections({ page }: { page: MarketingPage }) {
           case "lineup":
             return <LineupGallery key={i} section={section} />;
           case "valueprops":
-            return <ValueProps key={i} section={section} />;
+            return <ValueProps key={i} id={i} section={section} />;
           case "cards":
-            return <MarketingCards key={i} section={section} />;
+            return <MarketingCards key={i} id={i} section={section} />;
           case "accordion":
             return <MarketingAccordion key={i} section={section} />;
           case "directory":
             return <MarketingDirectory key={i} section={section} />;
           case "statement":
-            return <StatementSection key={i} section={section} />;
+            return <StatementSection key={i} id={i} section={section} />;
         }
       })}
     </>

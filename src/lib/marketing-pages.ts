@@ -25,8 +25,12 @@
  *   the measured text carries the content.
  *
  * Generated from the live captures by the session-13 converter
- * (.scratch/s13/convert.mjs) and hand-verified against the raw DOM
- * extraction. Pinned by marketing-pages.test.ts.
+ * (.scratch/s13/convert.mjs, expired with the sandbox — the scratch area is
+ * gitignored). Hand-maintained measured data since session 14: the S14
+ * fidelity pass re-measured every patched string against the live reference
+ * DOM (the converter's 34/240/260-char caps and <br>-join artifacts fixed;
+ * the vision page rebuilt to the measured section structure). Pinned by
+ * marketing-pages.test.ts — including the S14-3 text-fidelity guard.
  */
 import type { MarketingCategoryId } from "./router";
 
@@ -264,7 +268,7 @@ const MAC_PAGE: MarketingPage = {
         { chip: "Displays", tiles: [
           {
             name: "Studio Display",
-            badge: "Studio Display",
+            badge: null,
             tagline: "A 5K Retina display that’s perfect for Mac.",
             measuredPrice: "From S$2,199",
             productId: null,
@@ -273,7 +277,7 @@ const MAC_PAGE: MarketingPage = {
           },
           {
             name: "Studio Display XDR",
-            badge: "Studio Display X",
+            badge: null,
             tagline: "The ultimate 5K Retina XDR display for creative and pro workflows.",
             measuredPrice: "From S$4,499",
             productId: null,
@@ -285,7 +289,7 @@ const MAC_PAGE: MarketingPage = {
     },
     {
       kind: "valueprops",
-      heading: "Why Apple is the bestplace to shop Mac.",
+      heading: "Why Apple is the best place to shop Mac.",
       headCta: { label: "Shop Mac", href: "#/store/mac" },
       rows: [
         { title: "Financing", copy: "Pay 0% interest for up to 24 months.",
@@ -346,13 +350,13 @@ const MAC_PAGE: MarketingPage = {
       tiles: [
         {
           eyebrow: null, headline: "Mac and iPhone",
-          copy: "Answer calls or messages from your iPhone directly on your Mac. See and control what’s on your iPhone from your Mac with iPhone Mirroring and Live Activities. Use Universal Clipboard to copy images, video or text from your iPhone, then paste into another app o", measuredPrice: null,
+          copy: "Answer calls or messages from your iPhone directly on your Mac. See and control what’s on your iPhone from your Mac with iPhone Mirroring and Live Activities. Use Universal Clipboard to copy images, video or text from your iPhone, then paste into another app on your nearby Mac. And thanks to iCloud, you can access your files from either your iPhone or your Mac. And so m⁠u⁠c⁠h⁠ ⁠m⁠o⁠r⁠e⁠.", measuredPrice: null,
           productId: null,
           ctas: [],
         },
         {
           eyebrow: null, headline: "Mac and iPad",
-          copy: "Sketch on your iPad and have it appear instantly on your Mac. Or use your iPad as a second display, so you can work on one screen while you reference the other. You can even start something on your iPad — like a presentation or an email — and continue it on yo", measuredPrice: null,
+          copy: "Sketch on your iPad and have it appear instantly on your Mac. Or use your iPad as a second display, so you can work on one screen while you reference the other. You can even start something on your iPad — like a presentation or an email — and continue it on your Mac.", measuredPrice: null,
           productId: null,
           ctas: [],
         },
@@ -379,7 +383,7 @@ const MAC_PAGE: MarketingPage = {
         { label: "Compare Mac", href: "#/info/compare-mac" },
         { label: "Switch from PC to Mac", href: "#/info/switch-from-pc-to-mac" },
         { label: "Shop Mac", href: "#/store/mac" },
-        { label: "Mac Accessories", href: "#/info/mac-accessories" },
+        { label: "Mac Accessories", href: "#/store/mac/accessories" },
         { label: "Apple Trade In", href: "#/info/apple-trade-in" },
         { label: "Financing", href: "#/info/financing" },
         { label: "Personal Setup", href: "#/info/personal-setup" },
@@ -462,7 +466,7 @@ const IPAD_PAGE: MarketingPage = {
     },
     {
       kind: "valueprops",
-      heading: "Why Apple is the bestplace to buy iPad.",
+      heading: "Why Apple is the best place to buy iPad.",
       headCta: { label: "Shop iPad", href: "#/store/ipad" },
       rows: [
         { title: "Financing", copy: "Pay 0% interest for up to 24 months.",
@@ -507,19 +511,19 @@ const IPAD_PAGE: MarketingPage = {
       tiles: [
         {
           eyebrow: null, headline: "iPad and iPhone",
-          copy: "iPad is perfect for taking the content you capture on iPhone and bringing it to life on an immersive canvas. You can shoot videos and photos on your iPhone and use the large display of your iPad to edit, add animations and more. You can also pick up wherever y", measuredPrice: null,
+          copy: "iPad is perfect for taking the content you capture on iPhone and bringing it to life on an immersive canvas. You can shoot videos and photos on your iPhone and use the large display of your iPad to edit, add animations and more. You can also pick up wherever you left off with Handoff.", measuredPrice: null,
           productId: null,
           ctas: [],
         },
         {
           eyebrow: null, headline: "iPad and Mac",
-          copy: "iPad and Mac are designed to work together to form the ultimate creative setup. Sketch on your iPad and have it appear instantly on your Mac with Sidecar. Then use your iPad for drawing or editing with Apple Pencil or as a second display. Extend your workflow ", measuredPrice: null,
+          copy: "iPad and Mac are designed to work together to form the ultimate creative setup. Sketch on your iPad and have it appear instantly on your Mac with Sidecar. Then use your iPad for drawing or editing with Apple Pencil or as a second display. Extend your workflow to new places, and when you return to your desk, Universal Control allows you to use one mouse or trackpad seamlessly across both devices.", measuredPrice: null,
           productId: null,
           ctas: [],
         },
         {
           eyebrow: null, headline: "iPad and Apple Watch",
-          copy: "iPad is a great way to optimise your workouts while tracking your progress on Apple Watch. See personal metrics from Apple Watch integrated on the screen of your iPad in real time. The sensors in Apple Watch combine with advanced algorithms to provide data tha", measuredPrice: null,
+          copy: "iPad is a great way to optimise your workouts while tracking your progress on Apple Watch. See personal metrics from Apple Watch integrated on the screen of your iPad in real time. The sensors in Apple Watch combine with advanced algorithms to provide data that keeps you motivated. And see it all come together in the Health app on iPad.", measuredPrice: null,
           productId: null,
           ctas: [],
         }
@@ -538,7 +542,7 @@ const IPAD_PAGE: MarketingPage = {
         { label: "Keyboards", href: "#/info/keyboards" },
         { label: "Compare iPad", href: "#/info/compare-ipad" },
         { label: "Shop iPad", href: "#/store/ipad" },
-        { label: "iPad Accessories", href: "#/info/ipad-accessories" },
+        { label: "iPad Accessories", href: "#/store/ipad/accessories" },
         { label: "Apple Trade In", href: "#/info/apple-trade-in" },
         { label: "Financing", href: "#/info/financing" },
         { label: "Personal Setup", href: "#/info/personal-setup" },
@@ -655,7 +659,7 @@ const IPHONE_PAGE: MarketingPage = {
     },
     {
       kind: "valueprops",
-      heading: "Why Apple is the bestplace to buy iPhone.",
+      heading: "Why Apple is the best place to buy iPhone.",
       headCta: { label: "Shop iPhone", href: "#/store/iphone" },
       rows: [
         { title: "Apple Trade In", copy: "Save on a new iPhone with a trade‑in.",
@@ -674,7 +678,7 @@ const IPHONE_PAGE: MarketingPage = {
     },
     {
       kind: "valueprops",
-      heading: "Why Apple is the bestplace to buy iPhone.",
+      heading: "Why Apple is the best place to buy iPhone.",
       headCta: { label: "Shop iPhone", href: "#/store/iphone" },
       rows: [
         { title: "Apple Trade In", copy: "You can get up to S$515 for your Android smartphone.*",
@@ -717,7 +721,7 @@ const IPHONE_PAGE: MarketingPage = {
           eyebrow: null, headline: "AirTag",
           copy: "Now with a 50% louder speaker and up to a 1.5x greater Precision Finding range,1 it’s easier than ever to keep track of what matters.", measuredPrice: null,
           productId: null,
-          ctas: [{ label: "Buy", href: "#/info/airtag" }],
+          ctas: [{ label: "Buy", href: "#/product/airtag-4-pack?buy" }],
         }
       ],
     },
@@ -725,9 +729,9 @@ const IPHONE_PAGE: MarketingPage = {
       kind: "accordion",
       heading: "Significant others.",
       items: [
-        { headline: "iPhone and Mac", copy: "With iPhone Mirroring, you can view your iPhone screen on your Mac and control it without picking up your phone. Continuity features also let you answer calls or messages directly from your Mac. You can even copy images, video or text from your iPhone and past",
+        { headline: "iPhone and Mac", copy: "With iPhone Mirroring, you can view your iPhone screen on your Mac and control it without picking up your phone. Continuity features also let you answer calls or messages directly from your Mac. You can even copy images, video or text from your iPhone and paste it all into a different app on your Mac. And with iCloud, you can access your files from either device.",
           ctas: [] },
-        { headline: "iPhone and Apple Watch", copy: "Misplaced your iPhone? The latest Apple Watch models can show you its approximate distance and direction.2 To set up a group photo on your iPhone, join the group and use Apple Watch as a viewfinder to snap the shot. And when you take a call on your Apple Watch",
+        { headline: "iPhone and Apple Watch", copy: "Misplaced your iPhone? The latest Apple Watch models can show you its approximate distance and direction.2 To set up a group photo on your iPhone, join the group and use Apple Watch as a viewfinder to snap the shot. And when you take a call on your Apple Watch, just tap your iPhone to continue the conversation there.",
           ctas: [] },
         { headline: "iPhone and AirPods", copy: "Set up AirPods on iPhone with just a tap. You’ll love Adaptive Audio, which automatically tailors the noise control for you to provide the best listening experience across different environments and interactions throughout the day.",
           ctas: [] },
@@ -747,7 +751,7 @@ const IPHONE_PAGE: MarketingPage = {
         { label: "Compare iPhone", href: "#/info/compare-iphone" },
         { label: "Switch from Android", href: "#/info/switch-from-android" },
         { label: "Shop iPhone", href: "#/store/iphone" },
-        { label: "iPhone Accessories", href: "#/info/iphone-accessories" },
+        { label: "iPhone Accessories", href: "#/store/iphone/accessories" },
         { label: "Apple Trade In", href: "#/info/apple-trade-in" },
         { label: "Financing", href: "#/info/financing" },
         { label: "Personal Setup", href: "#/info/personal-setup" },
@@ -792,7 +796,7 @@ const WATCH_PAGE: MarketingPage = {
           {
             name: "Apple Watch Series 12",
             badge: "New",
-            tagline: "The ultimate way towatch your health.",
+            tagline: "The ultimate way to watch your health.",
             measuredPrice: null,
             productId: "apple-watch-series-12",
             learnHref: "#/product/apple-watch-series-12",
@@ -801,7 +805,7 @@ const WATCH_PAGE: MarketingPage = {
           {
             name: "Apple Watch Ultra 4",
             badge: "New",
-            tagline: "The ultimate sportsand adventure watch.",
+            tagline: "The ultimate sports and adventure watch.",
             measuredPrice: "From S$1,199",
             productId: null,
             learnHref: "#/info/apple-watch-ultra-4",
@@ -822,7 +826,7 @@ const WATCH_PAGE: MarketingPage = {
     {
       kind: "valueprops",
       heading: "Why Apple is the best place to buy Apple Watch.",
-      headCta: { label: "Shop Apple Watch", href: "#/info/shop-apple-watch" },
+      headCta: { label: "Shop Apple Watch", href: "#/store/watch" },
       rows: [
         { title: "Financing", copy: "Pay 0% interest for up to 24 months.",
           cta: null },
@@ -858,7 +862,7 @@ const WATCH_PAGE: MarketingPage = {
       tiles: [
         {
           eyebrow: null, headline: "Apple Watch and iPhone",
-          copy: "Combining Apple Watch and iPhone opens up a world of features that make each device better. You can do things like create a custom route with Maps on your iPhone, then download it to your watch to use anytime. Or start a workout on your watch and see your metr", measuredPrice: null,
+          copy: "Combining Apple Watch and iPhone opens up a world of features that make each device better. You can do things like create a custom route with Maps on your iPhone, then download it to your watch to use anytime. Or start a workout on your watch and see your metrics automatically appear as a Live Activity on your iPhone.", measuredPrice: null,
           productId: null,
           ctas: [],
         },
@@ -888,9 +892,9 @@ const WATCH_PAGE: MarketingPage = {
         { label: "Apple Watch Hermès", href: "#/info/apple-watch-herm-s" },
         { label: "Compare Watch", href: "#/info/compare-watch" },
         { label: "Why Apple Watch", href: "#/info/why-apple-watch" },
-        { label: "Shop Apple Watch", href: "#/info/shop-apple-watch" },
+        { label: "Shop Apple Watch", href: "#/store/watch" },
         { label: "Apple Watch Straps", href: "#/info/apple-watch-straps" },
-        { label: "Apple Watch Accessories", href: "#/info/apple-watch-accessories" },
+        { label: "Apple Watch Accessories", href: "#/store/watch/accessories" },
         { label: "Apple Trade In", href: "#/info/apple-trade-in" },
         { label: "Financing", href: "#/info/financing" },
         { label: "Personal Setup", href: "#/info/personal-setup" },
@@ -916,19 +920,30 @@ const VISION_PAGE: MarketingPage = {
   sections: [
     {
       kind: "statement",
+      // the reference's section-hero (the D12 pin: Buy deep-links the configurator)
       heading: "New powerful M5 chip and comfortable Dual Knit Band.",
       paragraphs: [
-        "New powerful M5 chip and comfortable Dual Knit Band.",
       ],
       ctas: [{ label: "Book a demo", href: "#/info/book-a-demo" }, { label: "Buy", href: "#/product/apple-vision-pro?buy" }],
     },
     {
       kind: "statement",
+      // the reference's section-foundation: three display statements, no heading
+      heading: null,
+      paragraphs: [
+        "Apple Vision Pro seamlessly blends digital content with your physical space.",
+        "So you can work, watch, relive memories and connect in ways never before possible.",
+        "The era of spatial computing is here.",
+      ],
+      ctas: [],
+    },
+    {
+      kind: "statement",
+      // section-design: the video caption pair leads, then the measured drawer copy; the AR quick-look link is the reference's own
       heading: "Take a closer look.",
       paragraphs: [
         "Stream Wolfs on Apple TV with a subscription",
         "PlayStation VR2 Sense controller sold separately.",
-        "Take a closer look.",
         "Apple Vision Pro is the result of decades of high‑performance, mobile and wearable device innovation. Its advanced technology and elegant form deliver an amazing experience every time you put it on.",
         "The new Dual Knit Band combines soft, breathable straps with a counterbalanced design, so you can stay immersed in your favourite spatial experiences longer.",
         "The dual-function Fit Dial lets you easily adjust the band’s upper and lower straps independently for a comfortable, personalised fit.",
@@ -939,38 +954,93 @@ const VISION_PAGE: MarketingPage = {
         "ZEISS Optical Inserts can be customised with your vision prescription,2 and they attach to the lenses magnetically for precise viewing and eye tracking.",
         "The optional Solo Knit Band provides cushioning, breathability and stretch.",
       ],
-      ctas: [{ label: "Stream Wolfs on Apple TV with a su", href: "#/info/stream-wolfs-on-apple-tv-with-a-su" }, { label: "View in your space", href: "#/info/view-in-your-space" }],
-    },
-    {
-      kind: "cards",
-      heading: "Entertainment",
-      tiles: [
-        {
-          eyebrow: null, headline: null,
-          copy: "With Apple Intelligence, Writing Tools can proofread your text and rewrite versions until the tone and wording are just right, and summarise selected text with a tap. And Smart Reply in Mail and Messages can quickly draft a response with all the right details ", measuredPrice: null,
-          productId: null,
-          ctas: [{ label: "Learn more about Apple Intelligenc", href: "#/info/learn-more-about-apple-intelligenc" }],
-        },
-        {
-          eyebrow: null, headline: null,
-          copy: "The App Store for Apple Vision Pro features groundbreaking apps built for visionOS with powerful spatial experiences, as well as compatible iPad and iPhone apps. Movies, games, sport, fashion, business — it’s all here.", measuredPrice: null,
-          productId: null,
-          ctas: [{ label: "Explore apps for Apple Vision Pro", href: "#/info/explore-apps-for-apple-vision-pro" }],
-        }
-      ],
+      ctas: [{ label: "Stream Wolfs on Apple TV with a subscription", href: "#/info/stream-wolfs-on-apple-tv-with-a-subscription" }],
     },
     {
       kind: "statement",
+      // section-experiences: Entertainment
+      heading: "Entertainment",
+      paragraphs: [
+        "The ultimate theatre. Wherever you are.",
+        "Transform any room into your own personal theatre — with more pixels than a 4K TV for each eye. Experience mind‑blowing immersion with Spatial Audio and expand movies, shows and games on a giant screen. Whether you’re on the sofa or a long flight, enjoy stunning content anywhere.",
+        "Apple Immersive Video is a 180-degree, 3D 8K recording format captured with Spatial Audio — putting you inside the action and transporting you to places you’ve never been.",
+        "Immerse yourself with the Spatial Gallery app — an evolving collection of spatial photos, videos and panoramas curated by Apple. Discover unique perspectives from trailblazing creators, stories from iconic brands and behind-the-scenes moments from Apple Music and Apple TV.",
+        "visionOS games offer thrilling ways to play using the space around you. With hand tracking at up to 90Hz, spatial games feel more fluid and responsive than ever. You can also experience selected games, like Pickle Pro, in six degrees of freedom using the PlayStation VR2 Sense controller.3",
+        "Enjoy your favourite movies and TV shows from Apple TV and other streaming services. Even watch them with friends using Apple Vision Pro in the same room.4",
+        "Apple Vision Pro is fantastic on the move. With Travel Mode, whatever you’re watching will feel smooth — whether on a train, bus, car or at 9,000 metres. And you can seamlessly pair AirPods Pro with Apple Vision Pro so you can focus on what you’re watching.",
+      ],
+      ctas: [{ label: "Stream Wolfs on Apple TV with a subscription", href: "#/info/stream-wolfs-on-apple-tv-with-a-subscription" }],
+    },
+    {
+      kind: "statement",
+      // section-experiences: Productivity
+      heading: "Productivity",
+      paragraphs: [
+        "A workspace with infinite space.",
+        "Apple Vision Pro gives you limitless space to do your best work. Bring your Mac workflows into view on a massive screen. Multitask across apps and organise them any way you like. And write, express yourself and get things done effortlessly with Apple Intelligence — all with groundbreaking privacy protections.5",
+        "Mac Virtual Display lets you bring your Mac wirelessly into Apple Vision Pro with an expandable, ultra-wide screen and rich stereo sound.6 It’s the equivalent of having two 5K monitors side by side, creating one massive, curved display — everything looks astoundingly sharp and incredibly detailed.",
+        "With widgets, you can arrange your favourite information and apps — like Photos, Clock, Music and Calendar — in your space exactly how you want. Customise their frame thickness, colour and depth, and find them just where you left them, every time you put on Apple Vision Pro.",
+        "With Apple Intelligence, Writing Tools can proofread your text and rewrite versions until the tone and wording are just right, and summarise selected text with a tap. And Smart Reply in Mail and Messages can quickly draft a response with all the right details — identifying key questions and suggesting relevant answers. Usage limits may apply.",
+        "Use Magic Keyboard, Magic Trackpad and other Bluetooth accessories with Apple Vision Pro. Great for things like complex spreadsheets and long emails.",
+        "Apple Vision Pro is redefining how businesses run. Collaborate with teams across time zones, build and iterate on prototypes faster and turn complex training into immersive experiences.",
+      ],
+      ctas: [{ label: "Learn more about Apple Intelligence", href: "#/info/learn-more-about-apple-intelligence" }, { label: "Visit Apple Vision Pro for Enterprise", href: "#/info/visit-apple-vision-pro-for-enterprise" }],
+    },
+    {
+      kind: "statement",
+      // section-experiences: Photos and Videos
+      heading: "Photos and Videos",
+      paragraphs: [
+        "Be in the moment. All over again.",
+        "With Apple Vision Pro, you can capture magical spatial photos and videos in 3D, then relive those cherished moments all over again. And make your memories come to life by transforming your 2D photos into spatial scenes with just a tap.",
+        "Instantly transform 2D photos from your photo library into spatial scenes that feel as if you could lean in and look around — bringing memories to life with natural-looking depth and dimension.",
+        "Spatial videos and photos have incredible depth that lets you see into a moment. Expand them to get even closer to your favourite memories.",
+        "Apple Intelligence helps you search for photos and videos in the Photos app simply by describing what you’re looking for. And you can revisit your favourite moments by creating a custom memory movie in Photos. Just enter a description, and Apple Intelligence finds the best photos and videos to craft your movie with its own storyline and soundtrack.",
+        "With support for native playback of 360-degree, 180-degree and wide field-of-view video captured by action cameras from GoPro, Insta360 and Canon, you can relive and share exciting moments as they were meant to be seen.",
+        "The top button makes capturing spatial videos or photos quick and easy. EyeSight signals to those around you that you’re recording or taking photos.",
+        "You can also take spatial photos and videos on your iPhone, then relive them on Apple Vision Pro.7",
+      ],
+      ctas: [],
+    },
+    {
+      kind: "statement",
+      // section-experiences: Connection
+      heading: "Connection",
+      paragraphs: [
+        "Share quality time. And space.",
+        "Collaborate and connect wherever you are, in more engaging ways than ever. Make a FaceTime call with others and see them in life-sized video tiles. Or use your Persona and feel like co-workers, friends and family are there with you.",
+        "With striking realism and expressiveness, your Persona lets others see a dynamic, natural representation of you. You can even work together in the same space using apps like Freeform.",
+        "In FaceTime, each participant appears in your space within a tile that you can adjust in scale. Spatial Audio makes the conversation feel more natural by placing each person’s voice in the location of their tile.",
+        "With SharePlay, you can stream TV shows, movies and music and play multiplayer games with friends and family, and view photos together during a FaceTime call.",
+        "Express yourself visually with Image Playground. Create fun and unique images in seconds based on a description, a concept or even a friend from your Photos library — then share them in Messages or on social media. And create a Genmoji simply by typing a description in the emoji keyboard to match any conversation. All powered by Apple Intelligence. Usage limits may apply.",
+      ],
+      ctas: [],
+    },
+    {
+      kind: "statement",
+      // section-experiences: Apps
+      heading: "Apps",
+      paragraphs: [
+        "Do what you love. Reimagine how you do it.",
+        "Featured apps: Visage Ease VP.** For informational purposes only. Not for diagnostic use.",
+        "Apple Vision Pro expands the experience of your go‑to apps, making everything from browsing in Safari to chatting in Messages feel more magical. And on the App Store, you’ll discover an ever-growing collection of awe-inspiring spatial apps designed for Apple Vision Pro.",
+        "Apple Vision Pro has the familiar apps you know and love — transformed to live in your space. Like Safari, Photos, Music and Messages. And with iCloud, your content is automatically synced with your iPhone, iPad and Mac.",
+        "The App Store for Apple Vision Pro features groundbreaking apps built for visionOS with powerful spatial experiences, as well as compatible iPad and iPhone apps. Movies, games, sport, fashion, business — it’s all here.",
+        "Apps can expand fully into your space, like during a Mindfulness session, where you can create a private moment of calm.",
+      ],
+      ctas: [{ label: "Visit the App Store", href: "#/info/visit-the-app-store" }, { label: "Explore apps for Apple Vision Pro", href: "#/info/explore-apps-for-apple-vision-pro" }],
+    },
+    {
+      kind: "statement",
+      // section-visionos
       heading: "visionOS",
       paragraphs: [
-        "visionOS",
         "An operating system designed for spatial computing.",
-        "Built on the foundation of macOS, iOS and iPadOS, visionOS enables powerful spatial experiences that you navigate naturally using your eyes, hands and voice. And with the latest visionOS, you’ll discover even more magical ways to watch, wor",
-        "Learn more about visionOS",
+        "Built on the foundation of macOS, iOS and iPadOS, visionOS enables powerful spatial experiences that you navigate naturally using your eyes, hands and voice. And with the latest visionOS, you’ll discover even more magical ways to watch, work, create and connect colleagues, friends and family using Apple Vision Pro.",
         "In visionOS, apps fill the space around you, beyond the boundaries of a display. They move anywhere, scale to the perfect size, react to the lighting in your room and even cast shadows.",
         "Environments magically transform your surroundings with stunning 360-degree landscapes — like Yosemite, Bora Bora and Jupiter — letting apps grow beyond the dimensions of your room and creating the perfect place to focus.",
         "EyeSight lets those nearby know when you’re using apps or fully immersed in an experience. When someone approaches, Apple Vision Pro simultaneously lets you see the person and reveals your eyes to them.",
-        "Guest User makes it easy to give others access to your Apple Vision Pro, choose which apps they can see and guide them from your iPhone or iPad with View Mirroring. You can also save your most recent guest’s eye and hand data, so they can s",
+        "Guest User makes it easy to give others access to your Apple Vision Pro, choose which apps they can see and guide them from your iPhone or iPad with View Mirroring. You can also save your most recent guest’s eye and hand data, so they can skip their next setup and dive back in.",
         "Navigate visionOS just by looking at apps, buttons and text fields — and scroll through Safari web pages and other apps using only your eyes.",
         "Tap your fingers together to make a selection and gently flick to scroll. Apple Vision Pro is designed to understand hand gestures from comfortable positions, like when your hands are resting in your lap or on the sofa.",
         "Simply look at the microphone button in a search field and start speaking to dictate text.",
@@ -980,25 +1050,25 @@ const VISION_PAGE: MarketingPage = {
     },
     {
       kind: "statement",
+      // section-technology
       heading: "Technology",
       paragraphs: [
-        "Technology",
         "Innovation you can see, hear and feel.",
         "Pushing boundaries from the inside out.",
         "More pixels than a 4K TV. For each eye.",
         "The custom micro‑OLED display system features 23 million pixels, delivering stunning resolution and colours. And a specially designed three‑element lens creates the feeling of a display that’s everywhere you look.",
         "Our most advanced Spatial Audio system ever.",
-        "Dual-driver audio pods positioned next to each ear deliver personalised sound while letting you hear what’s around you. Spatial Audio makes sounds feel like they’re coming from your surroundings. Audio ray tracing analyses your room’s acous",
+        "Dual-driver audio pods positioned next to each ear deliver personalised sound while letting you hear what’s around you. Spatial Audio makes sounds feel like they’re coming from your surroundings. Audio ray tracing analyses your room’s acoustic properties to adapt and match sound to your space. And if you want to use headphones with Apple Vision Pro, AirPods Pro 3 and AirPods 4 offer the perfect experience — featuring Lossless Audio with ultra-low latency, supported by the H2‑to‑H2 connection across devices.",
         "Responsive, precision eye tracking.",
         "A high‑performance eye-tracking system of LEDs and infrared cameras projects invisible light patterns onto each eye. This advanced system provides ultra-precise input, so you can accurately select elements just by looking at them.",
         "A sophisticated sensor array.",
-        "A pair of high-resolution cameras transmit over 1 billion pixels per second to the displays so you can see the world around you clearly. The system also helps deliver precise head and hand tracking and real‑time 3D mapping, all while unders",
+        "A pair of high-resolution cameras transmit over 1 billion pixels per second to the displays so you can see the world around you clearly. The system also helps deliver precise head and hand tracking and real‑time 3D mapping, all while understanding your hand gestures from a wide range of positions.",
         "Revolutionary dual‑chip performance. Now powered by M5.",
-        "Apple Vision Pro makes a giant leap in chip performance with the new M5. It simultaneously runs visionOS, executes advanced computer vision algorithms and delivers stunning graphics. And the R1 chip is specifically dedicated to process inpu",
+        "Apple Vision Pro makes a giant leap in chip performance with the new M5. It simultaneously runs visionOS, executes advanced computer vision algorithms and delivers stunning graphics. And the R1 chip is specifically dedicated to process input from the cameras, sensors and microphones, streaming images to the displays within 12 milliseconds — for a virtually lag‑free, real‑time view of the world. With the extra power and efficiency provided by M5, Apple Vision Pro delivers even more incredible spatial experiences.",
         "Enables up to 120Hz refresh rates",
         "Renders 10% more pixels8",
         "Delivers up to 3 hours video playback1",
-        "The M5 chip supercharges Apple Vision Pro to deliver the best spatial experiences yet — including faster load times for apps and widgets, more responsive web browsing, sharper details across text and visuals8 and up to 2x faster AI workload",
+        "The M5 chip supercharges Apple Vision Pro to deliver the best spatial experiences yet — including faster load times for apps and widgets, more responsive web browsing, sharper details across text and visuals8 and up to 2x faster AI workloads.9",
         "A specially designed thermal system gently moves air through Apple Vision Pro, so it can deliver phenomenal performance while remaining cool and quiet.",
         "Infrared flood illuminators work with the external sensors to enhance hand‑tracking performance in low‑light conditions.",
       ],
@@ -1006,51 +1076,36 @@ const VISION_PAGE: MarketingPage = {
     },
     {
       kind: "statement",
+      // section-values
       heading: "Values",
       paragraphs: [
-        "Values",
         "Designed to make a difference.",
         "Our values lead the way.",
         "Use Optic ID to authorise purchases and unlock passwords with the uniqueness of your iris. Optic ID data is private and encrypted, and it never leaves your device. It’s accessible only to the Secure Enclave processor.",
         "Data from cameras and sensors is processed at the system level, so individual apps don’t need to see your surroundings to enable spatial experiences.",
         "Eye input is not shared with Apple, third-party apps or websites. Only your final selections are transmitted when you tap your fingers together.",
-        "Inclusive by design, Apple Vision Pro comes with built-in features like Smart Colour Invert, Reduce Transparency Support, Cochlear Implant Support, Live Captions10 and Live Recognition, which can describe surroundings, find objects and read",
+        "Inclusive by design, Apple Vision Pro comes with built-in features like Smart Colour Invert, Reduce Transparency Support, Cochlear Implant Support, Live Captions10 and Live Recognition, which can describe surroundings, find objects and read documents in real time.",
         "Apple Vision Pro contains 100 per cent recycled aluminium in the frame and battery enclosure.",
-        "Apple and the environment",
       ],
       ctas: [{ label: "Apple and the environment", href: "#/info/apple-and-the-environment" }],
     },
     {
       kind: "statement",
+      // section-routers: the accessories router
       heading: "Explore Apple Vision Pro accessories.",
       paragraphs: [
-        "Explore Apple Vision Pro accessories.",
-        "Shop",
-        "An exciting new platform. A world of new opportunities for developers.",
-        "The opportunities for what developers can dream up and build for Apple Vision Pro are endless. And with familiar tools and frameworks like Xcode, SwiftUI, RealityKit and ARKit, as well as support for Unity and the 3D-content preparation app",
-        "Learn more about developing for visionOS",
-      ],
-      ctas: [{ label: "Shop", href: "#/store/vision/accessories" }, { label: "Learn more about developing for vi", href: "#/info/learn-more-about-developing-for-vi" }],
-    },
-    {
-      kind: "statement",
-      heading: "Explore Apple Vision Pro accessories.",
-      paragraphs: [
-        "Explore Apple Vision Pro accessories.",
-        "Shop",
       ],
       ctas: [{ label: "Shop", href: "#/store/vision/accessories" }],
     },
     {
       kind: "statement",
+      // section-routers: the developer router
       heading: "An exciting new platform. A world of new opportunities for developers.",
       paragraphs: [
-        "An exciting new platform. A world of new opportunities for developers.",
-        "The opportunities for what developers can dream up and build for Apple Vision Pro are endless. And with familiar tools and frameworks like Xcode, SwiftUI, RealityKit and ARKit, as well as support for Unity and the 3D-content preparation app",
-        "Learn more about developing for visionOS",
+        "The opportunities for what developers can dream up and build for Apple Vision Pro are endless. And with familiar tools and frameworks like Xcode, SwiftUI, RealityKit and ARKit, as well as support for Unity and the 3D-content preparation app Reality Composer Pro, developers have everything they need to create amazing spatial experiences.",
       ],
-      ctas: [{ label: "Learn more about developing for vi", href: "#/info/learn-more-about-developing-for-vi" }],
-    }
+      ctas: [{ label: "Learn more about developing for visionOS", href: "#/info/learn-more-about-developing-for-visionos" }],
+    },
   ],
 };
 
@@ -1088,7 +1143,7 @@ const HOME_PAGE: MarketingPage = {
           {
             name: "HomePod mini 2",
             badge: "New",
-            tagline: "Room-filling soundin a compact design.",
+            tagline: "Room-filling sound in a compact design.",
             measuredPrice: "S$199",
             productId: null,
             learnHref: "#/info/homepod-mini-2",
@@ -1109,7 +1164,7 @@ const HOME_PAGE: MarketingPage = {
     {
       kind: "valueprops",
       heading: "Why Apple is the best place to shop Apple Home.",
-      headCta: { label: "Shop Apple Home", href: "#/info/shop-apple-home" },
+      headCta: { label: "Shop Apple Home", href: "#/store/home" },
       rows: [
         { title: "Guided Shopping", copy: "Shop live with a Specialist.",
           cta: null },
@@ -1131,19 +1186,19 @@ const HOME_PAGE: MarketingPage = {
         "Delightful and connected",
         "Apple Home devices connect seamlessly and work better together. HomePod, HomePod mini 2, Apple TV 4K, and Apple HomeView all bring you integrated entertainment and effortless smart home assistance.",
         "Personal assistance",
-        "Siri AI.More personal.More powerful.1",
+        "Siri AI. More personal. More powerful.1",
         "Personal assistance",
-        "Truly helpful AI that’s centered around you and your needs, grounded in your context, and private at every step.Siri AI is rolling out in English. Usage limits may apply.",
+        "Truly helpful AI that’s centered around you and your needs, grounded in your context, and private at every step. Siri AI is rolling out in English. Usage limits may apply.",
         "Effortless entertainment",
-        "Everything you loveto hear and see.In exceptional quality.",
+        "Everything you love to hear and see. In exceptional quality.",
         "Effortless entertainment",
-        "Setting up your home theater is easy with Apple Home devices. HomePod mini 2 and HomePod deliver high-fidelity sound, taking your audio from big to bigger. And Apple TV 4K (4th generation) provides stunning picture with a stunningly simple ",
+        "Setting up your home theater is easy with Apple Home devices. HomePod mini 2 and HomePod deliver high-fidelity sound, taking your audio from big to bigger. And Apple TV 4K (4th generation) provides stunning picture with a stunningly simple set up. As a connected system, they deliver a truly cinematic audio and visual experience. And it’s easier than ever to discover relevant entertainment from the world of Apple services — just ask Siri.",
         "Keep in touch",
         "Stay connected with friends and family, wherever they are.",
         "Keep in touch",
-        "Apple HomeView brings crystal-clear audio and video to your FaceTime calls. Quickly respond to Messages on HomePod and HomeView with just your voice — and use Intercom to communicate with people through Apple devices in other parts of the h",
+        "Apple HomeView brings crystal-clear audio and video to your FaceTime calls. Quickly respond to Messages on HomePod and HomeView with just your voice — and use Intercom to communicate with people through Apple devices in other parts of the house. Quality time has never looked or sounded so good.",
         "Seamless smart home",
-        "Simple control.Peace of mind.",
+        "Simple control. Peace of mind.",
         "Seamless smart home",
         "It’s easy to control your smart home accessories using an Apple Home device as a hub. The accessories integrate with the Home app on your Apple devices. So you can manage and check in on your home, wherever you are.",
         "Privacy",
@@ -1181,7 +1236,7 @@ const HOME_PAGE: MarketingPage = {
         { label: "HomePod", href: "#/info/homepod" },
         { label: "HomePod mini 2", href: "#/info/homepod-mini-2" },
         { label: "Shop Home", href: "#/store/home" },
-        { label: "Shop Home Accessories", href: "#/info/shop-home-accessories" },
+        { label: "Shop Home Accessories", href: "#/store/home/accessories" },
         { label: "Personal Setup", href: "#/info/personal-setup" },
         { label: "Home Support", href: "#/info/home-support" },
         { label: "AppleCare for Apple TV", href: "#/info/applecare-for-apple-tv" },
@@ -1211,7 +1266,6 @@ export const MARKETING_PAGES: Readonly<Record<MarketingCategoryId, MarketingPage
  * converter made (the sibling seams' shape: label + the built href). */
 export const MARKETING_INFO_LABELS: readonly { label: string; href: string }[] = [
   { label: "AirPlay", href: "#/info/airplay" },
-  { label: "AirTag", href: "#/info/airtag" },
   { label: "Apple and the environment", href: "#/info/apple-and-the-environment" },
   { label: "Apple at Work", href: "#/info/apple-at-work" },
   { label: "Apple Creator Studio", href: "#/info/apple-creator-studio" },
@@ -1222,7 +1276,6 @@ export const MARKETING_INFO_LABELS: readonly { label: string; href: string }[] =
   { label: "Apple Trade In", href: "#/info/apple-trade-in" },
   { label: "Apple TV", href: "#/info/apple-tv" },
   { label: "Apple TV app", href: "#/info/apple-tv-app" },
-  { label: "Apple Watch Accessories", href: "#/info/apple-watch-accessories" },
   { label: "Apple Watch For Your Kids", href: "#/info/apple-watch-for-your-kids" },
   { label: "Apple Watch Hermès", href: "#/info/apple-watch-herm-s" },
   { label: "Apple Watch Nike", href: "#/info/apple-watch-nike" },
@@ -1261,7 +1314,6 @@ export const MARKETING_INFO_LABELS: readonly { label: string; href: string }[] =
   { label: "iCloud+", href: "#/info/icloud" },
   { label: "iMac", href: "#/info/imac" },
   { label: "iOS 27", href: "#/info/ios-27" },
-  { label: "iPad Accessories", href: "#/info/ipad-accessories" },
   { label: "iPad Air", href: "#/info/ipad-air" },
   { label: "iPad mini", href: "#/info/ipad-mini" },
   { label: "iPad Pro", href: "#/info/ipad-pro" },
@@ -1270,16 +1322,14 @@ export const MARKETING_INFO_LABELS: readonly { label: string; href: string }[] =
   { label: "iPhone 16", href: "#/info/iphone-16" },
   { label: "iPhone 17", href: "#/info/iphone-17" },
   { label: "iPhone 17e", href: "#/info/iphone-17e" },
-  { label: "iPhone Accessories", href: "#/info/iphone-accessories" },
   { label: "iPhone Air", href: "#/info/iphone-air" },
   { label: "iPhone Privacy", href: "#/info/iphone-privacy" },
   { label: "iPhone Support", href: "#/info/iphone-support" },
   { label: "Keyboards", href: "#/info/keyboards" },
   { label: "Keyboards for iPad", href: "#/info/keyboards-for-ipad" },
-  { label: "Learn more about Apple Intelligenc", href: "#/info/learn-more-about-apple-intelligenc" },
-  { label: "Learn more about developing for vi", href: "#/info/learn-more-about-developing-for-vi" },
+  { label: "Learn more about Apple Intelligence", href: "#/info/learn-more-about-apple-intelligence" },
+  { label: "Learn more about developing for visionOS", href: "#/info/learn-more-about-developing-for-visionos" },
   { label: "Learn more about visionOS", href: "#/info/learn-more-about-visionos" },
-  { label: "Mac Accessories", href: "#/info/mac-accessories" },
   { label: "Mac does that.", href: "#/info/mac-does-that" },
   { label: "Mac for Business", href: "#/info/mac-for-business" },
   { label: "Mac mini", href: "#/info/mac-mini" },
@@ -1290,18 +1340,16 @@ export const MARKETING_INFO_LABELS: readonly { label: string; href: string }[] =
   { label: "MacBook Neo", href: "#/info/macbook-neo" },
   { label: "macOS 27", href: "#/info/macos-27" },
   { label: "Personal Setup", href: "#/info/personal-setup" },
-  { label: "Shop Apple Home", href: "#/info/shop-apple-home" },
-  { label: "Shop Apple Watch", href: "#/info/shop-apple-watch" },
   { label: "Shop Apple Watch straps", href: "#/info/shop-apple-watch-straps" },
   { label: "Shop Cameras, Locks, and Sensors", href: "#/info/shop-cameras-locks-and-sensors" },
-  { label: "Shop Home Accessories", href: "#/info/shop-home-accessories" },
   { label: "Shop Lighting", href: "#/info/shop-lighting" },
-  { label: "Stream Wolfs on Apple TV with a su", href: "#/info/stream-wolfs-on-apple-tv-with-a-su" },
+  { label: "Stream Wolfs on Apple TV with a subscription", href: "#/info/stream-wolfs-on-apple-tv-with-a-subscription" },
   { label: "Studio Display", href: "#/info/studio-display" },
   { label: "Studio Display XDR", href: "#/info/studio-display-xdr" },
   { label: "Switch from Android", href: "#/info/switch-from-android" },
   { label: "Switch from PC to Mac", href: "#/info/switch-from-pc-to-mac" },
-  { label: "View in your space", href: "#/info/view-in-your-space" },
+  { label: "Visit Apple Vision Pro for Enterprise", href: "#/info/visit-apple-vision-pro-for-enterprise" },
+  { label: "Visit the App Store", href: "#/info/visit-the-app-store" },
   { label: "Wallet, Pay", href: "#/info/wallet-pay" },
   { label: "watchOS 27", href: "#/info/watchos-27" },
   { label: "Why Apple Watch", href: "#/info/why-apple-watch" },

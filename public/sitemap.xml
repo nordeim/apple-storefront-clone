@@ -231,6 +231,11 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/airpods-essentials-airpods-accessories</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/airpods-max-2</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
@@ -277,11 +282,6 @@
   </url>
   <url>
     <loc>http://localhost:5173/#/info/airpods-support</loc>
-    <priority>0.3</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>http://localhost:5173/#/info/airpodsessentials-airpods-accessories</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -491,17 +491,22 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/apple-tv-essentials-home-accessories</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/apple-tv-support</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/apple-tvessentials-home-accessories</loc>
+    <loc>http://localhost:5173/#/info/apple-vision-pro-battery</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/apple-vision-pro-battery</loc>
+    <loc>http://localhost:5173/#/info/apple-vision-pro-essentials-apple-vision-pro-accessories</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -522,16 +527,6 @@
   </url>
   <url>
     <loc>http://localhost:5173/#/info/apple-vision-pro-support</loc>
-    <priority>0.3</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>http://localhost:5173/#/info/apple-vision-proessentials-apple-vision-pro-accessories</loc>
-    <priority>0.3</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>http://localhost:5173/#/info/apple-watch-accessories</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -576,17 +571,17 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/apple-watch-straps-apple-watch-accessories</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/apple-watch-support</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>http://localhost:5173/#/info/apple-watch-ultra-4</loc>
-    <priority>0.3</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>http://localhost:5173/#/info/apple-watchstraps-apple-watch-accessories</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -936,12 +931,12 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/contentcreation-iphone-accessories</loc>
+    <loc>http://localhost:5173/#/info/content-creation-iphone-accessories</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/contentcreation-mac-accessories</loc>
+    <loc>http://localhost:5173/#/info/content-creation-mac-accessories</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -1451,7 +1446,7 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/homeview-mountsand-cables-home-accessories</loc>
+    <loc>http://localhost:5173/#/info/homeview-mounts-and-cables-home-accessories</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -1497,11 +1492,6 @@
   </url>
   <url>
     <loc>http://localhost:5173/#/info/ios-27</loc>
-    <priority>0.3</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>http://localhost:5173/#/info/ipad-accessories</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -1572,11 +1562,6 @@
   </url>
   <url>
     <loc>http://localhost:5173/#/info/iphone-18-pro-techwoven-case-with-magsafe-burgundy-new</loc>
-    <priority>0.3</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>http://localhost:5173/#/info/iphone-accessories</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -1691,12 +1676,12 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/learn-more-about-apple-intelligenc</loc>
+    <loc>http://localhost:5173/#/info/learn-more-about-apple-intelligence</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/learn-more-about-developing-for-vi</loc>
+    <loc>http://localhost:5173/#/info/learn-more-about-developing-for-visionos</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -1747,11 +1732,6 @@
   </url>
   <url>
     <loc>http://localhost:5173/#/info/lots-of-bright-ideas</loc>
-    <priority>0.3</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>http://localhost:5173/#/info/mac-accessories</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -2086,7 +2066,7 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/officeaccessories-mac-accessories</loc>
+    <loc>http://localhost:5173/#/info/office-accessories-mac-accessories</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -2331,16 +2311,6 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/shop-apple-home</loc>
-    <priority>0.3</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>http://localhost:5173/#/info/shop-apple-watch</loc>
-    <priority>0.3</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
     <loc>http://localhost:5173/#/info/shop-apple-watch-straps</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
@@ -2372,11 +2342,6 @@
   </url>
   <url>
     <loc>http://localhost:5173/#/info/shop-gifts</loc>
-    <priority>0.3</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>http://localhost:5173/#/info/shop-home-accessories</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -2466,7 +2431,7 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/smart-homeaccessories-home-accessories</loc>
+    <loc>http://localhost:5173/#/info/smart-home-accessories-home-accessories</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -2491,7 +2456,7 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/stream-wolfs-on-apple-tv-with-a-su</loc>
+    <loc>http://localhost:5173/#/info/stream-wolfs-on-apple-tv-with-a-subscription</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -2701,12 +2666,17 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/view-in-your-space</loc>
+    <loc>http://localhost:5173/#/info/visionos-27</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>http://localhost:5173/#/info/visionos-27</loc>
+    <loc>http://localhost:5173/#/info/visit-apple-vision-pro-for-enterprise</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/visit-the-app-store</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
