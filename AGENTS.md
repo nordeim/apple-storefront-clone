@@ -13,9 +13,9 @@ in-memory bag, Singapore checkout). The evidence dossier (measured tokens, devia
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest/jsdom — **10 files / 105 tests**; update this count in README + PAD when it changes) |
-| Production build | `npm run build` (single file → `dist/index.html`, ~310 kB) |
-| E2E | `npm run test:e2e` (Playwright — **28 tests**; builds and serves `dist/` itself) |
+| Unit tests | `npm run test` (Vitest/jsdom — **10 files / 108 tests**; update this count in README + PAD when it changes) |
+| Production build | `npm run build` (single file → `dist/index.html`, ~311 kB) |
+| E2E | `npm run test:e2e` (Playwright — **40 tests**: 28 pins + 12 axe-core a11y scans; builds and serves `dist/` itself) |
 | File:// smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
 | Regenerate sitemap | `npm run sitemap` (writes `public/sitemap.xml` + `public/robots.txt` from the tested `src/lib/sitemap.ts` seam — **156 routes**) |
 | Clean gate order | lint → typecheck → typecheck:tests → test → build → test:e2e → test:smoke |
@@ -65,11 +65,12 @@ shell wins — the `.env.example` `cp` flow works as documented). See `.env.exam
 
 ## Testing posture
 
-- Unit tests cover the pure seam only (`src/lib/*`) — the SPA's logic is deliberately pure and testable
-  without React rendering.
-- E2E pins three contracts: reference tokens (computed styles), the mobile navigation state machine
-  (390×844 touch viewport — bar layout, accordion menu, sub-link navigation), and the store flow
+- Unit tests cover the pure seam (`src/lib/*`) plus the one render-level component spec
+  (`ErrorBoundary.test.tsx`, React 19 `act` in jsdom).
+- E2E pins four contracts: reference tokens (computed styles), the mobile navigation state machine
+  (390×844 touch viewport — bar layout, accordion menu, sub-link navigation), the store flow
   (search → configurator → bag → checkout → confirmation → order lookup, incl. hostile routes rendered
-  as text).
+  as text), and the axe-core WCAG 2 A+AA a11y scans (`a11y.spec.ts` — ten routes + mobile resting/menu-open
+  states; two measured-reference exclusions documented in the spec header).
 - `tests/e2e/smoke.mjs` is the exhaustive file:// battery (45 assertions) kept as the parity net;
   it needs `npm run build` first and uses the same Playwright Chromium as the spec suite.

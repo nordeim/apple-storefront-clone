@@ -1,4 +1,4 @@
-# apple-storefront-clone — Master Project Architecture Document (PAD) v1.6
+# apple-storefront-clone — Master Project Architecture Document (PAD) v1.7
 
 **Classification:** Internal Engineering Reference
 **Status:** DEFINITIVE, PRODUCTION-LOCKED BLUEPRINT
@@ -7,6 +7,46 @@
 **Audience:** Senior Engineers, Tech Leads, DevOps, and Onboarding Engineers
 **Rule:** Every architectural decision in this document traces to a specific rationale.
 Nothing is here "because it's popular."
+
+#### Revision Block — v1.7 (the session-8 a11y-tier + crash-recovery cycle)
+
+- `[SR]` The session-8 cycle (2026-11-28, `docs/REMEDIATION_PLAN.md` session-8 section)
+  re-verified the pulled tree (1a3b13d) — baseline gates exactly as documented (10/105 unit ·
+  28/28 e2e · 45/45 smoke · 156 routes) — plus a read-only audit (0 CRITICAL/HIGH; **1 MEDIUM**
+  + 5 LOW + 4 INFO) and a fresh agent-browser parity sweep: the clone's mobile navigation
+  re-measured working at 390×844 and **all eleven reference flyout models re-extracted from
+  the live DOM and programmatically re-diffed against `flyoutSections()` — all match** (the
+  Home item's flyout lives in the reference's legacy `globalnav-item-tv` container); the TV+
+  gallery rail lazy-loaded into this session's headless render (9/9 titles — closing the
+  session-7 environment-limited gap); hero/promo sequences, resting-bar pins, the store chip
+  row and the category-page h1 all re-measured matching — zero reference drift.
+- `[FIX]` Audit M-1 (the session-7 boundary's real gap): `ErrorBoundary` latched `failed`
+  forever — `App.tsx` rendered it unkeyed and the class had no reset, so after one route-render
+  crash every in-app navigation kept the fallback until a full reload. The boundary now owns a
+  `resetKey` prop (`componentDidUpdate` clears the latch when it changes — the
+  react-error-boundary `resetKeys` pattern) and `App.tsx` passes the route path; the spec
+  grew the re-arm and re-latch cases (RED observed on both).
+- `[FEAT]` **The axe-core e2e tier landed** (the session-7 deferred debt): `@axe-core/playwright`
+  (devDependency only — nothing ships in the single-file artifact) + `tests/e2e/a11y.spec.ts`
+  scanning WCAG 2 A+AA across ten routes and the mobile resting/menu-open states. Fixes it
+  drove: the home page gained the sr-only `<h1>` the reference itself ships
+  (`visuallyhidden` "Apple" — the clone says "Apple (Singapore)"), and the TV+ gallery track
+  dropped its redundant `ul/li` shell for `div` + `role="tabpanel"` (a `li[role=tabpanel]`
+  breaks axe's `list` rule via the role override; no spec pinned the track markup). Two
+  measured-reference exclusions are documented in the spec header — the ribbon link
+  (#2997ff, no underline, on #1d1d1f — measured live this cycle) and the dimmed inactive
+  gallery cards (aria-hidden + 40% opacity by design). Router grammar hardened:
+  `#/search/x`, `#/entertainment/x`, `#/support/x` now 404 like their sibling heads.
+- `[VERIFY]` Full gate green after the change: lint 0 errors · typecheck clean ×2 · unit
+  10 files / 108 tests · build 310.71 kB / 93.74 kB gzip (CSS 33,720 bytes / 519 rules) ·
+  e2e 40/40 (28 pins + 12 axe scans) · smoke 45/45, zero console errors. The sr-only h1,
+  the div gallery track and the boundary's resetKey verified live on both the dev server
+  and the built artifact.
+- `[CHORE]` README/AGENTS/CLAUDE/PAD/SKILL/DEPLOYMENT swept in lockstep (counts 10/105 →
+  10/108 unit, 28 → 40 e2e, 310.4 → 310.7 kB, CSS 33,654 → 33,720 bytes); the audit's five
+  stale-doc spots fixed (§1.2's dead `clsx`/Testing-Library rows, §11/SKILL §5 line counts,
+  DEPLOYMENT §1 route counts, §5.3's dead `.button-neutral`, §3's component inventory); the
+  17 screenshots re-captured; worklog Task 120.
 
 #### Revision Block — v1.6 (the session-7 robustness + lockstep-integrity cycle)
 
@@ -269,10 +309,10 @@ AGENTS.md "Traps". Deploying: §8 plus `docs/DEPLOYMENT.md`.
 | CSS engine | Tailwind CSS | 4.1.17 via `@tailwindcss/vite` | CSS-first v4: tokens in `@theme`, no JS config, Oxide-speed builds |
 | Unit tests | Vitest | 4.1.12 (jsdom 29.1.1) | Same Vite pipeline and `@/` alias as the app; zero-config jsdom |
 | E2E tests | Playwright | 1.65.1 (`@playwright/test`) | Chromium + iPhone 13 device emulation against the production build |
-| DOM testing | Testing Library | react 16.3.3 / dom 10.4.2 | Present in devDeps for component-level work; current suite is seam-first |
+| DOM testing | React 19 `act` + `react-dom/client` directly | 19.2.6 | Component-level specs render via `createRoot`/`act` in jsdom (no Testing Library dependency — removed in session 2 as unused) |
 | Lint | ESLint | 10.15.0 flat config + typescript-eslint 8.74.0 | Flat config ignoring the vendored prose folders |
-| Utilities | clsx 2.1.1 + tailwind-merge 3.4.0 | — | `cn()` class merge helper (`src/utils/cn.ts`) |
 | Package manager | npm | lockfile `package-lock.json` | One lockfile, one manager — the reproducibility rule |
+| A11y scans | @axe-core/playwright | ^4.14.1 (devDep) | The e2e a11y tier scans WCAG 2 A+AA; nothing ships in the single-file artifact |
 | Local DB (optional) | PostgreSQL | 17 (rootless) or docker `postgres:17-alpine` | The repo family's documented local environment; this SPA does not connect to it |
 
 No backend, no ORM, no auth, no payment provider, no external services at runtime.
@@ -412,7 +452,8 @@ Layer 0: Entry        index.html + main.tsx — mounts App under StrictMode. Rul
 Layer 1: Composition  App.tsx (route switch + navigation side-effects), pages/* — one file per route.
                      Rule: pages compose components and the seam; they own no domain logic.
 Layer 2: Components   components/* (GlobalNav, SearchPanel, Tile, EntertainmentGallery,
-                     Footer, ProductArt, ProductCard, Ribbon, Icons). Rule: presentational +
+                     Footer, ProductArt, ProductCard, Ribbon, Icons, PageShell,
+                     ErrorBoundary, BagLineRow, BagSummary). Rule: presentational +
                      local UI state (panels/flyouts); interaction effects (in-view, media) via hooks/.
 Layer 3: Shared state context/BagContext.tsx — the ONE store. Rule: in-memory only.
 Layer 4: Domain seam  src/lib/* — pure, typed, unit-tested. Rule: no React imports.
@@ -442,7 +483,8 @@ apple-storefront-clone/
 │   ├── index.css               ← Tailwind v4 @theme tokens + @layer components CSS
 │   ├── components/             ← GlobalNav (flyouts + mobile accordion menu), SearchPanel, Tile,
 │   │                             EntertainmentGallery, Footer, ProductArt (SVG art),
-│   │                             ProductCard, Ribbon, Icons, PageShell
+│   │                             ProductCard, Ribbon, Icons, PageShell, ErrorBoundary
+│   │                             (page-level render guard), BagLineRow, BagSummary
 │   ├── pages/                  ← HomePage, StorePage, ProductPage, BagPage, CheckoutPage,
 │   │                             ConfirmationPage, SearchPage, StaticPages (info/support/404)
 │   ├── context/BagContext.tsx  ← the ONE store (in-memory bag + last order)
@@ -582,8 +624,7 @@ connects to it — see `docs/DEPLOYMENT.md` §4.
 
 ### 5.3 Component Primitives
 
-Buttons (`.button` 980px-radius pill, `button-secondary`, `button-neutral`,
-`button-block`), the `.link-cta` chevron link, `.globalnav` translucency
+Buttons (`.button` 980px-radius pill, `button-secondary`, `button-block`), the `.link-cta` chevron link, `.globalnav` translucency
 (`rgba(22,22,23,.8)` + `backdrop-filter: saturate(180%) blur(20px)`), tile grid
 (12px gaps, `--tile-h` 692/650/580 per breakpoint; promos 580/570/500), the
 gallery card (1250/668 aspect, 28px radius), the dotnav progress-fill dots.
@@ -624,11 +665,12 @@ credentials.
 
 | Category | Files | Tests | Location | Framework |
 |---|---|---|---|---|
-| Unit (seam) | 9 | 103 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
-| Unit (component) | 1 | 2 | `src/components/ErrorBoundary.test.tsx` | Vitest 4 + jsdom (React `act`) |
+| Unit (seam) | 9 | 104 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
+| Unit (component) | 1 | 4 | `src/components/ErrorBoundary.test.tsx` | Vitest 4 + jsdom (React `act`) |
 | E2E — desktop | 1 | 8 | `tests/e2e/home.spec.ts` | Playwright (1440×900) |
 | E2E — mobile nav | 1 | 11 | `tests/e2e/mobile-navigation.spec.ts` | Playwright (iPhone 13 viewport, touch) |
 | E2E — store flow | 1 | 9 | `tests/e2e/store-flow.spec.ts` | Playwright (1440×900) |
+| E2E — a11y scans | 1 | 12 | `tests/e2e/a11y.spec.ts` | Playwright + @axe-core/playwright (WCAG 2 A+AA) |
 | File:// smoke battery | 1 | 45 assertions | `tests/e2e/smoke.mjs` | Playwright library |
 
 ### 7.2 Test Patterns
@@ -646,9 +688,9 @@ credentials.
 
 - [ ] `npm run lint` exit 0
 - [ ] `npm run typecheck` && `npm run typecheck:tests` clean
-- [ ] `npm run test` — 10 files / 105 tests
+- [ ] `npm run test` — 10 files / 108 tests
 - [ ] `npm run build` — single-file `dist/index.html`
-- [ ] `npm run test:e2e` — 28 passed
+- [ ] `npm run test:e2e` — 40 passed (28 pins + 12 axe scans)
 - [ ] `npm run test:smoke` — 45 assertions, zero console errors
 - [ ] Docs touched in the same commit; counts in lockstep
 
@@ -659,8 +701,8 @@ credentials.
 ### 8.1 Production Build
 
 `npm run build` → `vite build` with `react()`, `@tailwindcss/vite`, and
-`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 310.4 kB /
-93.7 kB gzip this cycle; CSS 33.7 kB / 518 rules). No server bundle, no image
+`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 310.71 kB /
+93.74 kB gzip this cycle; CSS 33,720 bytes / 519 rules). No server bundle, no image
 pipeline, no external requests.
 
 ### 8.2 Environment Variables
@@ -737,7 +779,7 @@ The full remediation history of this cycle: `docs/REMEDIATION_PLAN.md`.
 | `src/lib/router.ts` | 94 | The hash-route grammar; every href factory + `hasBuyParam` |
 | `src/lib/route-title.ts` | 39 | The tab-title seam (full-form store labels, matching the h1) |
 | `src/lib/catalog.ts` | 356 | The typed catalog: 8 categories, 12 products, option matrices, search |
-| `src/lib/cart.ts` | 94 | The bag reducer + price/line-key seam |
+| `src/lib/cart.ts` | 103 | The bag reducer + price/line-key seam (`bagLineSummary`) |
 | `src/lib/checkout.ts` | 49 | Singapore checkout validation + order numbers |
 | `src/lib/sitemap.ts` | 75 | Route-set enumeration + sitemap.xml/robots.txt rendering (156 URLs) |
 | `src/lib/site-content.ts` | 441 | Nav links, the per-category flyout content model, footer directory, info-page map |
@@ -745,7 +787,7 @@ The full remediation history of this cycle: `docs/REMEDIATION_PLAN.md`.
 | `src/components/GlobalNav.tsx` | 253 | Desktop flyouts, mobile accordion menu, bag popover, search trigger |
 | `src/components/ProductArt.tsx` | 449 | The original SVG art library |
 | `src/components/EntertainmentGallery.tsx` | 153 | The TV+ gallery state machine (dwell, pause, keys) |
-| `src/components/BagLineRow.tsx` | 33 | The shared bag-line summary row (popover + checkout aside) |
+| `src/components/BagLineRow.tsx` | 31 | The shared bag-line summary row (popover + checkout aside) |
 | `src/components/ErrorBoundary.tsx` | 51 | Page-level render guard: graceful fallback, nav/bag state survive |
 | `src/components/BagSummary.tsx` | 25 | The shared Subtotal/Delivery/GST/Total ledger (bag page + checkout) |
 | `src/App.tsx` | 98 | Route switch, navigation side-effects, the page-level ErrorBoundary |

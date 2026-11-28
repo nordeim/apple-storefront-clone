@@ -109,8 +109,8 @@ connect to it): `bash docs/setup_pg_z.sh` — see `docs/DEPLOYMENT.md` §4.
 | `npm run preview` | Serve `dist/` (bind `--host 127.0.0.1`) |
 | `npm run lint` | ESLint 10 flat config — must exit 0 |
 | `npm run typecheck` / `npm run typecheck:tests` | `tsc --noEmit` (app / tests+configs) |
-| `npm run test` | Vitest run (10 files / 105 tests) |
-| `npm run test:e2e` | Playwright (28 tests; builds + serves the artifact) |
+| `npm run test` | Vitest run (10 files / 108 tests) |
+| `npm run test:e2e` | Playwright (40 tests: 28 pins + 12 axe-core a11y scans; builds + serves the artifact) |
 | `npm run test:smoke` | 45-assertion file:// battery over `dist/` |
 | `npm run sitemap` | Regenerate `public/sitemap.xml` + `public/robots.txt` (156 routes) |
 
@@ -125,7 +125,10 @@ connect to it): `bash docs/setup_pg_z.sh` — see `docs/DEPLOYMENT.md` §4.
   `mobile-navigation.spec.ts` (390×844 touch: the reference's bar layout,
   accordion menu open/expand/sub-link navigation/close, geometry, no
   horizontal overflow), `store-flow.spec.ts` (search → configurator → bag →
-  checkout validation → confirmation → order lookup → hostile routes).
+  checkout validation → confirmation → order lookup → hostile routes), and
+  `a11y.spec.ts` (axe-core WCAG 2 A+AA scans — ten routes plus mobile resting
+  and menu-open states; two measured-reference exclusions documented in the
+  spec header).
 - **Smoke** — `tests/e2e/smoke.mjs`, the exhaustive file:// parity battery.
 - Red-Green-Refactor for logic; regression test for every bug fix; counts
   stay in lockstep across README / PAD / SKILL in the same commit.

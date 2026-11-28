@@ -8,12 +8,12 @@ description: >
   to it. Covers the architecture, design tokens, the Tailwind v4 trap log, the
   three-tier test suite, the build/SEO posture, and the hard lessons of the 2026-11
   remediation cycle.
-version: 1.6.0
+version: 1.7.0
 last_updated: 2026-11-28
-tags: [react, vite, tailwindcss-v4, typescript, spa, e-commerce-clone, e2e-testing]
+tags: [react, vite, tailwindcss-v4, typescript, spa, e-commerce-clone, e2e-testing, accessibility]
 ---
 
-# apple-storefront-clone — Engineering Skill (v1.6.0)
+# apple-storefront-clone — Engineering Skill (v1.7.0)
 
 > **What this is:** the distilled, codebase-verified engineering reference for
 > the remediated `apple-storefront-clone`. Every number below was measured in
@@ -48,8 +48,9 @@ entertainment/support pages. Philosophy:
 | TypeScript | 5.9.3 | `strict`, `noUnusedLocals/Parameters`, bundler resolution, `@/*` → `src/*` |
 | Vite | 7.3.7 | `react()` + `@tailwindcss/vite` + `viteSingleFile()`; dep scan pinned to `index.html` |
 | Tailwind CSS | 4.1.17 | CSS-first: `@theme` tokens in `src/index.css`; NO JS config; NO PostCSS config |
-| Vitest | 4.1.12 (jsdom 29.1.1) | 10 files / 105 tests (9 seam + 1 render-level component spec) |
-| Playwright | 1.65.1 | 28 e2e over the production build; Chromium only (WebKit unavailable in the sandbox) |
+| Vitest | 4.1.12 (jsdom 29.1.1) | 10 files / 108 tests (9 seam + 1 render-level component spec, 4 cases) |
+| Playwright | 1.65.1 | 40 e2e over the production build (28 pins + 12 axe-core a11y scans); Chromium only (WebKit unavailable in the sandbox) |
+| axe-core | @axe-core/playwright ^4.14.1 (devDep) | WCAG 2 A+AA scan tier (`tests/e2e/a11y.spec.ts`); nothing ships in the single-file artifact |
 | ESLint | 10.15.0 (typescript-eslint 8.74.0) | Flat config; `skills/**` and `docs/**` ignored |
 | (removed) | — | `clsx`/`tailwind-merge` and the dead `cn()` helper were dropped in session 3 (zero importers) |
 
@@ -107,7 +108,7 @@ Layer model (PAD §3.1): Entry → Composition (`App.tsx`, `pages/*`) →
 Components → ONE store (`context/BagContext.tsx`) → pure seam (`lib/*`) →
 design system (`index.css`).
 
-Key components: `GlobalNav` (270 lines — desktop flyouts in the reference's
+Key components: `GlobalNav` (253 lines — desktop flyouts in the reference's
 per-category flyout content model (device categories Explore/Shop/More-from; Home a Quick-Links row; Entertainment and Accessories two-section), the **mobile bar measured off the live site**
 (logo left; Search/Bag/hamburger right), the **mobile accordion menu** with
 per-row conditional mounting, bag popover, search trigger), `SearchPanel`
@@ -205,9 +206,9 @@ real screen readers (documented Unknown).
 
 ```bash
 npm run lint && npm run typecheck && npm run typecheck:tests   # 0 / clean / clean
-npm run test                       # 10 files / 105 tests
-npm run build                      # dist/index.html ~310 kB (CSS 33.7 kB)
-npm run test:e2e                   # 28/28
+npm run test                       # 10 files / 108 tests
+npm run build                      # dist/index.html ~311 kB (CSS 33.7 kB)
+npm run test:e2e                   # 40/40 (28 pins + 12 axe scans)
 npm run test:smoke                 # 45 assertions, 0 console errors
 npm run sitemap                    # if routes changed: regenerate + re-check 156→N
 ```
@@ -274,6 +275,25 @@ code in the same commit; `git status` clean before the SSH-wrapper push.
    sanctioned in `src/` (observability beats silence), and its spec is the
    repo's first render-level component test (React 19 `act` in jsdom — no
    new dependencies needed).
+14. **A latched error boundary is a half-landed recovery** (session 8): the
+   boundary that never re-arms strands the user on the fallback for every
+   route until a full reload — the affordance it advertises ("the rest of
+   the site keeps working") silently breaks. Own the recovery in the
+   component (`resetKey` + `componentDidUpdate` reset — the
+   react-error-boundary `resetKeys` pattern) rather than relying on consumer
+   key discipline, pin it with a re-arm spec, and pin the re-latch case too
+   (a crash on the NEXT route must show the fallback again).
+15. **Scan the reference before "fixing" its a11y findings** (session 8):
+   the axe tier flagged the ribbon link (2.9:1) and dimmed gallery cards —
+   and the live reference measured EXACTLY the same design (#2997ff link,
+   no underline, on #1d1d1f; aria-hidden dimmed cards). Fix what the clone
+   got wrong versus the reference (the missing sr-only h1 the reference
+   ships; the `li[role=tabpanel]` list-rule break), and document the
+   reference's own inaccessible-by-design surfaces as exclusions with the
+   measured values in the spec header — never silently disable, never
+   "improve" past parity without a decision. Also: settle animations
+   (ribbon 2.6 s) and pause auto-advancing carousels before scanning, or
+   axe measures mid-flight states.
 
 ## §13 Pitfalls to Avoid
 
@@ -400,42 +420,48 @@ lockfiles, running app) → IMPLEMENT (small typed test-backed increments) →
 VERIFY (the full gate, browser-verified UI) → DELIVER (atomic conventional
 commits to `main`, docs lockstep, evidence labels, deferred-debt honesty).
 
-## Appendix B — project_state (measured 2026-11-28, session 7)
+## Appendix B — project_state (measured 2026-11-28, session 8)
 
-- Unit: **10 files / 105 tests** (9 seam files — cart (+ `bagLineSummary`),
+- Unit: **10 files / 108 tests** (9 seam files — cart (+ `bagLineSummary`),
   catalog, checkout, the per-category flyout content model, home tiles,
-  money, router (+ `hasBuyParam`), route-title, sitemap + robots — plus the
-  render-level component spec `ErrorBoundary.test.tsx`)
-- E2e: **28 tests** (home 8, mobile-navigation 11, store-flow 9 — incl. the
-  in-app `?buy` focus pin, its back/forward popstate tail, and the
-  ghost-product `?buy` 404 focus pin) over `vite preview --host 127.0.0.1:4173`
+  money, router (+ `hasBuyParam` + trailing-segment 404s), route-title, sitemap
+  + robots — plus the render-level component spec `ErrorBoundary.test.tsx`
+  with 4 cases incl. the resetKey re-arm/re-latch pair)
+- E2e: **40 tests** (home 8, mobile-navigation 11, store-flow 9, a11y 12) over
+  `vite preview --host 127.0.0.1:4173`; the a11y tier = `tests/e2e/a11y.spec.ts`
+  (axe-core WCAG 2 A+AA: ten routes + mobile resting/menu-open states, two
+  measured-reference exclusions documented in the spec header)
 - Smoke: **45 assertions**, `file://dist/index.html`, 0 console errors — the
   battery is now JSDoc-typed and covered by `typecheck:tests`
 - Sitemap: **156 routes / 131 info pages** generated from the seam; robots.txt
   rendered by the same seam + generator (one `VITE_SITE_URL` stamps both; the
   value resolves from the shell or a `.env` file via Vite `loadEnv`)
-- Build: `dist/index.html` **310.4 kB / 93.7 kB gzip**; CSS **33,654 bytes /
-  518 rules**; build time ~1.0 s
+- Build: `dist/index.html` **310.71 kB / 93.74 kB gzip**; CSS **33,720 bytes /
+  519 rules**; build time ~1.5 s
 - Gate: `npm run gate` — lint 0 errors · typecheck clean · tests green · build · e2e · smoke
-- Flyout model (session-4, re-verified sessions 5+6+7): Home is the reference's
+- A11y posture (session 8): the home page ships the sr-only `<h1>` the
+  reference itself ships (`Apple (Singapore)` vs the reference's `Apple`);
+  the gallery track is `div[role=tabpanel]` cards (no `li[role]` override);
+  `ErrorBoundary` re-arms on route change via `resetKey`
+- Flyout model (session-4, re-verified sessions 5+6+7+8): Home is the reference's
   restructured three-section model (Explore/Shop/More from Home, 16 links);
   Mac/iPad/iPhone/Watch/AirPods Explore rows carry the reference's full
   product-family labels (family labels that match a catalog product route to
   its product page — MacBook Pro, iPad, iPhone Duo, iPhone 18 Pro, Apple Watch
   Series 12, AirPods Pro 3 — the rest to info routes; catalog-only products
   stay reachable via the store — deviation D6 as revised in session 4);
-  sessions 5+6+7 re-extracted all eleven live models and diffed them against the
+  sessions 5–8 re-extracted all eleven live models and diffed them against the
   seam — all match
 - Store surfaces (session-4): the chip row matches the reference's measured
   order and full-form labels (+ AirTag chip; the leading All chip is the
   superset affordance); category h1s are full-form ("Shop Apple Watch"), and
   the tab title matches via the `route-title` seam (session-5)
 - Local PG 17 (optional): `postgresql://postgres:postgres@127.0.0.1:5432/app_db` — installed rootless, unused by the SPA
-- Mobile nav parity (sessions 5–7 re-measure at 390×844): bar geometry byte-equal
+- Mobile nav parity (sessions 5–8 re-measure at 390×844): bar geometry byte-equal
   (logo x=0 w=48, Search x=246, Bag x=294, Menu x=342); all 11 accordion rows
   carry expand buttons; open/expand/navigate/close all verified live with zero
   console errors — no Tailwind v4 display-toggling defect
-- Hygiene (sessions 5–7): `aria-controls` exists only while its panel is mounted;
+- Hygiene (sessions 5–8): `aria-controls` exists only while its panel is mounted;
   the `?buy` deep link is an exact query-key grammar (`hasBuyParam`), and on in-app
   navigation into it the Configurator heading owns focus (shell focus reset gated,
   e2e-pinned on the artifact); the dead `.button-neutral`/`.section-ribbon-host` CSS

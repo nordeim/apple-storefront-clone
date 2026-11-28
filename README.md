@@ -19,9 +19,9 @@ Apple's proprietary assets were deliberately not copied or hot-linked.
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest, jsdom — 10 files / 105 tests) |
+| Unit tests | `npm run test` (Vitest, jsdom — 10 files / 108 tests) |
 | Production build (single file → `dist/index.html`) | `npm run build` |
-| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 28 tests) |
+| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 40 tests incl. 12 axe-core a11y scans) |
 | File-protocol smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
 | Regenerate `public/sitemap.xml` | `npm run sitemap` |
 | Clean gate order | `npm run lint && npm run typecheck && npm run typecheck:tests && npm run test && npm run build && npm run test:e2e && npm run test:smoke` |
@@ -43,9 +43,9 @@ npm run dev          # → http://localhost:5173
 
 ```bash
 npm run typecheck    # clean, no output
-npm run test         # 10 files / 105 tests passed
-npm run build        # dist/index.html (~310 kB single file)
-npm run test:e2e     # 28 passed
+npm run test         # 10 files / 108 tests passed
+npm run build        # dist/index.html (~311 kB single file)
+npm run test:e2e     # 40 passed (28 pins + 12 axe a11y scans)
 ```
 
 Node.js ≥ 20 (verified on Node 24); npm is the package manager and `package-lock.json` is the lockfile.
@@ -72,7 +72,8 @@ category pages the reference's full-form h1 ("Shop Apple Watch").
 price), an in-memory bag with a nav popover, GST-inclusive totals (9%), validated Singapore checkout
 (6-digit postal code, 8-digit +65 numbers), order confirmation, order-status lookup, live search
 (overlay + results page), entertainment and support pages, 404 handling, skip link, focus management on
-navigation, `prefers-reduced-motion` support.
+navigation, `prefers-reduced-motion` support, a page-level error boundary that keeps the shell usable after
+a render crash (and recovers on the next navigation), and an axe-core WCAG 2 A+AA e2e scan tier.
 
 ## Architecture
 
@@ -136,9 +137,11 @@ paths and the connection contract (`postgresql://postgres:postgres@127.0.0.1:543
   a placeholder page that says so.
 - **Fonts.** The stack is SF Pro → system fonts, as on the reference; machines without SF Pro / Helvetica
   fall back to Arial/DejaVu and will look wider.
-- **Not verified:** Safari/WebKit and Firefox (only headless Chromium was run); real-device touch; screen-reader
-  output (semantics and ARIA are present but were not exercised with VoiceOver/NVDA); pixel-diff against the
-  live site (computed-style token checks were used instead).
+- **Not verified:** Safari/WebKit and Firefox (only headless Chromium was run); real-device touch; real
+  screen-reader output such as VoiceOver/NVDA (semantics and ARIA are present, and the axe-core WCAG 2
+  A+AA e2e tier passes with two documented parity-bound exclusions — the reference's own ribbon link
+  contrast and its dimmed inactive gallery cards); pixel-diff against the live site (computed-style token
+  checks were used instead).
 - The Apple name, logo and product names are trademarks of Apple Inc. This is an unaffiliated educational clone.
 
 ## Deployment
