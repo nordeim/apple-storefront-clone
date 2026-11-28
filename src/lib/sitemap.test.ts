@@ -17,6 +17,19 @@ describe("siteRoutes", () => {
     for (const slug of INFO_TITLES.keys()) expect(paths).toContain(`/info/${slug}`);
   });
 
+  it("enumerates the seven per-category accessories grids (session-12 D16)", () => {
+    const paths = siteRoutes().map((r) => r.path);
+    for (const c of CATEGORIES) {
+      if (c.id === "accessories") {
+        // the accessories category IS the all-accessories page — no grid of its own
+        expect(paths).not.toContain("/store/accessories/accessories");
+        continue;
+      }
+      expect(paths).toContain(`/store/${c.id}/accessories`);
+    }
+    expect(paths.filter((p) => /^\/store\/(?!accessories\/accessories$)[a-z-]+\/accessories$/.test(p))).toHaveLength(7);
+  });
+
   it("is unique and sorted deterministically", () => {
     const paths = siteRoutes().map((r) => r.path);
     expect(new Set(paths).size).toBe(paths.length);

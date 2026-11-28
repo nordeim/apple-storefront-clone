@@ -1,6 +1,7 @@
 import { CATEGORIES, PRODUCTS, type CategoryId } from "./catalog";
 import { routeHref } from "./router";
 import { ACCESSORIES_INFO_LABELS } from "./accessories-page";
+import { ACCESSORIES_CATEGORY_INFO_LABELS } from "./accessories-category-pages";
 import { AIRPODS_INFO_LABELS } from "./airpods-page";
 import { CATEGORY_RAIL_INFO_LABELS } from "./category-rails";
 import { RAIL_INFO_LABELS } from "./store-rails";
@@ -177,7 +178,9 @@ export function flyoutSections(link: NavLinkSpec): FlyoutSection[] {
           heading: "Shop Home",
           links: [
             { label: "Shop Home", href: routeHref.store("home") },
-            { label: "Shop Home Accessories", href: routeHref.store("accessories") },
+            // the reference's Shop Home Accessories link opens the Home
+            // accessories grid (session-12 D16)
+            { label: "Shop Home Accessories", href: routeHref.storeAccessories("home") },
             infoLink("Personal Setup"),
           ],
         },
@@ -215,13 +218,16 @@ export function flyoutSections(link: NavLinkSpec): FlyoutSection[] {
           heading: "Shop Accessories",
           links: [
             { label: "Shop All Accessories", href: routeHref.store("accessories") },
-            { label: "Mac", href: routeHref.store("mac") },
-            { label: "iPad", href: routeHref.store("ipad") },
-            { label: "iPhone", href: routeHref.store("iphone") },
-            { label: "Apple Watch", href: routeHref.store("watch") },
-            { label: "Apple Vision Pro", href: routeHref.store("vision") },
-            { label: "AirPods", href: routeHref.store("airpods") },
-            { label: "Home", href: routeHref.store("home") },
+            // the reference's per-category links open the per-category
+            // accessories grids (session-12 D16 — the goto/{x}/accessories
+            // destinations, modeled this cycle)
+            { label: "Mac", href: routeHref.storeAccessories("mac") },
+            { label: "iPad", href: routeHref.storeAccessories("ipad") },
+            { label: "iPhone", href: routeHref.storeAccessories("iphone") },
+            { label: "Apple Watch", href: routeHref.storeAccessories("watch") },
+            { label: "Apple Vision Pro", href: routeHref.storeAccessories("vision") },
+            { label: "AirPods", href: routeHref.storeAccessories("airpods") },
+            { label: "Home", href: routeHref.storeAccessories("home") },
           ],
         },
         {
@@ -256,7 +262,7 @@ export function flyoutSections(link: NavLinkSpec): FlyoutSection[] {
       ? [
           { label: `Shop ${label}`, href: routeHref.store(c) },
           infoLink("Apple Watch Straps"),
-          { label: `${label} Accessories`, href: routeHref.store("accessories") },
+          { label: `${label} Accessories`, href: routeHref.storeAccessories(c) },
           infoLink("Apple Trade In"),
           infoLink("Financing"),
           infoLink("Personal Setup"),
@@ -264,7 +270,7 @@ export function flyoutSections(link: NavLinkSpec): FlyoutSection[] {
       : c === "vision"
         ? [
             { label: `Shop ${label}`, href: routeHref.store(c) },
-            { label: `${label} Accessories`, href: routeHref.store("accessories") },
+            { label: `${label} Accessories`, href: routeHref.storeAccessories(c) },
             infoLink("Book a Demo"),
             infoLink("Financing"),
             infoLink("Personal Setup"),
@@ -274,11 +280,11 @@ export function flyoutSections(link: NavLinkSpec): FlyoutSection[] {
               infoLink("Shop AirPods 5"),
               { label: "Shop AirPods Pro 3", href: routeHref.product("airpods-pro-3") },
               infoLink("Shop AirPods Max 2"),
-              { label: "AirPods Accessories", href: routeHref.store("accessories") },
+              { label: "AirPods Accessories", href: routeHref.storeAccessories("airpods") },
             ]
           : [
               { label: `Shop ${label}`, href: routeHref.store(c) },
-              { label: `${label} Accessories`, href: routeHref.store("accessories") },
+              { label: `${label} Accessories`, href: routeHref.storeAccessories(c) },
               infoLink("Apple Trade In"),
               infoLink("Financing"),
               infoLink("Personal Setup"),
@@ -439,6 +445,7 @@ export const INFO_TITLES: ReadonlyMap<string, string> = new Map([
     ...CATEGORY_RAIL_INFO_LABELS,
     ...AIRPODS_INFO_LABELS,
     ...ACCESSORIES_INFO_LABELS,
+    ...ACCESSORIES_CATEGORY_INFO_LABELS,
   ]
     .filter(isInfoRouted)
     .map((l) => [slugify(l.label), l.label] as const),

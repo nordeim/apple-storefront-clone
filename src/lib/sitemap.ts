@@ -26,6 +26,11 @@ export function siteRoutes(): SiteRoute[] {
     { path: "/support", priority: 0.6, changefreq: "monthly" },
   ];
   for (const c of CATEGORIES) routes.push({ path: `/store/${c.id}`, priority: 0.8, changefreq: "weekly" });
+  // the per-category accessories grids (session-12 D16) — every device category
+  for (const c of CATEGORIES) {
+    if (c.id === "accessories") continue;
+    routes.push({ path: `/store/${c.id}/accessories`, priority: 0.7, changefreq: "weekly" });
+  }
   for (const p of PRODUCTS) routes.push({ path: `/product/${p.id}`, priority: 0.7, changefreq: "weekly" });
   for (const slug of INFO_TITLES.keys()) routes.push({ path: `/info/${slug}`, priority: 0.3, changefreq: "monthly" });
   return routes.sort((a, b) => a.path.localeCompare(b.path));

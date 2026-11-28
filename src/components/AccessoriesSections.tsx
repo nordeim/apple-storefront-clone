@@ -8,20 +8,35 @@ import {
   ACCESSORIES_INDEX_NAV,
   ACCESSORIES_VALUE_PROPS,
   type AccessoriesCuratedItem,
+  type AccessoriesCuratedTab,
+  type AccessoriesGalleryCard,
+  type AccessoriesIndexGroup,
+  type AccessoriesValueProp,
 } from "@/lib/accessories-page";
+import type { AccessoriesCategoryPage } from "@/lib/accessories-category-pages";
 
 /** The Accessories filtered-grid page's section family (session-11; measured
  * off apple.com/sg/shop/accessories/all). The page renders above the clone's
  * superset store block — the measured parity surface on top, the working
- * store below. */
+ * store below. Session-12 parameterizes the five sections by an optional
+ * model prop (the all-page constants as defaults — the pinned all-page
+ * rendering is byte-identical) so the seven per-category pages
+ * (#/store/{cat}/accessories, D16) render the same family from their own
+ * measured models. */
 
-/** The reference's chapter nav: nine product chips ("iPhone - Accessories"
+/** The reference's chapter nav: product chips ("iPhone - Accessories"
  * accessible names), a horizontal strip under the h1. */
-export const AccessoriesChapterNav = memo(function AccessoriesChapterNav() {
+export const AccessoriesChapterNav = memo(function AccessoriesChapterNav({
+  chips = ACCESSORIES_CHAPTERNAV,
+  navLabel = "Accessories by product",
+}: {
+  chips?: readonly { label: string; ariaLabel: string; href: string }[];
+  navLabel?: string;
+}) {
   return (
-    <nav aria-label="Accessories by product" className="accessories-chapternav">
+    <nav aria-label={navLabel} className="accessories-chapternav">
       <ul role="list" className="m-0 flex list-none flex-wrap items-center justify-center gap-2 p-0">
-        {ACCESSORIES_CHAPTERNAV.map((chip) => (
+        {chips.map((chip) => (
           <li key={chip.label} className="m-0 list-none">
             <a href={chip.href} aria-label={chip.ariaLabel} className="accessories-chip">
               {chip.label}
@@ -33,17 +48,21 @@ export const AccessoriesChapterNav = memo(function AccessoriesChapterNav() {
   );
 });
 
-/** The measured media gallery: eight themed cards in the scroller family
+/** The measured media gallery: themed cards in the scroller family
  * (headline, body, CTA; the reference's photography drops, D1 — the theme
  * background carries the card). */
-export const AccessoriesGallery = memo(function AccessoriesGallery() {
+export const AccessoriesGallery = memo(function AccessoriesGallery({
+  gallery = ACCESSORIES_GALLERY,
+}: {
+  gallery?: { headline: string; cards: readonly AccessoriesGalleryCard[] };
+}) {
   return (
     <section aria-labelledby="accessories-gallery" className="store-rail">
       <h2 id="accessories-gallery" className="accessories-section-header m-0">
-        {ACCESSORIES_GALLERY.headline}
+        {gallery.headline}
       </h2>
       <ul role="list" className="rail-scroller m-0 p-0">
-        {ACCESSORIES_GALLERY.cards.map((card) => (
+        {gallery.cards.map((card) => (
           <li
             key={card.headline}
             className={`accessories-gallery-card m-0 list-none ${card.theme === "dark" ? "accessories-gallery-dark" : "accessories-gallery-light"}`}
@@ -71,11 +90,13 @@ const CuratedCard = memo(function CuratedCard({ item }: { item: AccessoriesCurat
   if (item.kind === "promo") {
     return (
       <li className="accessories-curated-card accessories-curated-promo m-0 list-none">
-        <p className="accessories-curated-eyebrow m-0">{item.eyebrow}</p>
+        {item.eyebrow && <p className="accessories-curated-eyebrow m-0">{item.eyebrow}</p>}
         <p className="accessories-curated-headline m-0">{item.headline}</p>
-        <a href={item.href} className="accessories-curated-link">
-          {item.ctaLabel}
-        </a>
+        {item.ctaLabel && (
+          <a href={item.href} className="accessories-curated-link">
+            {item.ctaLabel}
+          </a>
+        )}
       </li>
     );
   }
@@ -92,12 +113,16 @@ const CuratedCard = memo(function CuratedCard({ item }: { item: AccessoriesCurat
   );
 });
 
-/** The measured curated grid: five pill tabs over 53 measured items. The tab
+/** The measured curated grid: pill tabs over the measured items. The tab
  * strip implements the WAI-ARIA tabs pattern (roving tabindex, arrow keys,
  * aria-selected + labelled panels). */
-export const AccessoriesCurated = memo(function AccessoriesCurated() {
+export const AccessoriesCurated = memo(function AccessoriesCurated({
+  curated = ACCESSORIES_CURATED,
+}: {
+  curated?: { headline: string; tabs: readonly AccessoriesCuratedTab[] };
+}) {
   const [active, setActive] = useState(0);
-  const tabs = ACCESSORIES_CURATED.tabs;
+  const tabs = curated.tabs;
   const onKey = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
     if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
     event.preventDefault();
@@ -108,7 +133,7 @@ export const AccessoriesCurated = memo(function AccessoriesCurated() {
   return (
     <section aria-labelledby="accessories-curated" className="accessories-curated">
       <h2 id="accessories-curated" className="accessories-section-header m-0">
-        {ACCESSORIES_CURATED.headline}
+        {curated.headline}
       </h2>
       <div className="accessories-tablist-row">
         <div role="tablist" aria-label="Accessory picks" className="flex flex-wrap gap-2">
@@ -154,15 +179,19 @@ export const AccessoriesCurated = memo(function AccessoriesCurated() {
   );
 });
 
-/** The measured value-props row (four items, each with a Learn more link). */
-export const AccessoriesValueProps = memo(function AccessoriesValueProps() {
+/** The measured value-props row (each item with a Learn more link). */
+export const AccessoriesValueProps = memo(function AccessoriesValueProps({
+  valueProps = ACCESSORIES_VALUE_PROPS,
+}: {
+  valueProps?: { headline: string; items: readonly AccessoriesValueProp[] };
+}) {
   return (
     <section aria-labelledby="accessories-value-props" className="accessories-value-props">
       <h2 id="accessories-value-props" className="accessories-section-header m-0">
-        {ACCESSORIES_VALUE_PROPS.headline}
+        {valueProps.headline}
       </h2>
       <ul role="list" className="m-0 grid list-none gap-8 p-0 tablet:grid-cols-2 wide:grid-cols-4">
-        {ACCESSORIES_VALUE_PROPS.items.map((item) => (
+        {valueProps.items.map((item) => (
           <li key={item.headline} className="m-0 list-none">
             <h3 className="accessories-value-headline m-0">{item.headline}</h3>
             <p className="accessories-value-body m-0">{item.body}</p>
@@ -178,14 +207,18 @@ export const AccessoriesValueProps = memo(function AccessoriesValueProps() {
 
 /** The measured index-nav directory: three groups of links (the page's
  * closing "Accessories" section). */
-export const AccessoriesIndexNav = memo(function AccessoriesIndexNav() {
+export const AccessoriesIndexNav = memo(function AccessoriesIndexNav({
+  indexNav = ACCESSORIES_INDEX_NAV,
+}: {
+  indexNav?: { headline: string; groups: readonly AccessoriesIndexGroup[] };
+}) {
   return (
     <section aria-labelledby="accessories-index-nav" className="accessories-index-nav">
       <h2 id="accessories-index-nav" className="accessories-index-headline m-0">
-        {ACCESSORIES_INDEX_NAV.headline}
+        {indexNav.headline}
       </h2>
       <div className="grid gap-10 tablet:grid-cols-3">
-        {ACCESSORIES_INDEX_NAV.groups.map((group) => (
+        {indexNav.groups.map((group) => (
           <div key={group.headline}>
             <h3 className="accessories-index-group m-0">{group.headline}</h3>
             <ul role="list" className="m-0 grid list-none gap-3 p-0">
@@ -214,6 +247,21 @@ export function AccessoriesPageSections() {
       <AccessoriesCurated />
       <AccessoriesValueProps />
       <AccessoriesIndexNav />
+    </>
+  );
+}
+
+/** The per-category accessories grid sequence (session-12 D16): the same
+ * section family over a per-category measured model. The page's h1 lives in
+ * StorePage. */
+export function AccessoriesCategoryPageSections({ page }: { page: AccessoriesCategoryPage }) {
+  return (
+    <>
+      <AccessoriesChapterNav chips={page.chapternav} navLabel={`${page.h1} by category`} />
+      <AccessoriesGallery gallery={page.gallery} />
+      <AccessoriesCurated curated={page.curated} />
+      <AccessoriesValueProps valueProps={page.valueProps} />
+      <AccessoriesIndexNav indexNav={page.indexNav} />
     </>
   );
 }

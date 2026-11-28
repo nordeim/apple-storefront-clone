@@ -22,7 +22,7 @@ function RouteView({ route }: { route: Route }) {
     case "home":
       return <HomePage />;
     case "store":
-      return <StorePage key={route.category ?? "all"} category={route.category} />;
+      return <StorePage key={route.view === "accessories" ? `${route.category ?? "all"}-accessories` : route.category ?? "all"} category={route.category} view={route.view} />;
     case "product": {
       const product = getProduct(route.id);
       return product ? <ProductPage product={product} /> : <NotFoundPage />;

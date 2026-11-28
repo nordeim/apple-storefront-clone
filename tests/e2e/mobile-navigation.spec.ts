@@ -127,7 +127,18 @@ test.describe("mobile navigation (390×844, touch)", () => {
   test("no horizontal overflow on any route", async ({ page }) => {
     await page.goto("/");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    for (const r of ["#/store", "#/bag", "#/checkout", "#/entertainment", "#/support", "#/product/macbook-pro-m6", "#/info/compare-mac"]) {
+    for (const r of [
+      "#/store",
+      "#/bag",
+      "#/checkout",
+      "#/entertainment",
+      "#/support",
+      "#/product/macbook-pro-m6",
+      "#/info/compare-mac",
+      // session-12: the per-category accessories grids (the chips/tabs scroll)
+      "#/store/mac/accessories",
+      "#/store/iphone/accessories",
+    ]) {
       await page.goto(r);
       await page.waitForTimeout(200);
       expect(

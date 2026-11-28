@@ -14,7 +14,9 @@ const SITE = "Apple (Singapore)";
  * Two categories render their reference's own page families, not the "Shop X"
  * store family: airpods is the marketing page (h1 "AirPods", the reference's
  * document title) and accessories is the filtered grid (h1 "Accessories") —
- * session-11's D14/D15.
+ * session-11's D14/D15. The per-category accessories views carry the
+ * reference's own measured titles (session-12 D16) — including iPad's
+ * lowercase "accessories".
  */
 const STORE_PAGE_TITLES: Readonly<Record<CategoryId, string>> = {
   mac: "Shop Mac",
@@ -27,11 +29,25 @@ const STORE_PAGE_TITLES: Readonly<Record<CategoryId, string>> = {
   accessories: "Accessories",
 };
 
+const ACCESSORIES_VIEW_TITLES: Readonly<Record<CategoryId, string>> = {
+  mac: "Shop Mac Accessories",
+  ipad: "Shop iPad accessories",
+  iphone: "Shop iPhone Accessories",
+  watch: "Apple Watch Accessories",
+  vision: "Apple Vision Pro Accessories",
+  airpods: "Shop AirPods & Accessories",
+  home: "Home Accessories",
+  accessories: "Accessories",
+};
+
 export function routeTitle(route: Route): string {
   switch (route.name) {
     case "home":
       return SITE;
     case "store":
+      if (route.view === "accessories" && route.category) {
+        return `${ACCESSORIES_VIEW_TITLES[route.category]} - ${SITE}`;
+      }
       return `${route.category ? STORE_PAGE_TITLES[route.category] : "Store"} - ${SITE}`;
     case "product":
       return `${getProduct(route.id)?.name ?? "Product"} - ${SITE}`;

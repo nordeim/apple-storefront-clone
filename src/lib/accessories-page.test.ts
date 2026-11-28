@@ -35,10 +35,11 @@ describe("ACCESSORIES_* (the reference's measured /sg/shop/accessories/all grid 
       expect(chip.ariaLabel).toBe(`${chip.label} - Accessories`);
       expect(routeable(chip.href), chip.label).toBe(true);
     }
-    // device chips route to the clone's category pages (the pages that carry
-    // their measured accessory shelves — D15); AirTag/Beats route to info pages
-    expect(ACCESSORIES_CHAPTERNAV[0]?.href).toBe("#/store/iphone");
-    expect(ACCESSORIES_CHAPTERNAV[6]?.href).toBe("#/store/home");
+    // device chips route to the per-category accessories grids (the pages
+    // that model their reference destinations — session-12 D16);
+    // AirTag/Beats route to info pages (no clone category)
+    expect(ACCESSORIES_CHAPTERNAV[0]?.href).toBe("#/store/iphone/accessories");
+    expect(ACCESSORIES_CHAPTERNAV[6]?.href).toBe("#/store/home/accessories");
     expect(ACCESSORIES_CHAPTERNAV[7]?.href).toBe("#/info/airtag-accessories");
     expect(ACCESSORIES_CHAPTERNAV[8]?.href).toBe("#/info/beats-accessories");
   });
@@ -165,7 +166,7 @@ describe("ACCESSORIES_* (the reference's measured /sg/shop/accessories/all grid 
     const exported = new Set(ACCESSORIES_INFO_LABELS.map((l) => l.href));
     const pageHrefs = new Set([
       ...ACCESSORIES_GALLERY.cards.map((c) => c.cta.href),
-      ...curatedCards.flatMap((c) => (c.kind === "promo" ? [c.href] : [c.href])),
+      ...curatedCards.map((c) => c.href),
       ...ACCESSORIES_VALUE_PROPS.items.map((i) => i.href),
       ...ACCESSORIES_INDEX_NAV.groups.flatMap((g) => g.links.map((l) => l.href)),
       ...ACCESSORIES_CHAPTERNAV.map((c) => c.href),

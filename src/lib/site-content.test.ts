@@ -11,7 +11,8 @@ const nav = (id: string) => {
 const headings = (sections: FlyoutSection[]) => sections.map((s) => s.heading);
 
 /** The hash-route grammar every flyout href must satisfy — routeHref factories only. */
-const ROUTE_RE = /^#\/(store(\/[a-z0-9-]+)?|product\/[a-z0-9-]+|info\/[a-z0-9-]+|entertainment|support|bag|search\?.+)$/;
+// session-12: the store head gains the per-category accessories second segment
+const ROUTE_RE = /^#\/(store(\/[a-z0-9-]+)?(\/accessories)?|product\/[a-z0-9-]+|info\/[a-z0-9-]+|entertainment|support|bag|search\?.+)$/;
 
 describe("flyoutSections", () => {
   it("gives the device categories the reference's three-section structure", () => {
@@ -51,7 +52,7 @@ describe("flyoutSections", () => {
     expect(explore.links[2]).toEqual({ label: "Apple TV 4K", href: "#/product/apple-tv-4k" });
     expect(shop.links.map((l) => l.label)).toEqual(["Shop Home", "Shop Home Accessories", "Personal Setup"]);
     expect(shop.links[0]).toEqual({ label: "Shop Home", href: "#/store/home" });
-    expect(shop.links[1]).toEqual({ label: "Shop Home Accessories", href: "#/store/accessories" });
+    expect(shop.links[1]).toEqual({ label: "Shop Home Accessories", href: "#/store/home/accessories" });
     expect(more.links.map((l) => l.label)).toEqual([
       "Home Support",
       "AppleCare for Apple TV",
@@ -316,7 +317,8 @@ describe("flyoutSections", () => {
     const shop = flyoutSections(nav("iphone"))[1].links;
     expect(shop).toEqual([
       { label: "Shop iPhone", href: "#/store/iphone" },
-      { label: "iPhone Accessories", href: "#/store/accessories" },
+      // session-12 D16: X Accessories opens the per-category accessories grid
+      { label: "iPhone Accessories", href: "#/store/iphone/accessories" },
       { label: "Apple Trade In", href: "#/info/apple-trade-in" },
       { label: "Financing", href: "#/info/financing" },
       { label: "Personal Setup", href: "#/info/personal-setup" },

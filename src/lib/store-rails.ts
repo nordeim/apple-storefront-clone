@@ -58,8 +58,11 @@ export interface StoreQuickLink {
 
 /** Reference rail-card labels that name a clone catalog product under a variant
  * spelling or a "- New"/"- Free engraving" annotation — the exact-name rule
- * alone can't see these (measured live capture). */
-const PRODUCT_ALIASES: Readonly<Record<string, string>> = {
+ * alone can't see these (measured live capture). Exported since session 12:
+ * the accessories-category-pages spec mirrors this rule for its D10 guard
+ * (the session-11 PRODUCT_EYEBROWS precedent — a private map's keys are
+ * unpinnable). */
+export const PRODUCT_ALIASES: Readonly<Record<string, string>> = {
   "MacBook Pro PROLED XDR Display": "macbook-pro-proled",
   "AirTag 4 pack": "airtag-4-pack",
   "AirTag 4 pack - Free engraving": "airtag-4-pack",

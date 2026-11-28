@@ -59,10 +59,13 @@ export interface AccessoriesCuratedCard {
 
 export interface AccessoriesCuratedPromo {
   kind: "promo";
-  /** The reference's eyebrow on the in-grid promo cards (the tab's name or "Apple TV"). */
-  eyebrow: string;
+  /** The reference's eyebrow on the in-grid promo cards (the tab's name, a
+   * product name, a category) — absent on the measured headline-only promos
+   * (the footnote and single-link cards, session-12). */
+  eyebrow?: string;
   headline: string;
-  ctaLabel: string;
+  /** Absent on the reference's link-only promos (the whole card is the link). */
+  ctaLabel?: string;
   href: string;
 }
 
@@ -92,18 +95,18 @@ export interface AccessoriesIndexGroup {
 
 const info = (label: string): string => routeHref.info(slugify(label));
 
-/** The measured chapter nav. The reference's device chips route to per-category
- * accessory grids; the clone's honest destinations are the category pages that
- * carry their measured accessory shelves (D15) \u2014 AirTag and Beats have no
- * clone category, so they route to generated info pages (the flyout pattern). */
+/** The measured chapter nav. The reference's device chips route to the
+ * per-category accessory grids (/sg/shop/{cat}/accessories \u2014 modeled this
+ * cycle, D16); AirTag and Beats have no clone category, so they route to
+ * generated info pages (the flyout pattern). */
 export const ACCESSORIES_CHAPTERNAV: readonly AccessoriesChapterChip[] = [
-  { label: "iPhone", ariaLabel: "iPhone - Accessories", href: routeHref.store("iphone") },
-  { label: "iPad", ariaLabel: "iPad - Accessories", href: routeHref.store("ipad") },
-  { label: "Mac", ariaLabel: "Mac - Accessories", href: routeHref.store("mac") },
-  { label: "Apple Watch", ariaLabel: "Apple Watch - Accessories", href: routeHref.store("watch") },
-  { label: "Apple Vision Pro", ariaLabel: "Apple Vision Pro - Accessories", href: routeHref.store("vision") },
-  { label: "AirPods", ariaLabel: "AirPods - Accessories", href: routeHref.store("airpods") },
-  { label: "Home", ariaLabel: "Home - Accessories", href: routeHref.store("home") },
+  { label: "iPhone", ariaLabel: "iPhone - Accessories", href: routeHref.storeAccessories("iphone") },
+  { label: "iPad", ariaLabel: "iPad - Accessories", href: routeHref.storeAccessories("ipad") },
+  { label: "Mac", ariaLabel: "Mac - Accessories", href: routeHref.storeAccessories("mac") },
+  { label: "Apple Watch", ariaLabel: "Apple Watch - Accessories", href: routeHref.storeAccessories("watch") },
+  { label: "Apple Vision Pro", ariaLabel: "Apple Vision Pro - Accessories", href: routeHref.storeAccessories("vision") },
+  { label: "AirPods", ariaLabel: "AirPods - Accessories", href: routeHref.storeAccessories("airpods") },
+  { label: "Home", ariaLabel: "Home - Accessories", href: routeHref.storeAccessories("home") },
   { label: "AirTag", ariaLabel: "AirTag - Accessories", href: info("AirTag Accessories") },
   { label: "Beats", ariaLabel: "Beats - Accessories", href: info("Beats Accessories") },
 ];

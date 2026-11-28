@@ -263,6 +263,53 @@ test.describe("store flow (desktop)", () => {
     await expect(page.locator("#accessories-panel-1 .accessories-curated-card")).toHaveCount(11);
   });
 
+  test("per-category accessories grid renders the measured model (session-12 D16)", async ({ page }) => {
+    // The reference's /sg/shop/mac/accessories — the same grid family with
+    // per-category content: h1 → 9 chips → gallery → 4 tabs → value props →
+    // index nav, with the superset below.
+    await page.goto("/#/store/mac/accessories");
+    await expect(page).toHaveTitle("Shop Mac Accessories - Apple (Singapore)");
+    await expect(page.getByRole("heading", { level: 1, name: "Mac Accessories", exact: true })).toBeVisible();
+    await expect(page.locator(".accessories-chapternav a")).toHaveCount(9);
+    await expect(page.getByRole("heading", { name: "Just in for Mac." })).toBeVisible();
+    await expect(page.locator(".accessories-gallery-card")).toHaveCount(2);
+    await expect(page.getByRole("heading", { name: "More to love for Mac." })).toBeVisible();
+    const tabs = page.locator(".accessories-tab");
+    await expect(tabs).toHaveCount(4);
+    await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
+    // the Gear Up panel carries its measured 12 items (11 cards + 1 promo)
+    await expect(page.locator("#accessories-panel-0 .accessories-curated-card")).toHaveCount(12);
+    await expect(page.locator(".accessories-value-props li")).toHaveCount(3);
+    await expect(page.locator(".accessories-index-nav a")).toHaveCount(21);
+    // the index-nav "Shop by Product" group routes the device links to the
+    // per-category grids (D16) — and the superset grid follows below
+    const iPhoneIndexLink = page.locator(".accessories-index-nav a").filter({ hasText: /^iPhone$/ });
+    await expect(iPhoneIndexLink).toHaveAttribute("href", "#/store/iphone/accessories");
+    await expect(page.getByRole("heading", { name: "All products." })).toBeVisible();
+    // the index-nav iPhone link navigates to its per-category grid
+    await iPhoneIndexLink.click();
+    await expect(page).toHaveTitle("Shop iPhone Accessories - Apple (Singapore)");
+    await expect(page.getByRole("heading", { level: 1, name: "iPhone Accessories", exact: true })).toBeVisible();
+    await expect(page.locator(".accessories-tab")).toHaveCount(5);
+  });
+
+  test("per-category grid derives catalog prices where the reference contradicts them (D10)", async ({ page }) => {
+    // The reference's Home accessories page quotes S$399 for the Apple TV 4K
+    // curated card and its gallery Buy CTA — this clone's catalog says From
+    // S$229 (the reference's string is a functional lie here; the card
+    // derives, always).
+    await page.goto("/#/store/home/accessories");
+    await expect(page).toHaveTitle("Home Accessories - Apple (Singapore)");
+    await expect(page.getByRole("heading", { level: 1, name: "Home Accessories", exact: true })).toBeVisible();
+    // the Home Essentials panel (first tab) carries the Apple TV 4K card
+    const tvCard = page.locator("#accessories-panel-0 .accessories-curated-card").filter({ hasText: "Apple TV 4K" });
+    await expect(tvCard.getByText("From S$229")).toBeVisible();
+    await expect(tvCard.locator("a")).toHaveAttribute("href", "#/product/apple-tv-4k");
+    // the gallery card's Buy CTA deep-links the working configurator (D12)
+    const tvGallery = page.locator(".accessories-gallery-card").filter({ hasText: "Apple TV 4K" });
+    await expect(tvGallery.getByRole("link", { name: "Buy Apple TV 4K" })).toHaveAttribute("href", "#/product/apple-tv-4k?buy");
+  });
+
   test("in-app Buy CTA keeps the configurator heading focused", async ({ page }) => {
     // In-app navigation into ?buy (not a fresh load): the Configurator's
     // heading must own focus — the shell's <main> focus reset must not

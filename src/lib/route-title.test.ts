@@ -40,6 +40,23 @@ describe("routeTitle", () => {
     expect(routeTitle({ name: "store", category: "accessories" })).toBe(`Accessories - ${SITE}`);
   });
 
+  it("titles the per-category accessories views with the reference's measured titles (D16, S12-5)", () => {
+    // The reference's /sg/shop/{cat}/accessories document titles, measured
+    // live — including iPad's own lowercase "accessories".
+    const cases: [Route, string][] = [
+      [{ name: "store", category: "mac", view: "accessories" }, "Shop Mac Accessories"],
+      [{ name: "store", category: "ipad", view: "accessories" }, "Shop iPad accessories"],
+      [{ name: "store", category: "iphone", view: "accessories" }, "Shop iPhone Accessories"],
+      [{ name: "store", category: "watch", view: "accessories" }, "Apple Watch Accessories"],
+      [{ name: "store", category: "vision", view: "accessories" }, "Apple Vision Pro Accessories"],
+      [{ name: "store", category: "airpods", view: "accessories" }, "Shop AirPods & Accessories"],
+      [{ name: "store", category: "home", view: "accessories" }, "Home Accessories"],
+    ];
+    for (const [route, expected] of cases) {
+      expect(routeTitle(route)).toBe(`${expected} - ${SITE}`);
+    }
+  });
+
   it("titles product pages with the product's catalogue name", () => {
     expect(routeTitle({ name: "product", id: "iphone-duo" })).toBe(`iPhone Duo - ${SITE}`);
   });

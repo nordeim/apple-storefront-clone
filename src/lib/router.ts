@@ -2,7 +2,7 @@ import { isCategoryId, getProduct, type CategoryId } from "./catalog";
 
 export type Route =
   | { name: "home" }
-  | { name: "store"; category?: CategoryId }
+  | { name: "store"; category?: CategoryId; view?: "accessories" }
   | { name: "product"; id: string }
   | { name: "bag" }
   | { name: "checkout" }
@@ -12,6 +12,19 @@ export type Route =
   | { name: "support" }
   | { name: "info"; slug: string }
   | { name: "not-found" };
+
+/** The categories whose reference destination is a per-category accessories
+ * grid (/sg/shop/{cat}/accessories) — every category except accessories
+ * itself (session-12 D16). */
+const ACCESSORIES_VIEW_CATEGORIES: ReadonlySet<string> = new Set([
+  "mac",
+  "ipad",
+  "iphone",
+  "watch",
+  "vision",
+  "airpods",
+  "home",
+]);
 
 const NOT_FOUND: Route = { name: "not-found" };
 export const ORDER_NO = /^EL-[A-Z0-9]{8}$/;
@@ -53,7 +66,15 @@ export function parseHash(hash: string): Route {
   if (segments.some((s) => s === undefined)) return NOT_FOUND;
   const [head, arg, ...rest] = segments as string[];
 
-  if (rest.length > 0) return NOT_FOUND;
+  // Exactly one second segment is legal anywhere in the grammar: the store
+  // head's per-category accessories view (`#/store/mac/accessories`). Every
+  // other trailing segment 404s (the uniform grammar).
+  if (rest.length === 1) {
+    if (head !== "store" || rest[0] !== "accessories") return NOT_FOUND;
+    if (arg === undefined || !ACCESSORIES_VIEW_CATEGORIES.has(arg)) return NOT_FOUND;
+    return { name: "store", category: arg as CategoryId, view: "accessories" };
+  }
+  if (rest.length > 1) return NOT_FOUND;
 
   switch (head) {
     case undefined:
@@ -85,6 +106,9 @@ export function parseHash(hash: string): Route {
 export const routeHref = {
   home: "#/",
   store: (category?: CategoryId) => (category ? `#/store/${category}` : "#/store"),
+  /** The per-category accessories grid (`#/store/mac/accessories`) — the
+   * reference's /sg/shop/{cat}/accessories destination (session-12 D16). */
+  storeAccessories: (category: CategoryId) => `#/store/${category}/accessories`,
   product: (id: string) => `#/product/${id}`,
   /** Product deep link that scrolls straight to the configurator (App/ProductPage consume the `?buy` hint). */
   productBuy: (id: string) => `#/product/${id}?buy`,

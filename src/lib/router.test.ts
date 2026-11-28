@@ -64,6 +64,25 @@ describe("parseHash", () => {
     expect(parseHash("#/support/iphone")).toEqual({ name: "not-found" });
   });
 
+  it("parses the per-category accessories view for the seven device categories (S12-4)", () => {
+    // The reference's /sg/shop/{cat}/accessories destinations — the session-12
+    // D16 surface. The accessories category itself has no accessories page.
+    const DEVICE_CATEGORIES = ["mac", "ipad", "iphone", "watch", "vision", "airpods", "home"] as const;
+    for (const category of DEVICE_CATEGORIES) {
+      expect(parseHash(`#/store/${category}/accessories`)).toEqual({ name: "store", category, view: "accessories" });
+    }
+    expect(parseHash("#/store/accessories/accessories")).toEqual({ name: "not-found" });
+    expect(parseHash("#/store/toasters/accessories")).toEqual({ name: "not-found" });
+  });
+
+  it("rejects every other second segment and any third segment (uniform 404 grammar)", () => {
+    expect(parseHash("#/store/mac/ipad")).toEqual({ name: "not-found" });
+    expect(parseHash("#/store/mac/accessories/x")).toEqual({ name: "not-found" });
+    expect(parseHash("#/store/accessories/mac")).toEqual({ name: "not-found" });
+    expect(parseHash("#/product/iphone/accessories")).toEqual({ name: "not-found" });
+    expect(parseHash("#/info/privacy/accessories")).toEqual({ name: "not-found" });
+  });
+
   it("returns not-found for unknown routes", () => {
     expect(parseHash("#/nope")).toEqual({ name: "not-found" });
   });
@@ -78,6 +97,11 @@ describe("routeHref factories", () => {
     expect(routeHref.productBuy("iphone-18-pro")).toBe("#/product/iphone-18-pro?buy");
     expect(routeHref.bag).toBe("#/bag");
     expect(routeHref.info("privacy")).toBe("#/info/privacy");
+  });
+
+  it("builds and round-trips the per-category accessories view (S12-4)", () => {
+    expect(routeHref.storeAccessories("mac")).toBe("#/store/mac/accessories");
+    expect(parseHash(routeHref.storeAccessories("watch"))).toEqual({ name: "store", category: "watch", view: "accessories" });
   });
 
   it("round-trips the buy deep link through parseHash to the product page", () => {
