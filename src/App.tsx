@@ -80,7 +80,7 @@ function Shell() {
       </a>
       <GlobalNav />
       <main id="main" ref={mainRef} tabIndex={-1} className="focus:outline-none">
-        <ErrorBoundary>
+        <ErrorBoundary resetKey={path}>
           <RouteView route={route} />
         </ErrorBoundary>
       </main>

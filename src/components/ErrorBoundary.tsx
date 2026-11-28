@@ -2,6 +2,16 @@ import { Component, type ErrorInfo, type ReactNode } from "react";
 import { PageShell, PageTitle } from "./PageShell";
 import { routeHref } from "@/lib/router";
 
+interface BoundaryProps {
+  children: ReactNode;
+  /** Route identity (App passes the hash path): when it changes, the latch
+   * clears so the next route renders — navigating away from a crashed page
+   * recovers instead of showing the fallback until a full reload. A crash on
+   * the new route re-latches (React renders children, they throw, the
+   * boundary catches again). */
+  resetKey?: string;
+}
+
 interface BoundaryState {
   failed: boolean;
 }
@@ -13,11 +23,17 @@ interface BoundaryState {
  * — deliberately NOT the whole app, so the nav and its bag popover survive a
  * route crash and remain usable from the fallback.
  */
-export class ErrorBoundary extends Component<{ children: ReactNode }, BoundaryState> {
+export class ErrorBoundary extends Component<BoundaryProps, BoundaryState> {
   state: BoundaryState = { failed: false };
 
   static getDerivedStateFromError(): BoundaryState {
     return { failed: true };
+  }
+
+  componentDidUpdate(prevProps: Readonly<BoundaryProps>): void {
+    if (prevProps.resetKey !== this.props.resetKey && this.state.failed) {
+      this.setState({ failed: false });
+    }
   }
 
   componentDidCatch(error: unknown, info: ErrorInfo): void {

@@ -58,4 +58,57 @@ describe("ErrorBoundary", () => {
     expect(reload).not.toBeNull();
     errorSpy.mockRestore();
   });
+
+  it("re-arms when resetKey changes so the next route renders again (crash recovery)", () => {
+    // The App wires <ErrorBoundary resetKey={path}> — navigating away from a
+    // crashed route must clear the latch, or every further route shows the
+    // fallback until a full reload (the nav shell's recovery affordance).
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { container, root } = render(
+      <ErrorBoundary resetKey="#/bad-route">
+        <Boom />
+      </ErrorBoundary>,
+    );
+    expect(container.textContent).toContain("Something went wrong");
+
+    act(() => {
+      root.render(
+        <ErrorBoundary resetKey="#/">
+          <p>recovered child</p>
+        </ErrorBoundary>,
+      );
+    });
+    expect(container.textContent).toContain("recovered child");
+    expect(container.textContent).not.toContain("Something went wrong");
+    errorSpy.mockRestore();
+  });
+
+  it("re-latches when the route after a resetKey change crashes again", () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { container, root } = render(
+      <ErrorBoundary resetKey="#/a">
+        <Boom />
+      </ErrorBoundary>,
+    );
+    expect(container.textContent).toContain("Something went wrong");
+
+    act(() => {
+      root.render(
+        <ErrorBoundary resetKey="#/b">
+          <p>healthy stopover</p>
+        </ErrorBoundary>,
+      );
+    });
+    expect(container.textContent).toContain("healthy stopover");
+
+    act(() => {
+      root.render(
+        <ErrorBoundary resetKey="#/c">
+          <Boom />
+        </ErrorBoundary>,
+      );
+    });
+    expect(container.textContent).toContain("Something went wrong");
+    errorSpy.mockRestore();
+  });
 });
