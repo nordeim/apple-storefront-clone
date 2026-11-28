@@ -65,6 +65,19 @@ sleep 1
 agent-browser screenshot "$OUT/18-desktop-store-rails.png" >/dev/null 2>&1
 echo "captured 18-desktop-store-rails"
 
+# 19 — the session-10 Mac category shelves ("All models." + the measured rails)
+agent-browser open "$BASE/#/store/mac" >/dev/null 2>&1
+agent-browser set viewport 1440 900 >/dev/null 2>&1
+sleep 2
+agent-browser screenshot "$OUT/19-desktop-category-mac.png" >/dev/null 2>&1
+echo "captured 19-desktop-category-mac"
+
+# 20 — the session-10 Mac "All models." product cards close-up (Buy pills)
+agent-browser eval "document.querySelector('.rail-scroller').scrollIntoView({ block: 'center' }); 'scrolled'" >/dev/null 2>&1
+sleep 1
+agent-browser screenshot "$OUT/20-desktop-category-mac-all-models.png" >/dev/null 2>&1
+echo "captured 20-desktop-category-mac-all-models"
+
 capture_mobile 07-mobile-home ""
 capture_mobile 09-mobile-store "#/store"
 capture_mobile 10-mobile-product "#/product/iphone-18-pro"

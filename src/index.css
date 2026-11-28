@@ -388,7 +388,7 @@ body {
 .store-rail-header { font: 600 28px/1.1 var(--font-display); letter-spacing: -0.012em; margin: 0 0 24px; }
 .rail-scroller { display: flex; gap: 20px; list-style: none; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 0 8px; scrollbar-width: none; }
 .rail-scroller::-webkit-scrollbar { display: none; }
-.rail-card, .rail-card-accessory { position: relative; flex: 0 0 auto; border-radius: 18px; overflow: hidden; scroll-snap-align: start; }
+.rail-card, .rail-card-accessory, .rail-card-product, .rail-card-wide, .rail-card-short, .rail-card-short-wide { position: relative; flex: 0 0 auto; border-radius: 18px; overflow: hidden; scroll-snap-align: start; }
 .rail-card { width: 400px; height: 500px; background: #fff; }
 .rail-card-accessory { width: 313px; height: 500px; background: #fff; }
 .rail-card-art { position: absolute; inset: 0; }
@@ -398,12 +398,38 @@ body {
 .rail-card-info-on-art { background: linear-gradient(to bottom, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.65) 55%, transparent 100%); }
 .rail-card-eyebrow { font: 600 12px/1.2 var(--font-text); letter-spacing: -0.01em; color: #424245; margin: 0 0 6px; }
 .rail-card-editorial .rail-card-eyebrow { color: inherit; }
+.rail-card-editorial .rail-card-chevron { color: inherit; }
 .rail-card-name { font: 600 28px/1.07 var(--font-display); letter-spacing: -0.012em; color: inherit; margin: 0 0 8px; }
 .rail-card-name-accessory { font-size: 17px; line-height: 1.2; font-family: var(--font-text); }
 .rail-card-desc { font: 400 17px/1.24 var(--font-text); color: inherit; margin: 0; }
 .rail-card-chevron { position: absolute; right: 16px; bottom: 16px; z-index: 2; color: var(--color-ink); }
 .rail-card a { color: inherit; }
 .store-quick-links { padding: 20px 0 0; }
+
+/* ---------- The category pages' shelf cards (session-10; measured off apple.com/sg/shop/buy-*) ---------- */
+/* The "All models." product card: 400x500 white; name/tag at top, art mid,
+   price + the Buy pill at the bottom (measured: price 14px bottom-left, pill
+   56x36 #0071e3 radius 980px bottom-right). */
+.rail-card-product { width: 400px; height: 500px; background: #fff; }
+.rail-card-product-wide { width: 646px; }
+.rail-card-product .rail-card-art svg { height: 60%; bottom: 48px; }
+.rail-card-product .rail-card-info { padding: 24px 28px 0; pointer-events: none; }
+.rail-card-product-link { position: absolute; inset: 0; z-index: 1; }
+.rail-card-product-foot { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 20px 20px; pointer-events: none; }
+.rail-card-price { font: 400 14px/1.3 var(--font-text); letter-spacing: -0.01em; color: var(--color-ink); }
+.rail-card-buy { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; min-width: 56px; height: 36px; padding: 0 16px; border-radius: 980px; background: var(--color-action); color: #fff; font: 400 14px/1 var(--font-text); letter-spacing: -0.01em; text-decoration: none; pointer-events: auto; }
+.rail-card-buy:hover { background: var(--color-action-hover); }
+
+/* The measured content-card geometries: 480x500 wide editorials, 313x240 and
+   480x240 short cards (headline 24px/600, vertically centered). */
+.rail-card-wide { width: 480px; height: 500px; background: #fff; }
+.rail-card-short, .rail-card-short-wide { background: #fff; }
+.rail-card-short { width: 313px; height: 240px; }
+.rail-card-short-wide { width: 480px; height: 240px; }
+.rail-card-short .rail-card-info, .rail-card-short-wide .rail-card-info { top: auto; bottom: auto; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 24px; }
+.rail-card-short .rail-card-name, .rail-card-short-wide .rail-card-name { font-size: 24px; line-height: 1.15; margin: 0; }
+.rail-card-short .rail-card-chevron, .rail-card-short-wide .rail-card-chevron { bottom: 12px; right: 12px; }
+
 @media (max-width: 734px) {
   .store-rails { gap: 64px; margin-top: 40px; }
   .store-rail-header { font-size: 21px; }
@@ -413,6 +439,16 @@ body {
   .rail-card-name { font-size: 21px; }
   .rail-card-name-accessory { font-size: 14px; }
   .rail-card-desc { font-size: 14px; }
+  .rail-card-product { width: 300px; height: 375px; }
+  .rail-card-product-wide { width: 300px; }
+  .rail-card-product .rail-card-info { padding: 18px 20px 0; }
+  .rail-card-product .rail-card-art svg { height: 56%; bottom: 44px; }
+  .rail-card-product-foot { padding: 0 16px 16px; }
+  .rail-card-wide { width: 300px; height: 375px; }
+  .rail-card-short { width: 235px; height: 180px; }
+  .rail-card-short-wide { width: 300px; height: 180px; }
+  .rail-card-short .rail-card-info, .rail-card-short-wide .rail-card-info { padding: 18px; }
+  .rail-card-short .rail-card-name, .rail-card-short-wide .rail-card-name { font-size: 19px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

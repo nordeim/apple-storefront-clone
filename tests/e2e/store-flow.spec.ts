@@ -145,6 +145,49 @@ test.describe("store flow (desktop)", () => {
     await expect(page.getByRole("heading", { name: "All products." })).toBeVisible();
   });
 
+  test("category page renders its measured shelf model with working buy deep links", async ({ page }) => {
+    // Session-10 parity surface: the reference's /sg/shop/buy-mac body is a
+    // shelf sequence; the clone's superset product grid follows below.
+    await page.goto("/#/store/mac");
+    const headers = page.locator(".store-rail-header");
+    await expect(headers).toHaveCount(7);
+    await expect(headers.first()).toHaveText(/All models\. Take your pick\./);
+    await expect(headers.nth(1)).toHaveText(/Mac picks\. More power to them\./);
+    await expect(headers.nth(2)).toHaveText(/Ways to save\. Find what works for you\./);
+    await expect(headers.nth(3)).toHaveText(/Only at Apple\. The total package\./);
+    await expect(headers.nth(6)).toHaveText(/Savings and offers\. Exclusive deals, special stores and more\./);
+    // "All models." carries the clone's catalog Macs (D12) + the measured
+    // COMPARE editorial card.
+    const firstShelf = page.locator(".rail-scroller").first();
+    await expect(firstShelf.locator("li")).toHaveCount(3);
+    // The measured per-product tag renders on the MacBook Pro (M6) card.
+    const proCard = firstShelf.locator("li").filter({ hasText: "NEW 14” WITH M6" }).first();
+    await expect(proCard.getByText("NEW 14” WITH M6")).toBeVisible();
+    await expect(proCard.getByText(/From S\$/)).toBeVisible();
+    // The superset grid follows the shelves (the working store below).
+    await expect(page.getByRole("heading", { name: "All products." })).toBeVisible();
+    // The Buy pill deep-links the working configurator.
+    await expect(proCard.getByRole("link", { name: /Buy MacBook Pro/ })).toHaveAttribute("href", "#/product/macbook-pro-m6?buy");
+    await proCard.getByRole("link", { name: /Buy MacBook Pro/ }).click();
+    await expect(page).toHaveURL(/#\/product\/macbook-pro-m6\?buy$/);
+    await expect(page.locator("#configure-heading")).toBeFocused();
+  });
+
+  test("over-long rail labels navigate to their info page, not the 404", async ({ page }) => {
+    // S10-1 regression pin: nine session-9 rail labels slugify past the
+    // router's old 60-char cap and landed on the 404 page; the cap now
+    // covers every measured label (longest 126) and the round-trip specs
+    // guard the boundary.
+    await page.goto("/#/store");
+    const card = page
+      .locator(".rail-scroller li")
+      .filter({ hasText: "Beats 360 Over‑Ear Headphones – Pink" })
+      .first();
+    await card.locator("a").first().click();
+    await expect(page).toHaveURL(/#\/info\/beats-360-over-ear-headphones-pink-with-pink-performance-knit-cushions$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Beats 360 Over‑Ear Headphones – Pink with Pink Performance Knit Cushions" })).toBeVisible();
+  });
+
   test("in-app Buy CTA keeps the configurator heading focused", async ({ page }) => {
     // In-app navigation into ?buy (not a fresh load): the Configurator's
     // heading must own focus — the shell's <main> focus reset must not

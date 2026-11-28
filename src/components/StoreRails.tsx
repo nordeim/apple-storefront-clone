@@ -1,5 +1,6 @@
 import { memo } from "react";
-import { getProduct, type Product } from "@/lib/catalog";
+import { CATEGORY_RAILS, type CategoryRail, type CategoryRailCard } from "@/lib/category-rails";
+import { getProduct, type CategoryId, type Product } from "@/lib/catalog";
 import { RAIL_HEADER_COLOR, STORE_QUICK_LINKS, STORE_RAILS, productPriceLabel, type StoreRail, type StoreRailCard } from "@/lib/store-rails";
 import { ProductArt } from "./ProductArt";
 import { ChevronRightIcon } from "./Icons";
@@ -94,5 +95,123 @@ export function StoreQuickLinks() {
         ))}
       </ul>
     </nav>
+  );
+}
+
+/* ---------- The category pages' shelf family (session-10; measured off
+ * apple.com/sg/shop/buy-*) ---------- */
+
+/** The measured card-geometry class per variant. The "product" family is the
+ * "All models." anatomy (name/tag at top, art mid, price + Buy pill at the
+ * bottom); the content family reuses the store-rails anatomy at the measured
+ * widths/heights. */
+const CATEGORY_CARD_CLASS: Readonly<Record<CategoryRailCard["variant"], string>> = {
+  product: "rail-card-product",
+  "product-wide": "rail-card-product rail-card-product-wide",
+  accessory: "rail-card-accessory",
+  editorial: "rail-card",
+  "editorial-wide": "rail-card-wide",
+  "editorial-short": "rail-card-short",
+  "editorial-short-wide": "rail-card-short-wide",
+};
+
+/** The D12 product card: the measured "All models." anatomy over the clone's
+ * catalog product — clone-honest price, and the Buy pill deep-links the
+ * working configurator (the reference's Buy is a marketing link; this one
+ * opens `#/product/<id>?buy`). The card body is one link (the Tile pattern);
+ * the Buy pill is a second link above it. */
+const CategoryProductCard = memo(function CategoryProductCard({ card }: { card: CategoryRailCard }) {
+  const product = card.productId ? getProduct(card.productId) : undefined;
+  if (!product || !card.buyHref) return null; // the seam guarantees both (D12)
+  return (
+    <li className={`m-0 list-none ${CATEGORY_CARD_CLASS[card.variant]}`}>
+      <a
+        href={card.href}
+        className="rail-card-product-link"
+        aria-label={`${card.label}. ${productPriceLabel(product)}.`}
+      />
+      <div className="rail-card-art" aria-hidden="true">
+        <ProductArt id={product.art} />
+      </div>
+      <div className="rail-card-info">
+        {card.eyebrow && <p className="rail-card-eyebrow m-0">{card.eyebrow}</p>}
+        <p className="rail-card-name m-0">{card.label}</p>
+      </div>
+      <div className="rail-card-product-foot">
+        <span className="rail-card-price">{productPriceLabel(product)}</span>
+        <a href={card.buyHref} className="rail-card-buy" aria-label={`Buy ${card.label}`}>
+          Buy
+        </a>
+      </div>
+    </li>
+  );
+});
+
+/** The content cards: the store-rails anatomy (themed editorial, accessory
+ * recomm, measured geometry) — one link, one chevron. */
+const CategoryContentCard = memo(function CategoryContentCard({ card }: { card: CategoryRailCard }) {
+  const accessory = card.variant === "accessory";
+  const theme = card.theme ?? { bg: "#ffffff", fg: "#1d1d1f" };
+  const themed = card.theme !== undefined;
+  return (
+    <li className={`m-0 list-none ${CATEGORY_CARD_CLASS[card.variant]}`}>
+      <a
+        href={card.href}
+        className={`block h-full no-underline ${CATEGORY_CARD_CLASS[card.variant]}${themed ? " rail-card-editorial" : ""}`}
+        style={themed ? { background: theme.bg, color: theme.fg } : undefined}
+      >
+        {!themed && <RailCardArt productId={card.productId} />}
+        <div className={`rail-card-info ${!themed ? "rail-card-info-on-art" : ""}`}>
+          {card.eyebrow && <p className="rail-card-eyebrow m-0">{card.eyebrow}</p>}
+          <p className={`rail-card-name m-0 ${accessory ? "rail-card-name-accessory" : ""}`}>{card.label}</p>
+          {card.desc && <p className="rail-card-desc m-0">{card.desc}</p>}
+        </div>
+        <span className="rail-card-chevron" aria-hidden="true">
+          <ChevronRightIcon />
+        </span>
+      </a>
+    </li>
+  );
+});
+
+const CategoryShelfCard = memo(function CategoryShelfCard({ card }: { card: CategoryRailCard }) {
+  return card.productId && card.buyHref ? <CategoryProductCard card={card} /> : <CategoryContentCard card={card} />;
+});
+
+const headingIdFor = (header: string): string =>
+  `category-shelf-${header.replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").toLowerCase()}`;
+
+/** One measured category shelf: header + secondary header + the scroller. */
+const CategoryShelfSection = memo(function CategoryShelfSection({ shelf }: { shelf: CategoryRail }) {
+  const headingId = headingIdFor(shelf.header);
+  return (
+    <section aria-labelledby={headingId} className="store-rail">
+      <h2 id={headingId} className="store-rail-header m-0">
+        <span style={{ color: RAIL_HEADER_COLOR }}>{shelf.header}</span>{" "}
+        <span className="text-[#6e6e73]">{shelf.subhead}</span>
+      </h2>
+      <ul role="list" className="rail-scroller m-0 p-0">
+        {shelf.cards.map((card, i) => (
+          // The key carries the index: the reference ships at least one
+          // duplicated card (iPhone experience's CONTINUITY pair) and the
+          // measured content is a frozen list — index keys are stable here.
+          <CategoryShelfCard key={`${shelf.header}-${i}-${card.label}`} card={card} />
+        ))}
+      </ul>
+    </section>
+  );
+});
+
+/** A category page's measured shelf sequence (session-10). Categories with
+ * no shelves (D13: airpods/accessories) render nothing. */
+export function CategoryShelves({ category }: { category: CategoryId }) {
+  const shelves = CATEGORY_RAILS[category];
+  if (shelves.length === 0) return null;
+  return (
+    <div className="store-rails">
+      {shelves.map((shelf) => (
+        <CategoryShelfSection key={shelf.header} shelf={shelf} />
+      ))}
+    </div>
   );
 }

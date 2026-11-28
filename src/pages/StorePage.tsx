@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { PageShell, PageTitle } from "@/components/PageShell";
 import { ProductCard } from "@/components/ProductCard";
-import { StoreQuickLinks, StoreRails } from "@/components/StoreRails";
+import { CategoryShelves, StoreQuickLinks, StoreRails } from "@/components/StoreRails";
 import { PRODUCTS, getCategory, productsByCategory, type CategoryId, type Product } from "@/lib/catalog";
 import { STORE_CATEGORY_LABELS, STORE_CHIPS } from "@/lib/site-content";
 
@@ -94,7 +94,19 @@ export function StorePage({ category }: { category?: CategoryId }) {
       </div>
 
       {current ? (
-        <ProductGrid products={products} />
+        <>
+          {/* The category pages carry the reference's measured shelf model
+              (session-10) with the clone's working store below: the "All
+              models." shelf derives from this catalog (D12), the content
+              shelves carry the reference's measured text. */}
+          <CategoryShelves category={current.id} />
+          <section aria-labelledby="store-all-products" className="mt-16">
+            <h2 id="store-all-products" className="m-0 mb-8 font-display text-[28px] leading-tight font-semibold tracking-[-0.012em]">
+              All products.
+            </h2>
+            <ProductGrid products={products} />
+          </section>
+        </>
       ) : (
         <>
           <StoreRails />
