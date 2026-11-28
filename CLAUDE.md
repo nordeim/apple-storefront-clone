@@ -69,7 +69,9 @@ SVG art. Two properties must survive every change:
 - **Nav content** — `flyoutSections()` in `src/lib/site-content.ts` is the
   single content source for the desktop flyouts AND the mobile accordion
   menu; informational labels join the `INFO_TITLES` derivation so sitemap
-  routes and flyout content cannot drift apart.
+  routes and flyout content cannot drift apart. The store index's editorial
+  rails and quick-links strip follow the same rule (`src/lib/store-rails.ts`
+  → `RAIL_INFO_LABELS`).
 
 ### Language & Framework Guidelines
 
@@ -109,23 +111,25 @@ connect to it): `bash docs/setup_pg_z.sh` — see `docs/DEPLOYMENT.md` §4.
 | `npm run preview` | Serve `dist/` (bind `--host 127.0.0.1`) |
 | `npm run lint` | ESLint 10 flat config — must exit 0 |
 | `npm run typecheck` / `npm run typecheck:tests` | `tsc --noEmit` (app / tests+configs) |
-| `npm run test` | Vitest run (10 files / 108 tests) |
-| `npm run test:e2e` | Playwright (40 tests: 28 pins + 12 axe-core a11y scans; builds + serves the artifact) |
+| `npm run test` | Vitest run (11 files / 119 tests) |
+| `npm run test:e2e` | Playwright (42 tests: 30 pins + 12 axe-core a11y scans; builds + serves the artifact) |
 | `npm run test:smoke` | 45-assertion file:// battery over `dist/` |
-| `npm run sitemap` | Regenerate `public/sitemap.xml` + `public/robots.txt` (156 routes) |
+| `npm run sitemap` | Regenerate `public/sitemap.xml` + `public/robots.txt` (204 routes) |
 
 ## Testing Strategy
 
 - **Unit (Vitest, jsdom)** — the pure seam `src/lib/*` (plus the one component-level
   spec, `ErrorBoundary.test.tsx`): catalog, cart
   reducer, router parsing (incl. malformed inputs), money/GST, checkout
-  validation, flyout content model, sitemap route enumeration.
+  validation, flyout content model, the store editorial-rail content model,
+  sitemap route enumeration.
 - **E2E (Playwright, production build)** — `home.spec.ts` (tokens, the
   per-category flyout content model, gallery state machine, zero console errors),
   `mobile-navigation.spec.ts` (390×844 touch: the reference's bar layout,
   accordion menu open/expand/sub-link navigation/close, geometry, no
   horizontal overflow), `store-flow.spec.ts` (search → configurator → bag →
-  checkout validation → confirmation → order lookup → hostile routes), and
+  checkout validation → confirmation → order lookup → hostile routes, plus the
+  store index's seven measured editorial rails and quick-links strip), and
   `a11y.spec.ts` (axe-core WCAG 2 A+AA scans — ten routes plus mobile resting
   and menu-open states; two measured-reference exclusions documented in the
   spec header).

@@ -56,6 +56,15 @@ sleep 1
 agent-browser screenshot "$OUT/12-desktop-flyout-iphone.png" >/dev/null 2>&1
 echo "captured 12-desktop-flyout-iphone"
 
+# 18 — the session-9 store editorial rails (scroll to the rails region)
+agent-browser open "$BASE/#/store" >/dev/null 2>&1
+agent-browser set viewport 1440 900 >/dev/null 2>&1
+sleep 2
+agent-browser eval "document.querySelector('.store-rails').scrollIntoView({ block: 'start' }); 'scrolled'" >/dev/null 2>&1
+sleep 1
+agent-browser screenshot "$OUT/18-desktop-store-rails.png" >/dev/null 2>&1
+echo "captured 18-desktop-store-rails"
+
 capture_mobile 07-mobile-home ""
 capture_mobile 09-mobile-store "#/store"
 capture_mobile 10-mobile-product "#/product/iphone-18-pro"

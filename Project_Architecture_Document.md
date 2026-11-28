@@ -1,4 +1,4 @@
-# apple-storefront-clone — Master Project Architecture Document (PAD) v1.7
+# apple-storefront-clone — Master Project Architecture Document (PAD) v1.8
 
 **Classification:** Internal Engineering Reference
 **Status:** DEFINITIVE, PRODUCTION-LOCKED BLUEPRINT
@@ -7,6 +7,45 @@
 **Audience:** Senior Engineers, Tech Leads, DevOps, and Onboarding Engineers
 **Rule:** Every architectural decision in this document traces to a specific rationale.
 Nothing is here "because it's popular."
+
+#### Revision Block — v1.8 (the session-9 store editorial-rails cycle)
+
+- `[SR]` The session-9 cycle (2026-11-28, `docs/REMEDIATION_PLAN.md` session-9 section)
+  re-verified the pulled tree (af88a0d) — baseline gates exactly as documented (10/108 unit ·
+  40/40 e2e · 45/45 smoke · 156 routes · 310.71 kB) — plus a read-only audit (0
+  CRITICAL/HIGH/MEDIUM; 1 LOW + 5 INFO) and a live-parity sweep: the clone's mobile navigation
+  re-measured working at 390×844, **all eleven reference flyout models re-extracted from the
+  live DOM and programmatically re-diffed against `flyoutSections()` — all match** (a rebuilt
+  Vite ssrLoadModule harness), hero/promo/chip-row/category-h1 surfaces re-measured matching,
+  and the reference's `/sg/store` measured in full for this cycle's feature.
+- `[FEAT]` **The store index's seven editorial rails landed** (the session-8 log's named
+  next-cycle surface): a new pure seam `src/lib/store-rails.ts` (253 lines — 7 rails × the
+  measured header/subhead/card model; `railCardHref` applies the flyout `familyLink` rule —
+  exact catalog-name match (plus a documented alias map for the reference's variant
+  spellings/annotations) routes to product pages, everything else to info pages;
+  `productPriceLabel` derives `From S$X`/`S$X` from THIS clone's catalog — deviation D10) +
+  `src/components/StoreRails.tsx` (98 lines) rendering the measured rail anatomy (400×500
+  white product cards with a 28px/600 name, 313×500 accessory cards, theme-coloured editorial
+  cards with the reference's measured bg/fg pairs; 28px/600 burgundy `#810831` rail headers;
+  20px gaps, a horizontal snap scroller, a 119px rail rhythm) + the quick-links strip (5
+  measured labels; AirPods routes to the clone's category page). The store index now follows
+  the reference's measured order (h1 → quick links → chips → rails) with the superset
+  product grid below ("All products." + the sort control); category pages keep their pinned
+  structure. `slugify` moved to `src/lib/slug.ts` (9 lines) so the seam shares the grammar
+  without a module cycle; `RAIL_INFO_LABELS` joins the `INFO_TITLES` derivation — the
+  sitemap grew 156 → 204 routes, all from the seam.
+- `[FEAT]` The axe tier drove a real fix on the new markup: the rail-card eyebrow's
+  `#424245` (measured on the reference's white product cards) failed contrast on the dark
+  editorial cards — editorial eyebrows now inherit the card theme's fg colour.
+- `[VERIFY]` Full gate green after the change: lint 0 errors · typecheck clean ×2 · unit
+  11 files / 119 tests (the 11-test `store-rails` spec, RED first) · build 322.34 kB / 97.42 kB
+  gzip (CSS 35,782 bytes / 553 rules) · e2e 42/42 (30 pins + 12 axe scans; +2 rail pins) ·
+  smoke 45/45, zero console errors. The rails verified live on both the dev server and the
+  built artifact; mobile rails re-checked at 390×844 (no horizontal overflow — pinned).
+- `[CHORE]` README/AGENTS/CLAUDE/PAD/SKILL/DEPLOYMENT swept in lockstep (counts 10/108 →
+  11/119 unit, 40 → 42 e2e, 156 → 204 routes, 310.71 → 322.34 kB, CSS 33,720 → 35,782
+  bytes); the audit's stale PAD §11 row fixed (ErrorBoundary 51 → 67); the 18-shot
+  screenshot family re-captured (+18-desktop-store-rails.png); worklog Task 121.
 
 #### Revision Block — v1.7 (the session-8 a11y-tier + crash-recovery cycle)
 
@@ -396,8 +435,8 @@ No backend, no ORM, no auth, no payment provider, no external services at runtim
 
 **ADR-007: SEO posture — generated sitemap, honest hash-route caveat.**
 - **Context:** Hash routes collapse to one URL for crawlers (ADR-002 consequence).
-- **Decision:** `src/lib/sitemap.ts` enumerates the real route set (156 URLs at the
-  session-8 measurement) from the
+- **Decision:** `src/lib/sitemap.ts` enumerates the real route set (204 URLs at the
+  session-9 measurement — the session-9 store-rail info labels joined the derivation) from the
   live catalog and footer map (tested, never hand-maintained);
   `scripts/build-sitemap.mjs` regenerates `public/sitemap.xml` against
   `VITE_SITE_URL`; `robots.txt`, OG/Twitter meta and JSON-LD ship in the entry HTML.
@@ -487,7 +526,8 @@ apple-storefront-clone/
 │   ├── components/             ← GlobalNav (flyouts + mobile accordion menu), SearchPanel, Tile,
 │   │                             EntertainmentGallery, Footer, ProductArt (SVG art),
 │   │                             ProductCard, Ribbon, Icons, PageShell, ErrorBoundary
-│   │                             (page-level render guard), BagLineRow, BagSummary
+│   │                             (page-level render guard), BagLineRow, BagSummary,
+│   │                             StoreRails (the editorial rails + quick-links strip)
 │   ├── pages/                  ← HomePage, StorePage, ProductPage, BagPage, CheckoutPage,
 │   │                             ConfirmationPage, SearchPage, StaticPages (info/support/404)
 │   ├── context/BagContext.tsx  ← the ONE store (in-memory bag + last order)
@@ -495,14 +535,16 @@ apple-storefront-clone/
 │   │                             (useMediaQuery, usePrefersReducedMotion, useInView)
 │   ├── lib/                    ← THE SEAM: catalog, cart, router, money, checkout,
 │   │                             home-content, site-content (+flyoutSections), sitemap,
-│   │                             route-title (each with *.test.ts)
+│   │                             route-title, store-rails (the seven measured editorial
+│   │                             rails + quick-links strip), slug (each with *.test.ts
+│   │                             except the 9-line slug module)
 ├── tests/
 │   └── e2e/                    ← home.spec.ts, mobile-navigation.spec.ts, store-flow.spec.ts,
 │                                 smoke.mjs (the 45-assertion file:// battery)
 ├── scripts/
 │   └── build-sitemap.mjs       ← regenerates public/sitemap.xml + public/robots.txt from the seam
 ├── public/
-│   ├── sitemap.xml             ← 156 routes, generated (npm run sitemap)
+│   ├── sitemap.xml             ← 204 routes, generated (npm run sitemap)
 │   └── robots.txt              ← generated alongside the sitemap (same VITE_SITE_URL)
 ├── docs/                       ← reference-investigation.md (parity dossier), DEPLOYMENT.md,
 │                                 REMEDIATION_PLAN.md (this cycle's audits), screenshots/,
@@ -591,6 +633,11 @@ There is no database. The domain model is typed constants + in-memory state:
 - **Order** (`src/context/BagContext.tsx`): `placeOrder` snapshots the bag into
   `lastOrder` and clears it — the support page's order-status lookup reads that
   snapshot in-session.
+- **Store rails** (`src/lib/store-rails.ts`): the reference's seven measured editorial
+  rails + the quick-links strip as typed constants — 68 cards (eyebrow/label/desc,
+  catalog matches carrying `productId`, editorial cards carrying the measured
+  bg/fg theme) routed by the flyout `familyLink` rule; `RAIL_INFO_LABELS` feeds the
+  `INFO_TITLES` derivation so the sitemap's 204 routes stay derived from one source.
 
 Optional local PostgreSQL 17: installed for the repo family's standard environment
 (rootless via `docs/setup_pg_z.sh`, or `docker compose up -d`); connection
@@ -668,11 +715,11 @@ credentials.
 
 | Category | Files | Tests | Location | Framework |
 |---|---|---|---|---|
-| Unit (seam) | 9 | 104 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
+| Unit (seam) | 10 | 115 | `src/lib/*.test.ts` | Vitest 4 + jsdom |
 | Unit (component) | 1 | 4 | `src/components/ErrorBoundary.test.tsx` | Vitest 4 + jsdom (React `act`) |
 | E2E — desktop | 1 | 8 | `tests/e2e/home.spec.ts` | Playwright (1440×900) |
 | E2E — mobile nav | 1 | 11 | `tests/e2e/mobile-navigation.spec.ts` | Playwright (iPhone 13 viewport, touch) |
-| E2E — store flow | 1 | 9 | `tests/e2e/store-flow.spec.ts` | Playwright (1440×900) |
+| E2E — store flow | 1 | 11 | `tests/e2e/store-flow.spec.ts` | Playwright (1440×900) |
 | E2E — a11y scans | 1 | 12 | `tests/e2e/a11y.spec.ts` | Playwright + @axe-core/playwright (WCAG 2 A+AA) |
 | File:// smoke battery | 1 | 45 assertions | `tests/e2e/smoke.mjs` | Playwright library |
 
@@ -691,9 +738,9 @@ credentials.
 
 - [ ] `npm run lint` exit 0
 - [ ] `npm run typecheck` && `npm run typecheck:tests` clean
-- [ ] `npm run test` — 10 files / 108 tests
+- [ ] `npm run test` — 11 files / 119 tests
 - [ ] `npm run build` — single-file `dist/index.html`
-- [ ] `npm run test:e2e` — 40 passed (28 pins + 12 axe scans)
+- [ ] `npm run test:e2e` — 42 passed (30 pins + 12 axe scans)
 - [ ] `npm run test:smoke` — 45 assertions, zero console errors
 - [ ] Docs touched in the same commit; counts in lockstep
 
@@ -704,8 +751,8 @@ credentials.
 ### 8.1 Production Build
 
 `npm run build` → `vite build` with `react()`, `@tailwindcss/vite`, and
-`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 310.71 kB /
-93.74 kB gzip this cycle; CSS 33,720 bytes / 519 rules). No server bundle, no image
+`viteSingleFile()` → **one artifact: `dist/index.html`** (measured 322.34 kB /
+97.42 kB gzip this cycle; CSS 35,782 bytes / 553 rules). No server bundle, no image
 pipeline, no external requests.
 
 ### 8.2 Environment Variables
@@ -784,15 +831,19 @@ The full remediation history of this cycle: `docs/REMEDIATION_PLAN.md`.
 | `src/lib/catalog.ts` | 356 | The typed catalog: 8 categories, 12 products, option matrices, search |
 | `src/lib/cart.ts` | 103 | The bag reducer + price/line-key seam (`bagLineSummary`) |
 | `src/lib/checkout.ts` | 49 | Singapore checkout validation + order numbers |
-| `src/lib/sitemap.ts` | 75 | Route-set enumeration + sitemap.xml/robots.txt rendering (156 URLs) |
+| `src/lib/sitemap.ts` | 75 | Route-set enumeration + sitemap.xml/robots.txt rendering (204 URLs) |
 | `src/lib/site-content.ts` | 441 | Nav links, the per-category flyout content model, footer directory, info-page map |
 | `src/index.css` | 387 | Tailwind v4 tokens + all component CSS + source scoping |
 | `src/components/GlobalNav.tsx` | 253 | Desktop flyouts, mobile accordion menu, bag popover, search trigger |
 | `src/components/ProductArt.tsx` | 449 | The original SVG art library |
 | `src/components/EntertainmentGallery.tsx` | 153 | The TV+ gallery state machine (dwell, pause, keys) |
 | `src/components/BagLineRow.tsx` | 31 | The shared bag-line summary row (popover + checkout aside) |
-| `src/components/ErrorBoundary.tsx` | 51 | Page-level render guard: graceful fallback, nav/bag state survive |
+| `src/components/ErrorBoundary.tsx` | 67 | Page-level render guard: graceful fallback, nav/bag state survive; `resetKey` re-arm |
 | `src/components/BagSummary.tsx` | 25 | The shared Subtotal/Delivery/GST/Total ledger (bag page + checkout) |
+| `src/lib/store-rails.ts` | 253 | The store index's seven measured editorial rails + quick-links strip (the rail content model, `railCardHref`, `productPriceLabel`) |
+| `src/lib/slug.ts` | 9 | The one label→slug grammar (extracted session 9 to keep the module graph acyclic) |
+| `src/components/StoreRails.tsx` | 98 | The rail + quick-links rendering (measured card anatomy, theme-coloured editorial cards) |
+| `src/pages/StorePage.tsx` | 111 | Store index (h1 → quick links → chips → rails → "All products." grid) and category pages |
 | `src/App.tsx` | 98 | Route switch, navigation side-effects, the page-level ErrorBoundary |
 | `tests/e2e/mobile-navigation.spec.ts` | 148 | The mobile-menu contract (bar layout, accordion, the v4 display trap) |
 | `tests/e2e/smoke.mjs` | 131 | The exhaustive file:// parity battery (45 assertions) |

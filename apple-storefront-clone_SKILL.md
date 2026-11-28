@@ -8,12 +8,12 @@ description: >
   to it. Covers the architecture, design tokens, the Tailwind v4 trap log, the
   three-tier test suite, the build/SEO posture, and the hard lessons of the 2026-11
   remediation cycle.
-version: 1.7.0
+version: 1.8.0
 last_updated: 2026-11-28
 tags: [react, vite, tailwindcss-v4, typescript, spa, e-commerce-clone, e2e-testing, accessibility]
 ---
 
-# apple-storefront-clone — Engineering Skill (v1.7.0)
+# apple-storefront-clone — Engineering Skill (v1.8.0)
 
 > **What this is:** the distilled, codebase-verified engineering reference for
 > the remediated `apple-storefront-clone`. Every number below was measured in
@@ -48,8 +48,8 @@ entertainment/support pages. Philosophy:
 | TypeScript | 5.9.3 | `strict`, `noUnusedLocals/Parameters`, bundler resolution, `@/*` → `src/*` |
 | Vite | 7.3.7 | `react()` + `@tailwindcss/vite` + `viteSingleFile()`; dep scan pinned to `index.html` |
 | Tailwind CSS | 4.1.17 | CSS-first: `@theme` tokens in `src/index.css`; NO JS config; NO PostCSS config |
-| Vitest | 4.1.12 (jsdom 29.1.1) | 10 files / 108 tests (9 seam + 1 render-level component spec, 4 cases) |
-| Playwright | 1.65.1 | 40 e2e over the production build (28 pins + 12 axe-core a11y scans); Chromium only (WebKit unavailable in the sandbox) |
+| Vitest | 4.1.12 (jsdom 29.1.1) | 11 files / 119 tests (10 seam — incl. the store-rails spec — + 1 render-level component spec, 4 cases) |
+| Playwright | 1.65.1 | 42 e2e over the production build (30 pins + 12 axe-core a11y scans); Chromium only (WebKit unavailable in the sandbox) |
 | axe-core | @axe-core/playwright ^4.14.1 (devDep) | WCAG 2 A+AA scan tier (`tests/e2e/a11y.spec.ts`); nothing ships in the single-file artifact |
 | ESLint | 10.15.0 (typescript-eslint 8.74.0) | Flat config; `skills/**` and `docs/**` ignored |
 | (removed) | — | `clsx`/`tailwind-merge` and the dead `cn()` helper were dropped in session 3 (zero importers) |
@@ -115,7 +115,12 @@ per-row conditional mounting, bag popover, search trigger), `SearchPanel`
 (live overlay), `Tile`, `EntertainmentGallery` (153 lines — the TV+ state
 machine: timed dwell, pause, dot nav, arrow keys, swipe), `ProductArt`
 (449 lines — the original SVG art library), `Footer` (directory +
-accordion ≤734px), `PageShell`/`ProductCard`/`Ribbon`/`Icons`.
+accordion ≤734px), `PageShell`/`ProductCard`/`Ribbon`/`Icons`,
+`StoreRails` (98 lines — the store index's seven measured editorial rails:
+400×500 white product cards with 28px/600 names over `ProductArt`, 313×500
+accessory cards, theme-coloured editorial cards with the reference's measured
+bg/fg pairs, a 20px-gap snap scroller, 28px/600 burgundy `#810831` headers;
+plus the 5-label quick-links strip).
 
 **The overlay rule:** panels (`menu`/`search`/`bag`) MOUNT via React state —
 `{panel === "menu" ? <div id="mobile-menu" …/> : null}` — and the mobile
@@ -142,8 +147,12 @@ full footer directory + info-page map via `slugify`), `src/lib/home-content.ts`
 (hero/promo tile copy + footnotes), `src/lib/route-title.ts` (the tab-title
 seam — full-form store labels matching the h1), `src/lib/cart.ts`'s
 `bagLineSummary` (the bag-line summary grammar shared by the popover and the
-checkout aside). The sitemap seam (`src/lib/sitemap.ts`)
-enumerates 156 routes from exactly these sources — the route set can never
+checkout aside). The store-rails seam (`src/lib/store-rails.ts`) models the reference's seven
+measured store editorial rails + the quick-links strip (68 cards; catalog
+matches route to product pages with prices derived from THIS clone's catalog —
+deviation D10; every other card carries the reference's measured text routed
+to info pages). The sitemap seam (`src/lib/sitemap.ts`)
+enumerates 204 routes from exactly these sources — the route set can never
 drift from the catalog.
 
 ## §8 Accessibility Implementation
@@ -206,11 +215,11 @@ real screen readers (documented Unknown).
 
 ```bash
 npm run lint && npm run typecheck && npm run typecheck:tests   # 0 / clean / clean
-npm run test                       # 10 files / 108 tests
-npm run build                      # dist/index.html ~311 kB (CSS 33.7 kB)
-npm run test:e2e                   # 40/40 (28 pins + 12 axe scans)
+npm run test                       # 11 files / 119 tests
+npm run build                      # dist/index.html ~322 kB (CSS 35.8 kB)
+npm run test:e2e                   # 42/42 (30 pins + 12 axe scans)
 npm run test:smoke                 # 45 assertions, 0 console errors
-npm run sitemap                    # if routes changed: regenerate + re-check 156→N
+npm run sitemap                    # if routes changed: regenerate + re-check 204→N
 ```
 
 Plus: counts swept in README/PAD/SKILL; no `TODO`/placeholder text; docs and
@@ -234,7 +243,7 @@ code in the same commit; `git status` clean before the SSH-wrapper push.
    battery was ported into `@playwright/test` specs so the parity evidence
    lives in the gate, not in an optional script.
 6. **Generate what you can derive.** The sitemap seam derives the full route
-   set (156 URLs at the 2026-11-28 session-5 measurement) from the catalog + content
+   set (204 URLs at the 2026-11-28 session-9 measurement — the store rails' info labels joined the derivation) from the catalog + content
    seam; hand-maintained artifacts drift by construction. The flyout content
    model and the robots.txt renderer are derived by the same rule.
 7. **Extract a tab-title seam the moment two surfaces disagree about a label**
@@ -294,6 +303,20 @@ code in the same commit; `git status` clean before the SSH-wrapper push.
    "improve" past parity without a decision. Also: settle animations
    (ribbon 2.6 s) and pause auto-advancing carousels before scanning, or
    axe measures mid-flight states.
+16. **A measured content surface is a seam, and its prices must be honest**
+   (session 9): the reference's store editorial rails landed as one pure
+   content module (7 rails × header/subhead/cards) consumed by one
+   presentational component — same layering as the flyout model, so the
+   rails and the sitemap share one derivation (`RAIL_INFO_LABELS` →
+   `INFO_TITLES`). Two traps the cycle hit: (a) card prices that name a
+   catalog product must derive from THIS clone's catalog (deviation D10) —
+   a rail quoting the reference's "From S$1,899" beside a product page
+   saying S$1,799 is a functional lie, so the seam stores `productId` and
+   the price grammar ("From S$X" iff options exist) derives at render;
+   (b) a colour measured on one surface (the eyebrow's #424245 on the
+   reference's WHITE product cards) fails on another surface (the dark
+   editorial cards) — the axe tier caught it; themes must inherit, not
+   carry one hardcoded colour.
 
 ## §13 Pitfalls to Avoid
 
@@ -422,22 +445,26 @@ commits to `main`, docs lockstep, evidence labels, deferred-debt honesty).
 
 ## Appendix B — project_state (measured 2026-11-28, session 8)
 
-- Unit: **10 files / 108 tests** (9 seam files — cart (+ `bagLineSummary`),
+- Unit: **11 files / 119 tests** (10 seam files — cart (+ `bagLineSummary`),
   catalog, checkout, the per-category flyout content model, home tiles,
-  money, router (+ `hasBuyParam` + trailing-segment 404s), route-title, sitemap
+  money, router (+ `hasBuyParam` + trailing-segment 404s), route-title,
+  store-rails (11 tests: the seven measured rails' headers/subheads/cards,
+  `railCardHref`, `productPriceLabel`, the quick-links strip), sitemap
   + robots — plus the render-level component spec `ErrorBoundary.test.tsx`
   with 4 cases incl. the resetKey re-arm/re-latch pair)
-- E2e: **40 tests** (home 8, mobile-navigation 11, store-flow 9, a11y 12) over
+- E2e: **42 tests** (home 8, mobile-navigation 11, store-flow 11 — incl. the
+  session-9 editorial-rails and quick-links pins — a11y 12) over
   `vite preview --host 127.0.0.1:4173`; the a11y tier = `tests/e2e/a11y.spec.ts`
   (axe-core WCAG 2 A+AA: ten routes + mobile resting/menu-open states, two
   measured-reference exclusions documented in the spec header)
 - Smoke: **45 assertions**, `file://dist/index.html`, 0 console errors — the
   battery is now JSDoc-typed and covered by `typecheck:tests`
-- Sitemap: **156 routes / 131 info pages** generated from the seam; robots.txt
-  rendered by the same seam + generator (one `VITE_SITE_URL` stamps both; the
-  value resolves from the shell or a `.env` file via Vite `loadEnv`)
-- Build: `dist/index.html` **310.71 kB / 93.74 kB gzip**; CSS **33,720 bytes /
-  519 rules**; build time ~1.5 s
+- Sitemap: **204 routes / 179 info pages** generated from the seam (session 9:
+  the store rails' 48 info-routed labels joined the `INFO_TITLES` derivation);
+  robots.txt rendered by the same seam + generator (one `VITE_SITE_URL` stamps
+  both; the value resolves from the shell or a `.env` file via Vite `loadEnv`)
+- Build: `dist/index.html` **322.34 kB / 97.42 kB gzip**; CSS **35,782 bytes /
+  553 rules**; build time ~1.2 s
 - Gate: `npm run gate` — lint 0 errors · typecheck clean · tests green · build · e2e · smoke
 - A11y posture (session 8): the home page ships the sr-only `<h1>` the
   reference itself ships (`Apple (Singapore)` vs the reference's `Apple`);
@@ -456,6 +483,13 @@ commits to `main`, docs lockstep, evidence labels, deferred-debt honesty).
   order and full-form labels (+ AirTag chip; the leading All chip is the
   superset affordance); category h1s are full-form ("Shop Apple Watch"), and
   the tab title matches via the `route-title` seam (session-5)
+- Store index editorial rails (session-9): the reference's seven measured
+  rails render in the reference's order (h1 → quick-links strip → chip row →
+  rails) with the superset "All products." grid below; catalog-matched rail
+  cards route to product pages with clone-derived prices (deviation D10),
+  every other card carries the reference's measured text routed to info pages
+  (deviation D11); the eyebrow colour inherits the card theme on editorial
+  cards (the axe-tier fix)
 - Local PG 17 (optional): `postgresql://postgres:postgres@127.0.0.1:5432/app_db` — installed rootless, unused by the SPA
 - Mobile nav parity (sessions 5–8 re-measure at 390×844): bar geometry byte-equal
   (logo x=0 w=48, Search x=246, Bag x=294, Menu x=342); all 11 accordion rows

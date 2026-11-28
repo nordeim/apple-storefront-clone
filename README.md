@@ -19,9 +19,9 @@ Apple's proprietary assets were deliberately not copied or hot-linked.
 | Lint | `npm run lint` (ESLint 10 flat config — must exit 0) |
 | Typecheck (app) | `npm run typecheck` |
 | Typecheck (tests + configs) | `npm run typecheck:tests` |
-| Unit tests | `npm run test` (Vitest, jsdom — 10 files / 108 tests) |
+| Unit tests | `npm run test` (Vitest, jsdom — 11 files / 119 tests) |
 | Production build (single file → `dist/index.html`) | `npm run build` |
-| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 40 tests incl. 12 axe-core a11y scans) |
+| E2E suite (builds + serves `dist/` via `vite preview`) | `npm run test:e2e` (Playwright — 42 tests incl. 12 axe-core a11y scans) |
 | File-protocol smoke battery | `npm run test:smoke` (45 assertions over `dist/index.html`) |
 | Regenerate `public/sitemap.xml` | `npm run sitemap` |
 | Clean gate order | `npm run lint && npm run typecheck && npm run typecheck:tests && npm run test && npm run build && npm run test:e2e && npm run test:smoke` |
@@ -43,9 +43,9 @@ npm run dev          # → http://localhost:5173
 
 ```bash
 npm run typecheck    # clean, no output
-npm run test         # 10 files / 108 tests passed
-npm run build        # dist/index.html (~311 kB single file)
-npm run test:e2e     # 40 passed (28 pins + 12 axe a11y scans)
+npm run test         # 11 files / 119 tests passed
+npm run build        # dist/index.html (~322 kB single file)
+npm run test:e2e     # 42 passed (30 pins + 12 axe a11y scans)
 ```
 
 Node.js ≥ 20 (verified on Node 24); npm is the package manager and `package-lock.json` is the lockfile.
@@ -65,8 +65,14 @@ from the reference's CSS — `docs/reference-investigation.md` holds the measure
 deviations ledger. The mobile navigation matches the reference's measured bar layout (logo flush left;
 Search, Bag and the hamburger flush right) and its two-level accordion menu (every one of the 11 rows
 carries an expand button; expansions reveal the same flyout content the desktop shows). The store page
-carries the reference's measured chip row (full-form labels, iPhone before iPad, AirTag chip) and the
-category pages the reference's full-form h1 ("Shop Apple Watch").
+carries the reference's measured quick-links strip (Shop Gifts · Find a Store · AirPods · Apple
+Intelligence · Apple Trade In), the measured chip row (full-form labels, iPhone before iPad, AirTag
+chip) and the reference's seven measured editorial rails — "The latest." / "Personalisation." /
+"Holiday picks." / "Colourful finds." / "Home essentials." / "Only at Apple." / "Savings and
+offers." — as a horizontal-scroller card family (measured headers, subheads, eyebrows, labels,
+prices and card themes; catalog-matched cards route to the clone's product pages, everything else to
+generated info pages) with the clone's superset product grid below ("All products."). The category
+pages carry the reference's full-form h1 ("Shop Apple Watch").
 
 **Superset:** store with category filters and sorting, product pages with a configurator (options change
 price), an in-memory bag with a nav popover, GST-inclusive totals (9%), validated Singapore checkout
@@ -81,12 +87,15 @@ a render crash (and recovers on the next navigation), and an axe-core WCAG 2 A+A
 src/lib/        pure, tested logic: catalog, cart reducer, router (hash), money, checkout validation,
                 content + the flyout content model (per-category structures measured off the live
                 reference; feeds nav flyouts, the mobile accordion menu and the sitemap route
-                enumeration), sitemap route enumeration (feeds public/sitemap.xml)
+                enumeration), store-rails (the store index's seven measured editorial rails + the
+                quick-links strip; feeds the rail markup and the sitemap info routes),
+                sitemap route enumeration (feeds public/sitemap.xml)
 src/hooks/      useRoute (hashchange), media-query / in-view hooks
 src/context/    BagContext (in-memory only)
 src/components/ GlobalNav (desktop flyouts + mobile accordion menu), SearchPanel, Tile, EntertainmentGallery,
                 Footer, ProductArt (original SVG art), ErrorBoundary (page-level render guard),
-                BagLineRow + BagSummary (shared bag-line/summary rows)
+                BagLineRow + BagSummary (shared bag-line/summary rows),
+                StoreRails + StoreQuickLinks (the store index's measured editorial rails)
 src/pages/      one file per route
 tests/e2e/      Playwright suite (home, mobile-navigation, store-flow) + the file:// smoke battery
 scripts/        build-sitemap.mjs (generates public/sitemap.xml from the tested seam)
@@ -114,7 +123,7 @@ The app reads **no** environment variables. One optional variable drives the sit
 
 ## SEO
 
-`public/sitemap.xml` (156 routes) is generated from the tested `src/lib/sitemap.ts` seam — never a
+`public/sitemap.xml` (204 routes) is generated from the tested `src/lib/sitemap.ts` seam — never a
 hand-maintained list. `public/robots.txt` and `index.html` (OG/Twitter meta, JSON-LD WebSite+Organization)
 are part of the same deliverable — one `VITE_SITE_URL` value stamps both the sitemap's base and the
 robots.txt `Sitemap:` directive. Honest limitation: hash routing means search engines collapse every
