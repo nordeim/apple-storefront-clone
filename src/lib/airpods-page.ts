@@ -35,7 +35,9 @@ export interface AirPodsHero {
   headlineSize: "display" | "chapter";
   theme: "dark" | "light";
   tagline: string;
-  price: string;
+  /** Measured price for info-routed heroes; derived at render when productId is
+   * set (D10 — the compare column's rule, applied to the hero, session-12 S12-2). */
+  price?: string;
   learnHref: string;
   buyHref: string;
   /** Set when the hero names one of this clone's catalog products (D12). */
@@ -89,7 +91,6 @@ export const AIRPODS_HEROES: readonly AirPodsHero[] = [
     headlineSize: "display",
     theme: "light",
     tagline: "The world\u2019s best in-ear Active Noise Cancellation.",
-    price: "S$349",
     learnHref: routeHref.product("airpods-pro-3"),
     buyHref: routeHref.productBuy("airpods-pro-3"),
     productId: "airpods-pro-3",
@@ -184,14 +185,22 @@ export const AIRPODS_MUSIC: { label: string; desc: string; href: string } = {
 
 /** Every info-routed label on the page — feeds the INFO_TITLES derivation so
  * the sitemap's info routes and this page's content can never drift apart
- * (labels are the source of truth; hrefs derive through the one slug grammar). */
+ * (labels are the source of truth; hrefs derive through the one slug grammar).
+ * The set-equality spec pins this list against the models' info hrefs — the
+ * session-12 S12-1 guard (a dropped label is a test failure, never a silent
+ * dead route). */
 const INFO_LABELS: readonly string[] = [
+  // the chapternav's info-routed destinations (AirPods → "AirPods 5",
+  // Compare → "Compare AirPods"; Pro routes to the product page and
+  // Accessories to the store — neither seeds an info route)
   "AirPods 5",
   "AirPods Max 2",
   "Compare AirPods",
   "Apple Music",
+  // the heroes' info-routed CTAs (the Pro 3 hero routes to the product)
   "Shop AirPods 5",
   "Shop AirPods Max 2",
+  // the compare module's info-routed columns (the Pro 3 column is productId)
   "AirPods 5 Wireless Charging Case",
 ];
 

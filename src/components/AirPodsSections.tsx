@@ -30,6 +30,10 @@ export const AirPodsChapterNav = memo(function AirPodsChapterNav() {
 
 const Hero = memo(function Hero({ hero }: { hero: AirPodsHero }) {
   const dark = hero.theme === "dark";
+  // D10 (S12-2): a hero that names a catalog product derives its price from
+  // the catalog at render — the compare column's rule, applied to the hero.
+  const product = hero.productId ? getProduct(hero.productId) : undefined;
+  const price = product ? productPriceLabel(product) : hero.price;
   return (
     <section
       aria-labelledby={heroId(hero.headline)}
@@ -40,7 +44,7 @@ const Hero = memo(function Hero({ hero }: { hero: AirPodsHero }) {
           {hero.headline}
         </h2>
         <p className="airpods-hero-tagline m-0">{hero.tagline}</p>
-        <p className="airpods-hero-price m-0">{hero.price}</p>
+        {price && <p className="airpods-hero-price m-0">{price}</p>}
         <div className="airpods-hero-ctas flex flex-wrap items-center gap-4">
           <a href={hero.learnHref} className="link-cta">
             Learn more

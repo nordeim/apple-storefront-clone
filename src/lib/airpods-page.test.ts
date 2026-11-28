@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getProduct } from "./catalog";
 import { parseHash } from "./router";
+import { productPriceLabel } from "./store-rails";
 import {
   AIRPODS_CHAPTERNAV,
   AIRPODS_COMPARE,
@@ -50,9 +51,15 @@ describe("AIRPODS_* (the reference's measured /sg/airpods/ marketing page)", () 
       headlineSize: "display",
       theme: "light",
       tagline: "The world\u2019s best in-ear Active Noise Cancellation.",
-      price: "S$349",
       productId: "airpods-pro-3",
     });
+    // D10 (session-12 S12-2): a hero that names a catalog product carries NO
+    // measured price — the component derives it from the catalog at render
+    // (the compare column's rule, applied to the hero; the measured "S$349"
+    // string is carried only by info-routed heroes)
+    expect(pro.price).toBeUndefined();
+    const proProduct = getProduct(pro.productId ?? "");
+    expect(proProduct && productPriceLabel(proProduct)).toBe("S$349");
     expect(max).toMatchObject({
       headline: "AirPods Max 2",
       headlineSize: "chapter",
@@ -134,5 +141,18 @@ describe("AIRPODS_* (the reference's measured /sg/airpods/ marketing page)", () 
     }
     const hrefs = new Set(AIRPODS_INFO_LABELS.map((l) => l.href));
     expect(hrefs.size).toBe(AIRPODS_INFO_LABELS.length);
+    // S12-1 (the session-12 M-1): set-equality with the info hrefs the page
+    // actually renders — the export cannot drift from the content models
+    // (the accessories seam's guard, applied here; a label used in a href but
+    // missing from the export would render a silently-404ing link)
+    const pageHrefs = new Set(
+      [
+        ...AIRPODS_CHAPTERNAV.map((l) => l.href),
+        ...AIRPODS_HEROES.flatMap((h) => [h.learnHref, h.buyHref]),
+        ...AIRPODS_COMPARE.columns.flatMap((c) => [c.learnHref, c.buyHref]),
+        AIRPODS_MUSIC.href,
+      ].filter((href): href is string => !!href && href.startsWith("#/info/")),
+    );
+    expect(new Set(AIRPODS_INFO_LABELS.map((l) => l.href))).toEqual(pageHrefs);
   });
 });
