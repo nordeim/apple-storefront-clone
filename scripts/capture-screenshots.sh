@@ -104,6 +104,22 @@ sleep 1
 agent-browser screenshot "$OUT/24-desktop-accessories-curated.png" >/dev/null 2>&1
 echo "captured 24-desktop-accessories-curated"
 
+# 25 — the session-12 per-category Mac accessories grid (h1 + chips + gallery)
+agent-browser open "$BASE/#/store/mac/accessories" >/dev/null 2>&1
+agent-browser set viewport 1440 900 >/dev/null 2>&1
+sleep 2
+agent-browser screenshot "$OUT/25-desktop-mac-accessories.png" >/dev/null 2>&1
+echo "captured 25-desktop-mac-accessories"
+
+# 26 — the session-12 iPhone accessories curated grid close-up (the 5-tab family)
+agent-browser open "$BASE/#/store/iphone/accessories" >/dev/null 2>&1
+agent-browser set viewport 1440 900 >/dev/null 2>&1
+sleep 2
+agent-browser eval "document.querySelector('.accessories-curated').scrollIntoView({ block: 'start' }); 'scrolled'" >/dev/null 2>&1
+sleep 1
+agent-browser screenshot "$OUT/26-desktop-iphone-accessories-curated.png" >/dev/null 2>&1
+echo "captured 26-desktop-iphone-accessories-curated"
+
 capture_mobile 07-mobile-home ""
 capture_mobile 09-mobile-store "#/store"
 capture_mobile 10-mobile-product "#/product/iphone-18-pro"

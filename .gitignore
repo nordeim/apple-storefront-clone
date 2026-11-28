@@ -7,3 +7,5 @@ dist
 !.env.example
 playwright-report
 test-results
+# session scratch areas (live-capture JSON + converters — never shipped)
+.scratch
