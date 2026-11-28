@@ -88,7 +88,6 @@ export function Tile({ spec, tier }: { spec: TileSpec; tier: Tier }) {
           type="button"
           className="tile-play"
           aria-label={playing ? "Pause Holiday 2026 animation" : "Play Holiday 2026 animation"}
-          aria-pressed={!playing}
           onClick={() => setUserPlaying(!playing)}
         >
           {playing ? <PauseIcon /> : <PlayIcon />}

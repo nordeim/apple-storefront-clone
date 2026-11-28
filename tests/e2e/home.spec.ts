@@ -113,7 +113,11 @@ test.describe("home (desktop)", () => {
   test("holiday tile play/pause toggles animation state", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => window.scrollTo(0, 0));
-    await page.getByRole("button", { name: "Pause Holiday 2026 animation" }).click();
+    const playButton = page.getByRole("button", { name: "Pause Holiday 2026 animation" });
+    // The flipping label is the state channel (the gallery's play/pause pattern);
+    // a toggle-button pressed state would read as a contradictory second channel.
+    await expect(playButton).not.toHaveAttribute("aria-pressed");
+    await playButton.click();
     await expect(page.locator("[data-tile-id=holiday-2026]")).toHaveAttribute("data-playing", "false");
   });
 
