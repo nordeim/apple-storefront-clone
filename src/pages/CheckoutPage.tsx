@@ -4,7 +4,7 @@ import { PageShell, PageTitle } from "@/components/PageShell";
 import { useBag } from "@/context/BagContext";
 import { validateCheckout, generateOrderNumber, type CheckoutErrors, type CheckoutField, type CheckoutForm } from "@/lib/checkout";
 import { routeHref } from "@/lib/router";
-import { BagSummary } from "./BagPage";
+import { BagSummary } from "@/components/BagSummary";
 
 const EMPTY: CheckoutForm = { fullName: "", email: "", phone: "", address: "", postalCode: "" };
 
