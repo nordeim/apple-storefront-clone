@@ -42,6 +42,20 @@ describe("parseHash", () => {
     expect(parseHash("#/info/..%2F..")).toEqual({ name: "not-found" });
   });
 
+  it("accepts info slugs up to 130 chars and rejects longer ones (S10-1: the measured rail labels slugify to 126)", () => {
+    // The longest measured rail label slugifies to 70 chars (store rails) and
+    // the longest category-shelf label to 126 (the APPLECARE+ card) — both
+    // must be routeable. 130 is the boundary; 131 must 404 (the grammar stays
+    // bounded).
+    const slug70 = "beats-360-over-ear-headphones-pink-with-pink-performance-knit-cushions";
+    expect(slug70).toHaveLength(70);
+    expect(parseHash(`#/info/${slug70}`)).toEqual({ name: "info", slug: slug70 });
+    const slug126 = "b".repeat(126);
+    expect(parseHash(`#/info/${slug126}`)).toEqual({ name: "info", slug: slug126 });
+    const slug131 = "a".repeat(131);
+    expect(parseHash(`#/info/${slug131}`)).toEqual({ name: "not-found" });
+  });
+
   it("rejects trailing segments on the argless heads (uniform 404 grammar)", () => {
     // bag/checkout already 404 these; search/entertainment/support must not
     // silently truncate a trailing segment into a valid route.

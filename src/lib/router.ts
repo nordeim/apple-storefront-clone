@@ -15,7 +15,11 @@ export type Route =
 
 const NOT_FOUND: Route = { name: "not-found" };
 export const ORDER_NO = /^EL-[A-Z0-9]{8}$/;
-const SLUG = /^[a-z0-9-]{1,60}$/;
+// Cap 60 → 130 (session-10, S10-1): measured rail/category labels slugify to
+// as long as 126 chars and 404'd under the 60 cap — silent dead links the
+// href-shape specs could not see. 130 keeps the grammar bounded with headroom
+// over the longest measured label; the round-trip specs guard the boundary.
+const SLUG = /^[a-z0-9-]{1,130}$/;
 
 function safeDecode(raw: string): string | undefined {
   try {

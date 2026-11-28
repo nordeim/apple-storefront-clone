@@ -6,9 +6,26 @@ import {
   railCardHref,
 } from "./store-rails";
 import { PRODUCTS, getProduct } from "./catalog";
+import { parseHash } from "./router";
 
 /** The hash-route grammar every rail card href must satisfy — routeHref factories only. */
 const ROUTE_RE = /^#\/(product\/[a-z0-9-]+|info\/[a-z0-9-]+|store(\/[a-z0-9-]+)?|entertainment|support)$/;
+
+describe("generated hrefs round-trip the router (the S10-1 drift guard)", () => {
+  it("parses every rail and quick-link href to a real route — never not-found", () => {
+    // Session-10 audit M-1: the href-shape regex alone let 9 over-long slugs
+    // ship (the router's 60-char cap 404'd them). Every generated href must
+    // survive parseHash — content, sitemap and router can never drift again.
+    const hrefs = [
+      ...STORE_RAILS.flatMap((rail) => rail.cards.map((card) => card.href)),
+      ...STORE_QUICK_LINKS.map((l) => l.href),
+    ];
+    expect(hrefs.length).toBeGreaterThan(60);
+    for (const href of hrefs) {
+      expect(parseHash(href).name).not.toBe("not-found");
+    }
+  });
+});
 
 describe("STORE_RAILS (the reference's measured store editorial rails)", () => {
   it("carries the seven measured rail headers and subheads, in order", () => {
