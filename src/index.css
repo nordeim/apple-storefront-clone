@@ -381,6 +381,40 @@ body {
   .footer-directory { display: block; padding: 8px 0 0; }
 }
 
+
+/* ---------- Store editorial rails (session-9; measured off /sg/store) ---------- */
+.store-rails { display: flex; flex-direction: column; gap: 119px; margin: 64px 0 0; }
+.store-rail { margin: 0; }
+.store-rail-header { font: 600 28px/1.1 var(--font-display); letter-spacing: -0.012em; margin: 0 0 24px; }
+.rail-scroller { display: flex; gap: 20px; list-style: none; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 0 8px; scrollbar-width: none; }
+.rail-scroller::-webkit-scrollbar { display: none; }
+.rail-card, .rail-card-accessory { position: relative; flex: 0 0 auto; border-radius: 18px; overflow: hidden; scroll-snap-align: start; }
+.rail-card { width: 400px; height: 500px; background: #fff; }
+.rail-card-accessory { width: 313px; height: 500px; background: #fff; }
+.rail-card-art { position: absolute; inset: 0; }
+.rail-card-art svg { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); height: 88%; width: auto; aspect-ratio: 1000 / 700; }
+.rail-card-art-neutral { position: absolute; inset: 0; }
+.rail-card-info { position: absolute; top: 0; left: 0; right: 0; padding: 28px; z-index: 2; }
+.rail-card-info-on-art { background: linear-gradient(to bottom, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.65) 55%, transparent 100%); }
+.rail-card-eyebrow { font: 600 12px/1.2 var(--font-text); letter-spacing: -0.01em; color: #424245; margin: 0 0 6px; }
+.rail-card-editorial .rail-card-eyebrow { color: inherit; }
+.rail-card-name { font: 600 28px/1.07 var(--font-display); letter-spacing: -0.012em; color: inherit; margin: 0 0 8px; }
+.rail-card-name-accessory { font-size: 17px; line-height: 1.2; font-family: var(--font-text); }
+.rail-card-desc { font: 400 17px/1.24 var(--font-text); color: inherit; margin: 0; }
+.rail-card-chevron { position: absolute; right: 16px; bottom: 16px; z-index: 2; color: var(--color-ink); }
+.rail-card a { color: inherit; }
+.store-quick-links { padding: 20px 0 0; }
+@media (max-width: 734px) {
+  .store-rails { gap: 64px; margin-top: 40px; }
+  .store-rail-header { font-size: 21px; }
+  .rail-card { width: 300px; height: 375px; }
+  .rail-card-accessory { width: 235px; height: 375px; }
+  .rail-card-info { padding: 20px; }
+  .rail-card-name { font-size: 21px; }
+  .rail-card-name-accessory { font-size: 14px; }
+  .rail-card-desc { font-size: 14px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; transition-delay: 0ms !important; scroll-behavior: auto !important; }
 }

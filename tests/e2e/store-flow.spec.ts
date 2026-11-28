@@ -105,6 +105,46 @@ test.describe("store flow (desktop)", () => {
     await expect(page).toHaveTitle("Store - Apple (Singapore)");
   });
 
+  test("store index renders the seven measured editorial rails in order", async ({ page }) => {
+    // Session-9 parity surface: the reference's /sg/store body is seven
+    // editorial rails; the clone's superset product grid follows below.
+    await page.goto("/#/store");
+    const headers = page.locator(".store-rail-header");
+    await expect(headers).toHaveCount(7);
+    await expect(headers.first()).toHaveText(/The latest\. Wonderful and colourful choices\./);
+    await expect(headers.nth(1)).toHaveText(/Personalisation\. Leave a lasting impression\./);
+    await expect(headers.nth(2)).toHaveText(/Holiday picks\. Get them all decked out\./);
+    await expect(headers.nth(3)).toHaveText(/Colourful finds\. Delight up the holiday season\./);
+    await expect(headers.nth(4)).toHaveText(/Home essentials\. More room to amaze\./);
+    await expect(headers.nth(5)).toHaveText(/Only at Apple\. The total package\./);
+    await expect(headers.nth(6)).toHaveText(/Savings and offers\. Exclusive deals, special stores and more\./);
+    // "The latest." carries the reference's twelve measured product cards.
+    const latestCards = page.locator(".rail-scroller").first().locator("li");
+    await expect(latestCards).toHaveCount(12);
+    // A catalog-matched rail card navigates to the clone's product page.
+    const iPhoneCard = latestCards.filter({ hasText: "iPhone 18 Pro" }).first();
+    await expect(iPhoneCard.locator("a")).toHaveAttribute("href", "#/product/iphone-18-pro");
+    await iPhoneCard.locator("a").click();
+    await expect(page).toHaveURL(/#\/product\/iphone-18-pro$/);
+    await expect(page.getByRole("heading", { level: 1, name: "iPhone 18 Pro" })).toBeVisible();
+  });
+
+  test("store quick-links strip renders between the h1 and the chip row", async ({ page }) => {
+    // The reference's measured store-page order: h1 → quick links → chips.
+    await page.goto("/#/store");
+    const strip = page.locator(".store-quick-links");
+    await expect(strip).toBeVisible();
+    await expect(strip.getByRole("link")).toHaveCount(5);
+    for (const label of ["Shop Gifts", "Find a Store", "AirPods", "Apple Intelligence", "Apple Trade In"]) {
+      await expect(strip.getByRole("link", { name: label })).toBeVisible();
+    }
+    // The AirPods quick link routes to the clone's category page.
+    await expect(strip.getByRole("link", { name: "AirPods" })).toHaveAttribute("href", "#/store/airpods");
+    // The superset grid section follows the rails (the working store below
+    // the parity surface).
+    await expect(page.getByRole("heading", { name: "All products." })).toBeVisible();
+  });
+
   test("in-app Buy CTA keeps the configurator heading focused", async ({ page }) => {
     // In-app navigation into ?buy (not a fresh load): the Configurator's
     // heading must own focus — the shell's <main> focus reset must not

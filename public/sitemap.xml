@@ -16,6 +16,26 @@
     <changefreq>weekly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/40mm-burgundy-sport-band-m-l-new</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/42mm-chambray-blue-sport-loop-new</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/46mm-magenta-sport-loop-new</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/49mm-burgundy-trail-loop-m-l-black-titanium-finish-new</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/accessibility</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
@@ -31,7 +51,17 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/airpods-5-new</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/airpods-max-2</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/airpods-max-2-orange-free-engraving</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -42,6 +72,11 @@
   </url>
   <url>
     <loc>http://localhost:5173/#/info/airtag</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/airtag-finewoven-key-ring-dark-olive-new</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -102,6 +137,11 @@
   </url>
   <url>
     <loc>http://localhost:5173/#/info/apple-fitness</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/apple-intelligence</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -236,7 +276,27 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/backbone-one-mobile-gaming-controller-usb-c-2nd-generation</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/beats</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/beats-360-over-ear-headphones-pink-with-pink-performance-knit-cushions</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/belkin-boostcharge-pro-power-bank-10k-with-apple-watch-charger</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/belkin-ultracharge-pro-20k-power-bank-with-integrated-cable</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -316,6 +376,11 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/customise-their-mac</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/displays</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
@@ -341,6 +406,11 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/everything-s-better-together</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/explore-support</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
@@ -356,12 +426,47 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/find-gifts-with-an-apple-specialist-in-a-store-or-online</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/free-extended-returns-between-now-and-8-1-2027</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/genius-bar</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/get-3-months-of-apple-arcade-free</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/get-3-months-of-apple-music-free</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/get-3-months-of-apple-tv-free-when-you-buy-an-eligible-apple-device</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/get-applecare</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/get-expert-service-and-support-at-the-genius-bar</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/get-gifts-in-time-for-the-holidays-with-free-delivery-or-easy-pickup</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -372,6 +477,11 @@
   </url>
   <url>
     <loc>http://localhost:5173/#/info/hearing-health</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/herschel-cloudform-sleeve-for-14-macbook-online-only</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -392,6 +502,16 @@
   </url>
   <url>
     <loc>http://localhost:5173/#/info/homepod-mini-2</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/homepod-mini-2-green-new</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/homepod-white</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -461,6 +581,16 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/iphone-18-pro-max-silicone-case-with-magsafe-magenta-new</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/iphone-18-pro-techwoven-case-with-magsafe-burgundy-new</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/iphone-air</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
@@ -476,12 +606,27 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/it-s-your-thought-that-counts</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/join-the-fun-at-apple-camp</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/keyboards</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>http://localhost:5173/#/info/legal</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/lots-of-bright-ideas</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -526,7 +671,27 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/make-their-joy-full</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/manage-your-apple-account</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/moft-snap-field-magsafe-wallet-stand-only-at-apple</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/mophie-frost-case-with-kickstand-for-iphone-18-pro-only-at-apple</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/mophie-knit-air-folio-case-for-11-inch-ipad-air-only-at-apple</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -546,7 +711,17 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/pay-in-full-or-pay-over-time-your-choice</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/personal-setup</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/powerbeats-pro-2-high-performance-earbuds-quick-sand</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -561,12 +736,42 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/put-your-bow-on-it</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/rains-14-utility-sleeve-for-macbook-and-ipad-only-at-apple</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/repair</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>http://localhost:5173/#/info/sales-and-refunds</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/save-on-a-new-mac-ipad-and-apple-watch-with-education-pricing</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/see-how-one-app-can-control-your-entire-home</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/set-up-your-new-device-with-help-from-a-specialist</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/shiftcam-snappocket-light-2-magnetic-led-ring-light-new</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -596,7 +801,17 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/shop-refurbished-apple-products-backed-by-a-one-year-warranty</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/shopping-help</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/simple-solutions-for-all-the-ways-you-work</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -607,6 +822,16 @@
   </url>
   <url>
     <loc>http://localhost:5173/#/info/site-map</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/smart-folio-for-ipad-mini-a20-pro-taupe-new</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/style-an-apple-watch-just-for-them</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -631,12 +856,27 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>http://localhost:5173/#/info/tech21-flexfolio-case-for-11-ipad-pro-only-at-apple</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/tech21-flexpulse-fauxven-art-case-for-iphone-17-magsafe-compatible</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>http://localhost:5173/#/info/terms-of-use</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>http://localhost:5173/#/info/today-at-apple</loc>
+    <priority>0.3</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>http://localhost:5173/#/info/trade-in-your-device-get-credit-towards-a-new-one</loc>
     <priority>0.3</priority>
     <changefreq>monthly</changefreq>
   </url>

@@ -69,3 +69,11 @@ export function PauseIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function ChevronRightIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 36 36" width={36} height={36} {...base} strokeWidth={1.5} {...props}>
+      <path d="M14 10l8 8-8 8" />
+    </svg>
+  );
+}

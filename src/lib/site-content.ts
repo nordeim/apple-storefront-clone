@@ -1,5 +1,9 @@
 import { CATEGORIES, PRODUCTS, type CategoryId } from "./catalog";
 import { routeHref } from "./router";
+import { RAIL_INFO_LABELS } from "./store-rails";
+import { slugify } from "./slug";
+
+export { slugify } from "./slug";
 
 export interface NavLinkSpec {
   id: string;
@@ -337,13 +341,6 @@ export function flyoutSections(link: NavLinkSpec): FlyoutSection[] {
   ];
 }
 
-export function slugify(label: string): string {
-  return label
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
 export interface FooterLink {
   label: string;
   href: string;
@@ -431,7 +428,7 @@ const FLYOUT_MODEL_INFO_LINKS: readonly FlyoutLink[] = NAV_LINKS.flatMap((link) 
 );
 
 export const INFO_TITLES: ReadonlyMap<string, string> = new Map([
-  ...[...FOOTER_GROUPS.flat().flatMap((s) => s.links), ...LEGAL_LINKS, ...FLYOUT_MODEL_INFO_LINKS]
+  ...[...FOOTER_GROUPS.flat().flatMap((s) => s.links), ...LEGAL_LINKS, ...FLYOUT_MODEL_INFO_LINKS, ...RAIL_INFO_LABELS]
     .filter(isInfoRouted)
     .map((l) => [slugify(l.label), l.label] as const),
   ["singapore", "Singapore"] as const,
